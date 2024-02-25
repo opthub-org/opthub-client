@@ -1,28 +1,26 @@
 import click
-import logging
-import json
-import time
 from InquirerPy.validator import PathValidator
 from InquirerPy import prompt
 from pathlib import Path
 from opthub_client.util import SolutionValidator
+from opthub_client.model import create_sol
 
-_logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+current_comp = "League A"
+current_match = "Match 1"
 
 @click.command()
 @click.option(
     "-c",
     "--competition",
     type=str,
-    default="current League A",
+    default=current_comp,
     help="Competition ID. default current competition",
 )
 @click.option(
     "-m",
     "--match",
     type=str,
-    default="current Match 1",
+    default=current_match,
     help="Match ID. default current match",
 )
 @click.option(
@@ -47,34 +45,23 @@ def submit(competition, match, file):
                 ]
         answers = prompt(questions)
         click.echo(answers)
+        create_sol()
+        click.echo("...Submitted.")
 def submit_file(competition, match):
-    _logger.debug("submit(%s)", {'competition': competition, 'match': match})
     questions = [
     {
         "type": "filepath",
         "message": "Submit the solution file (must be a JSON file):",
         "name": "location",
-        "default": str(Path('/tmp')),
+        "default": str(Path('~/')),
         "validate": PathValidator(is_file=True, message="Input is not a file"),
         "only_files": True,
     },
     ]
-
     result = prompt(questions)
     file_path = Path(result['location']).expanduser()
     click.echo(f"Submitting {result} for Competition: {competition}, Match: {match}...")
-    if file_path.suffix == ".json":
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-                click.echo(click.style(f"Contents of the JSON file: {json.dumps(data, indent=2)}",fg="black",bg="white"))
-        except Exception as e:
-            click.echo(click.style(f"Failed to read JSON file: {e}",bg="red"))
-    else:
-        click.echo(click.style("The submitted file is not a JSON file.",bg="red"))
-        return
-    
-    time.sleep(1)
+    create_sol(file_path)
     click.echo("...Submitted.")
     
 if __name__ == '__main__':

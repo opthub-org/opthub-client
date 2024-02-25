@@ -1,37 +1,27 @@
 import click
 from prompt_toolkit.validation import Validator, ValidationError
 import re
-def show_solutions(solutions):
-    solutions_str = print_json_lines(solutions)
+
+def display_trials(trials, show_label=False):
+    """Display a batch of solutions, optionally showing a label."""
+    if show_label:
+        click.echo("solutions:") 
+    solutions_str = print_lines(trials)
     click.echo(solutions_str.rstrip())
 
-def print_json_lines(data, indent=0):
+def print_lines(trials):
     lines = ""
-    if isinstance(data, list):
-        for item in data:
-            if isinstance(item, dict):
-                lines += print_json_lines(item, indent + 1)
-            else:
-                lines +=  " "+str(data) + "\n"
-                return lines
-    elif isinstance(data, dict):
-        for key, value in data.items():
-            prefix = "  " * indent
-            if isinstance(value, dict) or isinstance(value, list):
-                lines += f"{prefix}{key}:" + print_json_lines(value, indent + 1)
-            else:
-                lines += f"{prefix}{key}: {value}\n"
+    for trial in trials:
+        lines += "Trial No: " + str(trial.solution.trial_no) + "\n"
+        lines += "Solution: " + str(trial.solution.var) + "\n"
+        lines += "Evaluation: " + str(trial.evaluation.obj) + "\n"
+        lines += "Score: " + str(trial.score.score) + "\n"
     return lines
 
-    
 
 class SolutionValidator(Validator):
     def validate(self, document):
-        # if len(document.text) > 50:
-        #     raise ValidationError(
-        #         message='Too long.',
-        #         cursor_position=len(document.text))
-        pattern = r'^\[\d+(\s*,\d+)*\s*\]$'
+        pattern = r'^\[(\d|\d+\.\d+)+(\s*,\s*(\d|\d+\.\d+)+)*\s*\]$'
         if not re.match(pattern, document.text):
             raise ValidationError(
                 message="Invalid format. Please enter in the format [number,number,...,number].",

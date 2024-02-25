@@ -1,6 +1,6 @@
 import click
 from opthub_client.history import history
-from opthub_client.select_prompt import select_prompt
+from opthub_client.select import select
 from opthub_client.submit import submit
 
 @click.group(help="OptHub CLI client.")
@@ -10,7 +10,7 @@ def help():
     pass
 
 help.add_command(history)
-help.add_command(select_prompt)
+help.add_command(select)
 help.add_command(submit)
 
 if __name__ == '__main__':
