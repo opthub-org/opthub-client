@@ -1,7 +1,11 @@
 import click
 from InquirerPy import prompt
 from opthub_client.model import fetch_competitions
+from opthub_client.file_io import FileHandler
+from opthub_client.opt import opt
+
 import datetime
+
 custom_style = {
     "question": "fg:#ffff00 bold",  # question text style
     "answer": "fg:#f44336 bold",  # answer text style
@@ -17,11 +21,12 @@ all_comps = fetch_competitions(datetime.datetime.now())
 
 # competitions names for choices
 comp_names = [comp.name for comp in all_comps]
-
+@opt.command(help="Submit a solution.")
 @click.command()
-@click.option("-c", "--comp", type=str, help="Competition ID.")
+@click.option("-c", "--competition", type=str, help="Competition ID.")
 @click.option("-m", "--match", type=str, help="Match ID.")
-def select(comp, match):
+@click.pass_context
+def select(ctx,**kwargs):
     """Select a competition and match."""
     comp_questions = [
     {
@@ -31,7 +36,7 @@ def select(comp, match):
         "choices": comp_names,
     }, ]
     # if not set -c commands option
-    if comp not in comp_names:
+    if kwargs["competition"] not in comp_names:
         comp_result = prompt(questions=comp_questions,style=custom_style)
         comp = comp_result["competition"]    
     selected_comp = next((competition for competition in all_comps if competition.get_name() == comp), None)
@@ -44,11 +49,11 @@ def select(comp, match):
         "choices": match_names,
     }, ]
     # if not set -m commands option 
-    if match not in match_names:
+    if kwargs["match"] not in match_names:
         match_result = prompt(questions=match_questions,style=custom_style)
         match = match_result["match"]
     # show selected competition and match
+    data = f"{comp} - {match}"
     click.echo(f"You have selected {comp} - {match}")
-
-if __name__ == '__main__':
-    select()
+    file_handler = FileHandler() 
+    file_handler.write(data)  

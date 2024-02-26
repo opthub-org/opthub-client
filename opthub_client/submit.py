@@ -4,11 +4,22 @@ from InquirerPy import prompt
 from pathlib import Path
 from opthub_client.util import SolutionValidator
 from opthub_client.model import create_sol
+from opthub_client.file_io import FileHandler
 
-current_comp = "League A"
-current_match = "Match 1"
+file = FileHandler()
+
+current_comp = file.read().split(" - ")[0]
+current_match = file.read().split(" - ")[1]
 
 @click.command()
+@click.option(
+    "-u",
+    "--url",
+    envvar="OPTHUB_URL",
+    type=str,
+    default="http://192.168.1.174:20002",
+    help="OptHub URL.",
+)
 @click.option(
     "-c",
     "--competition",
@@ -47,7 +58,7 @@ def submit(competition, match, file):
         click.echo(answers)
         create_sol()
         click.echo("...Submitted.")
-def submit_file(competition, match):
+def submit_file(ctx,**kwargs):
     questions = [
     {
         "type": "filepath",
@@ -60,7 +71,7 @@ def submit_file(competition, match):
     ]
     result = prompt(questions)
     file_path = Path(result['location']).expanduser()
-    click.echo(f"Submitting {result} for Competition: {competition}, Match: {match}...")
+    click.echo(f"Submitting {result} for Competition: {ctx["competition"]}, Match: {ctx["match"]}...")
     create_sol(file_path)
     click.echo("...Submitted.")
     

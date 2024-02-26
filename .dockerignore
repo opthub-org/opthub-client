@@ -1,0 +1,9 @@
+.eggs/
+.git/
+.venv/
+build/
+dist/
+.dockerignore
+.gitignore
+*.egg-info
+file_handler_config.txt

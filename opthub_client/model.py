@@ -4,6 +4,7 @@ import datetime
 import json
 import click
 import time
+
 # mock competition class
 class Competition:
     def __init__(self):
@@ -181,6 +182,7 @@ def create_sol(file_path = None):
     elif file_path is not None:
         click.echo(click.style("The submitted file is not a JSON file.",bg="red"))
         return
+   
     sol = Solution()
     sol.set_all(1)
     time.sleep(1)

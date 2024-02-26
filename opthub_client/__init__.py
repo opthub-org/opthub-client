@@ -1,2 +1,6 @@
-from opthub_client.help import help
+
+
+__version__ = "0.0.1"
+
+import opthub_client.opt
 

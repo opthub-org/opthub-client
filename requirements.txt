@@ -1,0 +1,7 @@
+click >= 8.1.6
+inquirerpy >= 0.3.4
+pfzy >=0.3.1
+prompt-toolkit >=3.0.1
+setuptools >= 21.0.0
+wcwidth >= 0.2.13
+gql[all] >= 3.0.0
