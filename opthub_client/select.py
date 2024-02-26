@@ -2,7 +2,6 @@ import click
 from InquirerPy import prompt
 from opthub_client.model import fetch_competitions
 from opthub_client.file_io import FileHandler
-from opthub_client.opt import opt
 
 import datetime
 
@@ -21,12 +20,11 @@ all_comps = fetch_competitions(datetime.datetime.now())
 
 # competitions names for choices
 comp_names = [comp.name for comp in all_comps]
-@opt.command(help="Submit a solution.")
+
 @click.command()
 @click.option("-c", "--competition", type=str, help="Competition ID.")
 @click.option("-m", "--match", type=str, help="Match ID.")
-@click.pass_context
-def select(ctx,**kwargs):
+def select(**kwargs):
     """Select a competition and match."""
     comp_questions = [
     {

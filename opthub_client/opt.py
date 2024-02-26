@@ -1,11 +1,24 @@
 import click
 import logging
+
 from opthub_client.history import history
 from opthub_client.select import select
 from opthub_client.submit import submit
 from opthub_client.help import help
-
 _logger = logging.getLogger(__name__)
+
+
+
+custom_style = {
+    "question": "fg:#ffff00 bold",  # question text style
+    "answer": "fg:#f44336 bold",  # answer text style
+    "input": "fg:#ffeb3b",  # input field style
+    "pointer": "fg:#00bcd4 bold",  # select pointer style
+    "highlighted": "fg:#00bcd4 bold",  # highlighted item style
+    "selected": "fg:#cddc39 bold",  # selected text style
+    "instruction": "",  # instruction text style
+    "text": "",  # normal text style
+}
 
 @click.group(help="OptHub CLI client.")
 @click.option(
@@ -83,9 +96,9 @@ def opt(ctx, **kwargs):
     logging.basicConfig(level=log_level)
     _logger.info("Log level is set to %d.", log_level)
     _logger.info("opt(%s)", kwargs)
-    ctx.obj = kwargs
+    ctx = kwargs
     
-opt.add_command(help)
 opt.add_command(history)
 opt.add_command(select)
 opt.add_command(submit)
+opt.add_command(help)

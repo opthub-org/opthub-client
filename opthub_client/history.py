@@ -8,7 +8,6 @@ from opthub_client.util import display_trials
 from opthub_client.model import fetch_trials
 import sys 
 
-# style def
 style = Style.from_dict({
     'n': 'fg:blue bold',  
     'e': 'fg:red bold', 
@@ -33,7 +32,7 @@ def display_next_batch(competition,match):
     else:
         click.echo("No more solutions to display.")
     first = False
-   
+
 @click.command()
 @click.option(
     "-c",
@@ -50,14 +49,14 @@ def display_next_batch(competition,match):
     help="Match ID. default current match",
 )
 
-def history(competition, match):
+def history(**kwargs):
     """Check submitted solutions."""
     bindings = KeyBindings()
     
     @bindings.add('n')
     def _(event):
         """Display next batch of solutions."""
-        run_in_terminal(lambda: display_next_batch(competition, match), render_cli_done=False)
+        run_in_terminal(lambda: display_next_batch(kwargs["competition"], kwargs["match"]), render_cli_done=False)
 
     @bindings.add('e')
     @bindings.add('q')
@@ -69,7 +68,7 @@ def history(competition, match):
     # Initialize prompt session with key bindings.
     session = PromptSession(key_bindings=bindings)
     
-    display_next_batch(competition,match)
+    display_next_batch(kwargs["competition"],kwargs["match"])
     
     while True:
         session.prompt(HTML('<n style="class:n">n</n>: more solutions, <e style="class:e">e</e>: exit '), key_bindings=bindings,style=style)

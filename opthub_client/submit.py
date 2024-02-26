@@ -40,11 +40,10 @@ current_match = file.read().split(" - ")[1]
     is_flag=True,
     help="Flag to indicate file submission.",
 )
-
-def submit(competition, match, file):
+def submit(**kwargs):
     """Submit a solution."""
-    if file:
-        submit_file(competition, match)
+    if kwargs["file"]:
+        submit_file(kwargs["competition"], kwargs["match"])
     else:
         questions = [
                 {
@@ -55,10 +54,10 @@ def submit(competition, match, file):
                 },
                 ]
         answers = prompt(questions)
-        click.echo(answers)
+        click.echo(f"Submitting {answers} for Competition: {kwargs["competition"]}, Match: {kwargs["match"]}...")
         create_sol()
         click.echo("...Submitted.")
-def submit_file(ctx,**kwargs):
+def submit_file(comp,match):
     questions = [
     {
         "type": "filepath",
@@ -71,7 +70,7 @@ def submit_file(ctx,**kwargs):
     ]
     result = prompt(questions)
     file_path = Path(result['location']).expanduser()
-    click.echo(f"Submitting {result} for Competition: {ctx["competition"]}, Match: {ctx["match"]}...")
+    click.echo(f"Submitting {result} for Competition: {comp}, Match: {match}...")
     create_sol(file_path)
     click.echo("...Submitted.")
     
