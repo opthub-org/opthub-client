@@ -1,13 +1,11 @@
 import click
 import logging
 
-from opthub_client.history import history
-from opthub_client.select import select
-from opthub_client.submit import submit
-from opthub_client.help import help
+from opthub_client.controllers.history import history
+from opthub_client.controllers.select import select
+from opthub_client.controllers.submit import submit
+from opthub_client.controllers.help import help
 _logger = logging.getLogger(__name__)
-
-
 
 custom_style = {
     "question": "fg:#ffff00 bold",  # question text style
@@ -26,7 +24,7 @@ custom_style = {
     "--url",
     envvar="OPTHUB_URL",
     type=str,
-    default="https://opthub-api.herokuapp.com/v1/graphql",
+    default="http://192.168.1.174:20002",
     help="OptHub URL.",
 )
 @click.option(

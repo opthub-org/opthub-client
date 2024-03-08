@@ -1,9 +1,8 @@
 import click
 from InquirerPy import prompt
-from opthub_client.model import fetch_competitions
-from opthub_client.file_io import FileHandler
-
-import datetime
+from opthub_client.context.match_selection import MatchSelectionContext
+from opthub_client.models.competition import Competition
+from opthub_client.models.match import Match
 
 custom_style = {
     "question": "fg:#ffff00 bold",  # question text style
@@ -15,17 +14,15 @@ custom_style = {
     "instruction": "",  # instruction text style
     "text": "",  # normal text style
 }
-# fetch competitions 
-all_comps = fetch_competitions(datetime.datetime.now())
-
-# competitions names for choices
-comp_names = [comp.name for comp in all_comps]
 
 @click.command()
 @click.option("-c", "--competition", type=str, help="Competition ID.")
 @click.option("-m", "--match", type=str, help="Match ID.")
 def select(**kwargs):
     """Select a competition and match."""
+    match_select = MatchSelectionContext()
+    # competitions names for choices
+    comp_names = [comp.name for comp in Competition.fetch_participated_list(None)]
     comp_questions = [
     {
         "type": "list",
@@ -37,8 +34,7 @@ def select(**kwargs):
     if kwargs["competition"] not in comp_names:
         comp_result = prompt(questions=comp_questions,style=custom_style)
         comp = comp_result["competition"]    
-    selected_comp = next((competition for competition in all_comps if competition.get_name() == comp), None)
-    match_names = [match.get_name() for match in selected_comp.get_all_matches()]
+    match_names = [match.name for match in Match.fetch_participated_list_by_competition_id(None,comp)]
     match_questions = [
     {
         "type": "list",
@@ -51,7 +47,5 @@ def select(**kwargs):
         match_result = prompt(questions=match_questions,style=custom_style)
         match = match_result["match"]
     # show selected competition and match
-    data = f"{comp} - {match}"
     click.echo(f"You have selected {comp} - {match}")
-    file_handler = FileHandler() 
-    file_handler.write(data)  
+    match_select.update(comp,match)

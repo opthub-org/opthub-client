@@ -4,3 +4,4 @@ tests/
 *.egg-info/
 .eggs
 file_handler_config.txt
+.match_selection
