@@ -1,4 +1,5 @@
 import click
+from opthub_client.controllers.auth import signin
 from opthub_client.controllers.history import history
 from opthub_client.controllers.select import select
 from opthub_client.controllers.submit import submit
@@ -12,3 +13,4 @@ def help():
 help.add_command(history)
 help.add_command(select)
 help.add_command(submit)
+help.add_command(signin)

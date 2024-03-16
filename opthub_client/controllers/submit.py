@@ -3,38 +3,58 @@ from InquirerPy.validator import PathValidator
 from InquirerPy import prompt
 from pathlib import Path
 from opthub_client.context.match_selection import MatchSelectionContext
-from opthub_client.lib.util import SolutionValidator
-from opthub_client.models.solution import Solution
+from opthub_client.models.solution import create_solution
+from opthub_client.validators.solution_validator import SolutionValidator
 
 @click.command()
-# @click.option(
-#     "-c",
-#     "--competition",
-#     type=str,
-#     help="Competition ID. default current competition",
-# )
-# @click.option(
-#     "-m",
-#     "--match",
-#     type=str,
-#     help="Match ID. default current match",
-# )
+@click.option(
+    "-c",
+    "--competition",
+    type=str,
+    help="Competition ID",
+)
+@click.option(
+    "-m",
+    "--match",
+    type=str,
+    help="Match ID",
+)
 @click.option(
     "-f",
     "--file",
     is_flag=True,
     help="Flag to indicate file submission.",
 )
-def submit(**kwargs):
+@click.pass_context
+def submit(ctx,**kwargs):
     """Submit a solution."""
-    match_selection = MatchSelectionContext()
-    match_selection.load()
-    current_comp = match_selection.competition_id
-    current_match = match_selection.match_id
-    # TODO: write error handoling for current_comp and current_match not found
-    if kwargs["file"]:
-        submit_file(current_comp, current_match)
+    if(kwargs["match"] and kwargs["competition"]):
+        selected_match = kwargs["match"]
+        selected_competition = kwargs["competition"]
+    elif(kwargs["match"]):
+        match_selection = MatchSelectionContext()
+        selected_competition = match_selection.competition_id
+        selected_match = kwargs["match"]
     else:
+        match_selection = MatchSelectionContext()
+        selected_competition = match_selection.competition_id
+        selected_match = match_selection.match_id
+    if(selected_competition is None or selected_match is None):
+        click.echo("Please select a competition and match first.")
+        return
+    if kwargs["file"]: # file submission
+        questions = [
+        {
+            "name": "file",
+            "type": "filepath",
+            "message": "Submit the solution file (must be a JSON file):",
+            "default": str(Path('~/')),
+            "validate": PathValidator(is_file=True, message="Input is not a file"),
+            "only_files": True,
+        },
+        ]
+        result = prompt(questions)
+    else: # text submission
         questions = [
                 {
                     "name": "solution",
@@ -43,25 +63,7 @@ def submit(**kwargs):
                     "validate": SolutionValidator()
                 },
                 ]
-        answers = prompt(questions)
-        click.echo(f"Submitting {answers} for Competition: {current_comp}, Match: {current_match}...")
-        Solution.create_solution(None,current_comp,current_match) 
-        click.echo("...Submitted.")
-        
-def submit_file(current_comp,current_match):
-    questions = [
-    {
-        "type": "filepath",
-        "message": "Submit the solution file (must be a JSON file):",
-        "name": "location",
-        "default": str(Path('~/')),
-        "validate": PathValidator(is_file=True, message="Input is not a file"),
-        "only_files": True,
-    },
-    ]
-    result = prompt(questions)
-    file_path = Path(result['location']).expanduser()
-    click.echo(f"Submitting {result} for Competition: {current_comp}, Match: {current_match}...")
-    Solution.create_solution(None,current_comp,current_match) 
+        result = prompt(questions)
+    click.echo(f"Submitting {result} for Competition: {selected_competition}, Match: {selected_match}...")
+    create_solution(selected_competition,selected_match,result["solution"]) 
     click.echo("...Submitted.")
-    

@@ -1,20 +1,16 @@
-# solution class
-class Solution:
-    def __init__(self,attributes) :
-        self.variable = attributes.get("variable")
-        self.created_at = attributes.get("created_at")
-        pass
-    # TODO: mock => GraphQL fetch
-    @staticmethod
-    def fetch_list(graphql_client,pk,page,size):
-        sols = []
-        for i in range(size):
-            sol = Solution({"variable":i,"created_at":"2024-02-25T12:00:00Z"})
-            sols.append(sol)
-        return sols
-    @staticmethod
-    def create_solution(graphql_client,comp,match):
-        sol = Solution({"variable":0,"created_at":"2024-02-27T12:00:00Z"})
-        return sol
+from opthub_client.lib import graphql
+def fetch_solution_list(competition_id, match_id, page, size):
+    # mock data
+    solutions = [{
+        'variable': 3,
+        'created_at': '2021-01-01',
+    }]
+    return solutions
 
-       
+def create_solution(competition_id, match_id, variable):
+    # mock data
+    new_solution = {
+        'variable': variable,
+        'created_at': '2021-01-01',
+    }
+    return new_solution
