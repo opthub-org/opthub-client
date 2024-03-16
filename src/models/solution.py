@@ -1,4 +1,4 @@
-from opthub_client.lib import graphql
+from src.lib import graphql
 def fetch_solution_list(competition_id, match_id, page, size):
     # mock data
     solutions = [{

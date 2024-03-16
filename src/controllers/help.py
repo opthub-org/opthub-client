@@ -1,8 +1,8 @@
 import click
-from opthub_client.controllers.auth import signin
-from opthub_client.controllers.history import history
-from opthub_client.controllers.select import select
-from opthub_client.controllers.submit import submit
+from src.controllers.auth import signin
+from src.controllers.history import history
+from src.controllers.select import select
+from src.controllers.submit import submit
 
 @click.group(help="OptHub CLI client.")
 @click.pass_context

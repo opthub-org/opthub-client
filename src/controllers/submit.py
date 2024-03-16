@@ -2,9 +2,9 @@ import click
 from InquirerPy.validator import PathValidator
 from InquirerPy import prompt
 from pathlib import Path
-from opthub_client.context.match_selection import MatchSelectionContext
-from opthub_client.models.solution import create_solution
-from opthub_client.validators.solution_validator import SolutionValidator
+from src.context.match_selection import MatchSelectionContext
+from src.models.solution import create_solution
+from src.validators.solution_validator import SolutionValidator
 
 @click.command()
 @click.option(

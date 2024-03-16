@@ -1,4 +1,4 @@
-from opthub_client.lib import graphql
+from src.lib import graphql
 
 def fetch_participated_competition_list():
     # mock data

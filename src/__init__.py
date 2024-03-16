@@ -2,5 +2,5 @@
 
 __version__ = "0.1.0"
 
-import opthub_client.opt
+import src.opt
 

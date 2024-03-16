@@ -1,6 +1,6 @@
 import click
-from opthub_client.context.match_selection import MatchSelectionContext
-from opthub_client.models.trial import fetch_trial_list
+from src.context.match_selection import MatchSelectionContext
+from src.models.trial import fetch_trial_list
 from prompt_toolkit import PromptSession, HTML
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.application import run_in_terminal

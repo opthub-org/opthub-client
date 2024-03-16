@@ -1,7 +1,7 @@
-from opthub_client.lib import graphql
-from opthub_client.models.evaluation import fetch_evaluation_list
-from opthub_client.models.score import fetch_score_list
-from opthub_client.models.solution import fetch_solution_list
+from src.lib import graphql
+from src.models.evaluation import fetch_evaluation_list
+from src.models.score import fetch_score_list
+from src.models.solution import fetch_solution_list
 
 def fetch_trial_list(competition_id, match_id, page, size):
     solutions = fetch_solution_list(competition_id, match_id, page, size)
