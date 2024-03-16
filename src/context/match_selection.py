@@ -19,7 +19,6 @@ class MatchSelectionContext:
                     parts = content.split(",")
                     self.competition_id = parts[0]
                     self.match_id = parts[1]
-                    
             except IOError as e:
                 # file read error
                 print(f"An error occurred while reading the file: {e}. Please select competition and match again" ,file=sys.stderr)

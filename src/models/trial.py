@@ -1,4 +1,3 @@
-from src.lib import graphql
 from src.models.evaluation import fetch_evaluation_list
 from src.models.score import fetch_score_list
 from src.models.solution import fetch_solution_list

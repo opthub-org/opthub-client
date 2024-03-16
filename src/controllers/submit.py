@@ -1,3 +1,4 @@
+import json
 import click
 from InquirerPy.validator import PathValidator
 from InquirerPy import prompt
@@ -54,6 +55,7 @@ def submit(ctx,**kwargs):
         },
         ]
         result = prompt(questions)
+        variable = Path(result).read_text()
     else: # text submission
         questions = [
                 {
@@ -64,6 +66,8 @@ def submit(ctx,**kwargs):
                 },
                 ]
         result = prompt(questions)
+        variable = [float(x) for x in result["solution"].split(",")]
+        variable = json.dumps(variable)
     click.echo(f"Submitting {result} for Competition: {selected_competition}, Match: {selected_match}...")
-    create_solution(selected_competition,selected_match,result["solution"]) 
+    create_solution(selected_competition,selected_match,variable) 
     click.echo("...Submitted.")

@@ -1,4 +1,3 @@
-from src.lib import graphql
 def fetch_score_list(competition_id, match_id, page, size):
     # mock data
     scores = [{

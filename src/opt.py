@@ -30,7 +30,6 @@ custom_style = {
 @click.pass_context
 def opt(ctx, **kwargs):
     """The entrypoint of CLI.
-
     :param ctx: Click context
     :param kwargs: Click options
     """
