@@ -16,13 +16,11 @@ def fetch_solution_list(competition_id, match_id, page, size):
     }]
     return solutions
 
-def create_solution(competition_id, match_id, variable):
-    participant_id = "User#kuma"
+def create_solution(match_id, variable):
     mutation = gql("""
     mutation CreateSolution($input: CreateSolutionInput!) {
         createSolution(input: $input) {
             matchId
-            participantId
             trialNo
         }
     }
@@ -30,7 +28,6 @@ def create_solution(competition_id, match_id, variable):
     variables = {
         "input": {
             "matchId": match_id,
-            "participantId": participant_id,
             "variable": variable,
         }
     }
