@@ -1,6 +1,5 @@
 __pycache__/
 tests/
-.vscode/
 *.egg-info/
 .eggs
 file_handler_config.txt
