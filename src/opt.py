@@ -1,6 +1,6 @@
 import click
 
-from src.controllers.auth import signin
+from src.controllers.auth import sign_in
 from src.controllers.history import history
 from src.controllers.select import select
 from src.controllers.submit import submit
@@ -39,4 +39,4 @@ opt.add_command(history)
 opt.add_command(select)
 opt.add_command(submit)
 opt.add_command(help)
-opt.add_command(signin)
+opt.add_command(sign_in)
