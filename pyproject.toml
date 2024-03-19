@@ -2,7 +2,7 @@
 name = "opthub_client"
 version = "0.1.0"
 description = ""
-authors = ["OptHub Inc."]
+authors = ["OptHub Inc. <dev@opthub.ai>"]
 readme = "README.md"
 
 [tool.ruff]
