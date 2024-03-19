@@ -1,41 +1,80 @@
-# trial class
-from opthub_client.models.evaluation import Evaluation
-from opthub_client.models.score import Score
-from opthub_client.models.solution import Solution
-from enum import Enum, auto
+"""This module contains the types and functions related to participant trials."""
 
-class Status(Enum):
-    EVALUATING = auto()
-    CALCULATING_SCORE = auto()
-    COMPLETED = auto()
+from typing import TypedDict
 
-class Trial:
-    def __init__(self,attributes):
-        self.id = attributes.get("id")
-        self.solution = attributes.get("solution")
-        self.evaluation = attributes.get("evaluation")
-        self.score = attributes.get("score")
-        self.status = attributes.get("status")
-        pass
-    # TODO : mock => GraphQL fetch
-    @staticmethod
-    def fetch_list(graphql_client,pk,page,size):
-        trials = []
-        sols = Solution.fetch_list(graphql_client,pk,page,size)
-        evals = Evaluation.fetch_list(graphql_client,pk,page,size)
-        scores = Score.fetch_list(graphql_client,pk,page,size)
-        if(len(sols) != len(evals) or len(sols) != len(scores)):
-            raise ValueError("invalid size solution, evaluation, score")
-        for i in range(size):
-            # calcs of score and evaluation is finished
-            if(scores[i].score is not None and evals[i].objective is not None):
-                status = Status.COMPLETED
-            # calcs of score is not finished
-            elif scores[i].score is not None:
-                status = Status.CALCULATING_SCORE
-            # calcs of evaluation is not finished
-            else :
-                status = Status.EVALUATING
-            trial = Trial({"solution":sols[i],"evaluation":evals[i],"score":scores[i],"status":status})
-            trials.append(trial)
-        return trials
+from opthub_client.models.solution import Variable
+
+
+class Solution(TypedDict):
+    """This class represents the solution type."""
+
+    variable: Variable
+    created_at: str
+
+
+class Evaluation(TypedDict):
+    """This class represents the evaluation type."""
+
+    status: str
+    objective: float | list[float]
+    constraint: float | list[float]
+    info: object
+    started_at: str
+    finished_at: str
+
+
+class Score(TypedDict):
+    """This class represents the score type."""
+
+    status: str
+    score: float
+    started_at: str
+    finished_at: str
+
+
+class Trial(TypedDict):
+    """This class represents the trial type."""
+
+    id: int
+    solution: Solution
+    evaluation: Evaluation
+    score: Score
+
+
+def fetch_trials(competition_id: str, match_id: str, page: int, size: int) -> list[Trial]:
+    """Fetch the history of the user's submitted solutions and their evaluations and scores.
+
+    Args:
+        competition_id (str): Competition ID
+        match_id (str): Match ID in the competition
+        page (int): Page number
+        size (int): Size of the page
+
+    Returns:
+        list[Trial]:
+            The the history of the user's submitted solutions and their evaluations and scores.
+    """
+    trials: list[Trial] = [
+        {
+            "id": 1,
+            "solution": {
+                "variable": 3.0,
+                "created_at": "2021-01-01",
+            },
+            "evaluation": {
+                "objective": 3.0,
+                "constraint": 4.0,
+                "info": {},
+                "status": "finished",
+                "started_at": "2021-01-01",
+                "finished_at": "2021-01-01",
+            },
+            "score": {
+                "score": 3.2,
+                "status": "finished",
+                "started_at": "2021-01-01",
+                "finished_at": "2021-01-01",
+            },
+        },
+    ]
+    return trials

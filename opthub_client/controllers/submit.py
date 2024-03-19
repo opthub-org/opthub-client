@@ -1,67 +1,74 @@
-import click
-from InquirerPy.validator import PathValidator
-from InquirerPy import prompt
+"""This module contains the functions related to submit command."""
+
+import json
 from pathlib import Path
+
+import click
+from InquirerPy import prompt
+from InquirerPy.validator import PathValidator
+
 from opthub_client.context.match_selection import MatchSelectionContext
-from opthub_client.lib.util import SolutionValidator
-from opthub_client.models.solution import Solution
+from opthub_client.models.solution import create_solution
+from opthub_client.validators.solution import SolutionValidator
+
 
 @click.command()
-# @click.option(
-#     "-c",
-#     "--competition",
-#     type=str,
-#     help="Competition ID. default current competition",
-# )
-# @click.option(
-#     "-m",
-#     "--match",
-#     type=str,
-#     help="Match ID. default current match",
-# )
+@click.option(
+    "-c",
+    "--competition",
+    type=str,
+    help="Competition ID",
+)
+@click.option(
+    "-m",
+    "--match",
+    type=str,
+    help="Match ID",
+)
 @click.option(
     "-f",
     "--file",
     is_flag=True,
     help="Flag to indicate file submission.",
 )
-def submit(**kwargs):
+@click.pass_context
+def submit(ctx: click.Context, match: str, competition: str, file: bool) -> None:
     """Submit a solution."""
-    match_selection = MatchSelectionContext()
-    match_selection.load()
-    current_comp = match_selection.competition_id
-    current_match = match_selection.match_id
-    # TODO: write error handoling for current_comp and current_match not found
-    if kwargs["file"]:
-        submit_file(current_comp, current_match)
-    else:
+    match_selection_context = MatchSelectionContext()
+    if match is None:
+        match = match_selection_context.match_id
+    if competition is None:
+        competition = match_selection_context.competition_id
+    if competition is None or match is None:
+        click.echo("Please select a competition and match first.")
+        return
+    if file:  # file submission
         questions = [
-                {
-                    "name": "solution",
-                    "type": "input",
-                    "message": "Write the solution:",
-                    "validate": SolutionValidator()
-                },
-                ]
-        answers = prompt(questions)
-        click.echo(f"Submitting {answers} for Competition: {current_comp}, Match: {current_match}...")
-        Solution.create_solution(None,current_comp,current_match) 
-        click.echo("...Submitted.")
-        
-def submit_file(current_comp,current_match):
-    questions = [
-    {
-        "type": "filepath",
-        "message": "Submit the solution file (must be a JSON file):",
-        "name": "location",
-        "default": str(Path('~/')),
-        "validate": PathValidator(is_file=True, message="Input is not a file"),
-        "only_files": True,
-    },
-    ]
-    result = prompt(questions)
-    file_path = Path(result['location']).expanduser()
-    click.echo(f"Submitting {result} for Competition: {current_comp}, Match: {current_match}...")
-    Solution.create_solution(None,current_comp,current_match) 
+            {
+                "name": "file",
+                "type": "filepath",
+                "message": "Submit the solution file (must be a JSON file):",
+                "default": str(Path("~/")),
+                "validate": PathValidator(is_file=True, message="Input is not a file"),
+                "only_files": True,
+            },
+        ]
+        result = prompt(questions)
+        variable = Path(result).read_text()
+    else:  # text submission
+        questions = [
+            {
+                "name": "solution",
+                "type": "input",
+                "message": "Write the solution:",
+                "validate": SolutionValidator(),
+            },
+        ]
+        result = prompt(questions)
+        variable = [float(x) for x in result["solution"].split(",")]
+        variable = json.dumps(variable)
+    click.echo(
+        f"Submitting {result} for Competition: {competition}, Match: {match}...",
+    )
+    create_solution(match, variable)
     click.echo("...Submitted.")
-    

@@ -1,12 +1,25 @@
-class Match:
-    def __init__(self,attributes):
-        self.name = attributes.get("name")
-        pass
-    # TODO: mock => GraphQL fetch
-    @staticmethod
-    def fetch_participated_list_by_competition_id(graphql_client,competition_id):
-        matches = []
-        for i in range(3):
-            match = Match({"name":"Match "+str(i)})
-            matches.append(match)
-        return matches
+"""This module contains the functions related to matches."""
+
+from typing import TypedDict
+
+
+class Match(TypedDict):
+    """This class represents the match type."""
+
+    id: str
+    alias: str
+
+
+def fetch_matches_by_competition_alias(alias: str) -> list[Match]:
+    """Fetch matches by competition alias.
+
+    Args:
+        alias (str): Competition Alias
+
+    Returns:
+        list[Match]: Matches related to the competition
+    """
+    return [
+        {"id": "2a322f8b-f6d7-342c-5ab3-32320f953d51", "alias": "match1"},
+        {"id": "2a322f8b-f6d7-342c-5ab3-32320f953d51", "alias": "match2"},
+    ]

@@ -1,0 +1,27 @@
+{
+  // ファイルを自動保存する
+  "files.autoSave": "onFocusChange",
+
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+  },
+
+  "ruff.organizeImports": true,
+  "ruff.format.args": [
+    "--config=pyproject.toml"
+  ],
+  "mypy.runUsingActiveInterpreter": true,
+  "mypy.dmypyExecutable": ".venv/bin/dmypy",
+
+  // スペルチェックに単語を追加
+  "cSpell.userWords": ["opthub"],
+  "cSpell.words": [
+    "aiohttp"
+  ],
+
+  // ファイルの最後に改行を追加
+  "files.insertFinalNewline": true,
+}
