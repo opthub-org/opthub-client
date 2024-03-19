@@ -1,8 +1,11 @@
+"""This module contains the functions related to select command."""
+
 import click
-from context.match_selection import MatchSelectionContext
 from InquirerPy import prompt
-from models.competition import fetch_participated_competitions
-from models.match import fetch_matches_by_competition_alias
+
+from opthub_client.context.match_selection import MatchSelectionContext
+from opthub_client.models.competition import fetch_participated_competitions
+from opthub_client.models.match import fetch_matches_by_competition_alias
 
 custom_style = {
     "question": "fg:#ffff00 bold",  # question text style
@@ -27,7 +30,8 @@ def select(
 ) -> None:
     """Select a competition and match."""
     match_selection_context = MatchSelectionContext()
-    # competitions names for choices
+
+    # competitions aliases for choices
     competition_aliases = [competition["alias"] for competition in fetch_participated_competitions()]
 
     # if not set -c commands option

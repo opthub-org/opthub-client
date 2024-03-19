@@ -1,12 +1,15 @@
+"""This module contains the functions related to submit command."""
+
 import json
 from pathlib import Path
 
 import click
-from context.match_selection import MatchSelectionContext
 from InquirerPy import prompt
 from InquirerPy.validator import PathValidator
-from models.solution import create_solution
-from validators.solution import SolutionValidator
+
+from opthub_client.context.match_selection import MatchSelectionContext
+from opthub_client.models.solution import create_solution
+from opthub_client.validators.solution import SolutionValidator
 
 
 @click.command()

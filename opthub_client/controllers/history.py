@@ -1,12 +1,15 @@
+"""This module contains the functions related to history command."""
+
 import sys
 
 import click
-from context.match_selection import MatchSelectionContext
-from models.trial import Trial, fetch_trials
 from prompt_toolkit import HTML, PromptSession
 from prompt_toolkit.application import run_in_terminal
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
 from prompt_toolkit.styles import Style
+
+from opthub_client.context.match_selection import MatchSelectionContext
+from opthub_client.models.trial import Trial, fetch_trials
 
 style = Style.from_dict(
     {

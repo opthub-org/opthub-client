@@ -1,17 +1,19 @@
+"""This module contains the types and functions related to participant trials."""
+
 from typing import TypedDict
 
-from models.solution import Variable
+from opthub_client.models.solution import Variable
 
 
 class Solution(TypedDict):
-    """Solution Type"""
+    """This class represents the solution type."""
 
     variable: Variable
     created_at: str
 
 
 class Evaluation(TypedDict):
-    """Evaluation Type"""
+    """This class represents the evaluation type."""
 
     status: str
     objective: float | list[float]
@@ -22,7 +24,7 @@ class Evaluation(TypedDict):
 
 
 class Score(TypedDict):
-    """Score Type"""
+    """This class represents the score type."""
 
     status: str
     score: float
@@ -31,7 +33,7 @@ class Score(TypedDict):
 
 
 class Trial(TypedDict):
-    """Trial Type"""
+    """This class represents the trial type."""
 
     id: int
     solution: Solution

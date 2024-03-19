@@ -1,8 +1,10 @@
+"""This module contains the functions related to matches."""
+
 from typing import TypedDict
 
 
 class Match(TypedDict):
-    """Match Type"""
+    """This class represents the match type."""
 
     id: str
     alias: str

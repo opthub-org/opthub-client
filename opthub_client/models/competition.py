@@ -1,8 +1,10 @@
+"""This module contains the functions related to competitions."""
+
 from typing import TypedDict
 
 
 class Competition(TypedDict):
-    """Competition Type"""
+    """This class represents the competition type."""
 
     id: str
     alias: str

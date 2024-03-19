@@ -1,3 +1,5 @@
+"""This module contains the solution validator."""
+
 import re
 
 from prompt_toolkit.document import Document
@@ -5,7 +7,7 @@ from prompt_toolkit.validation import ValidationError, Validator
 
 
 class SolutionValidator(Validator):
-    """Validator for the solution input."""
+    """This class validates the solution input."""
 
     def validate(self, document: Document) -> None:
         """Validate the solution input."""

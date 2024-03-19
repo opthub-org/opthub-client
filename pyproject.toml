@@ -2,28 +2,24 @@
 name = "opthub_client"
 version = "0.1.0"
 description = ""
-authors = ["tkumamoto <kumamoto.t.ab@m.titech.ac.jp>"]
+authors = ["OptHub Inc."]
 readme = "README.md"
-
-[[tool.poetry.packages]]
-include = "src"
 
 [tool.ruff]
 target-version = "py312"
 line-length = 120
 select = ["ALL"]
 ignore = [
-    "ANN101", # 引数selfには型ヒントは付けない
-    "D100",  # モジュールのdocstringは書かない
-    "D104", # モジュールのdocstringは書かない
-    "D4", # docstringのフォーマットの制限を緩くする
-    "RET504", # 関数の返り値の前の代入を許可
-    "T201", # print関数は使用可能に
-    "FBT001", # bool型の位置引数を許可
-    "ARG001", # 使われていない変数の許可
-    "TD002", # Todoでアサインしなくても良いように
-    "TD003", # TodoにIssueを紐付けなくても良いように
+    "ANN101",   # Don't require type hints for self.
+    "D104",     # Don't require docstrings for public packages.
+    "RET504",   # Allow assignment before return
+    "FBT001",   # Allow bool type positional arguments
+    "TD002",    # Allow unassigned todos
+    "TD003",    # Allow todos without issue
 ]
+
+[tool.ruff.pydocstyle]
+convention = "google"
 
 [tool.poetry.dependencies]
 python = "3.12.1"
@@ -41,5 +37,6 @@ mypy = "^1.9.0"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+
 [tool.poetry.scripts]
-opt = "opt:opt"
+opt = "opthub_client.opt:opt"

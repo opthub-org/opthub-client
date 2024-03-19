@@ -1,3 +1,5 @@
+"""This module contains the functions related to auth command."""
+
 import click
 
 

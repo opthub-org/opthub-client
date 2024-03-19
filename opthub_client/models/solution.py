@@ -1,12 +1,8 @@
-from gql import Client, gql
-from gql.transport.aiohttp import AIOHTTPTransport
+"""Solution model."""
 
-# TODO: 別ファイルに分離
-url = "MOCK_URL"
-api_key = "MOCK_API_KEY"
-headers = {"x-api-key": api_key}
-transport = AIOHTTPTransport(url=url, headers=headers)
-client = Client(transport=transport, fetch_schema_from_transport=True)
+from gql import gql
+
+from opthub_client.graphql.client import get_gql_client
 
 Variable = list[float] | float
 
@@ -18,6 +14,7 @@ def create_solution(match_id: str, variable: Variable) -> None:
         match_id (str): The match ID.
         variable (object): The variable of solution.
     """
+    client = get_gql_client()
     mutation = gql("""
     mutation CreateSolution($input: CreateSolutionInput!) {
         createSolution(input: $input) {

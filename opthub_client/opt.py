@@ -1,9 +1,12 @@
+"""This module contains the OptHub CLI client entrypoint."""
+
 import click
-from controllers.auth import auth
-from controllers.help import help
-from controllers.history import history
-from controllers.select import select
-from controllers.submit import submit
+
+from opthub_client.controllers.auth import auth
+from opthub_client.controllers.help import help
+from opthub_client.controllers.history import history
+from opthub_client.controllers.select import select
+from opthub_client.controllers.submit import submit
 
 custom_style = {
     "question": "fg:#ffff00 bold",  # question text style
@@ -18,18 +21,9 @@ custom_style = {
 
 
 @click.group(help="OptHub CLI client.")
-@click.option(
-    "-u",
-    "--url",
-    envvar="OPTHUB_URL",
-    type=str,
-    default="http://192.168.1.174:20002",
-    help="OptHub URL.",
-)
-@click.version_option()
 @click.pass_context
-def opt(ctx: click.Context) -> None:
-    """CLIのエントリーポイント"""
+def opt(ctx: click.Context) -> None:  # noqa: ARG001
+    """This function is for OptHub CLI client entrypoint."""
 
 
 opt.add_command(history)
