@@ -1,16 +1,18 @@
 import click
-from src.controllers.auth import sign_in
-from src.controllers.history import history
-from src.controllers.select import select
-from src.controllers.submit import submit
+
+from controllers.auth import auth
+from controllers.history import history
+from controllers.select import select
+from controllers.submit import submit
+
 
 @click.group(help="OptHub CLI client.")
 @click.pass_context
-def help():
+def help(ctx: click.Context) -> None:  # noqa: A001, ARG001
     """Show commands usage."""
-    pass
+
 
 help.add_command(history)
 help.add_command(select)
 help.add_command(submit)
-help.add_command(sign_in)
+help.add_command(auth)

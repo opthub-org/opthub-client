@@ -1,4 +1,23 @@
-def fetch_participated_match_list_by_competition_id(competition_id):
-    #mock data
-    matches = [{"name": "match1"}, {"name": "match2"}]
-    return matches
+from typing import TypedDict
+
+
+class Match(TypedDict):
+    """Match Type"""
+
+    id: str
+    alias: str
+
+
+def fetch_matches_by_competition_alias(alias: str) -> list[Match]:
+    """Fetch matches by competition alias.
+
+    Args:
+        alias (str): Competition Alias
+
+    Returns:
+        list[Match]: Matches related to the competition
+    """
+    return [
+        {"id": "2a322f8b-f6d7-342c-5ab3-32320f953d51", "alias": "match1"},
+        {"id": "2a322f8b-f6d7-342c-5ab3-32320f953d51", "alias": "match2"},
+    ]

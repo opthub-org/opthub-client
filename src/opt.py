@@ -1,10 +1,9 @@
 import click
-
-from src.controllers.auth import sign_in
-from src.controllers.history import history
-from src.controllers.select import select
-from src.controllers.submit import submit
-from src.controllers.help import help
+from controllers.auth import auth
+from controllers.help import help
+from controllers.history import history
+from controllers.select import select
+from controllers.submit import submit
 
 custom_style = {
     "question": "fg:#ffff00 bold",  # question text style
@@ -17,6 +16,7 @@ custom_style = {
     "text": "",  # normal text style
 }
 
+
 @click.group(help="OptHub CLI client.")
 @click.option(
     "-u",
@@ -28,15 +28,12 @@ custom_style = {
 )
 @click.version_option()
 @click.pass_context
-def opt(ctx, **kwargs):
-    """The entrypoint of CLI.
-    :param ctx: Click context
-    :param kwargs: Click options
-    """
-    ctx = kwargs
-    
+def opt(ctx: click.Context) -> None:
+    """CLIのエントリーポイント"""
+
+
 opt.add_command(history)
 opt.add_command(select)
 opt.add_command(submit)
 opt.add_command(help)
-opt.add_command(sign_in)
+opt.add_command(auth)

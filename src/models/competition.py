@@ -1,10 +1,26 @@
-def fetch_participated_competition_list():
-    # mock data
-    competitions = [{
-        'name': 'competition1',
-        'matches': ['match1', 'match2']
-    }, {
-        'name': 'competition2',
-        'matches': ['match1', 'match2']
-    }]
-    return competitions
+from typing import TypedDict
+
+
+class Competition(TypedDict):
+    """Competition Type"""
+
+    id: str
+    alias: str
+
+
+def fetch_participated_competitions() -> list[Competition]:
+    """Fetch competitions and matches that the user is participating in.
+
+    Returns:
+        list[Competition]: Competitions and matches that the user is participating in
+    """
+    return [
+        {
+            "id": "2a322f8b-f6d7-342c-5ab3-32320f953d51",
+            "alias": "competition1",
+        },
+        {
+            "id": "2a322f8b-f6d7-342c-5ab3-32320f953d51",
+            "alias": "competition2",
+        },
+    ]

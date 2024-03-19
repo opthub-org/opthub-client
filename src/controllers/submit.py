@@ -1,11 +1,13 @@
 import json
-import click
-from InquirerPy.validator import PathValidator
-from InquirerPy import prompt
 from pathlib import Path
-from src.context.match_selection import MatchSelectionContext
-from src.models.solution import create_solution
-from src.validators.solution_validator import SolutionValidator
+
+import click
+from context.match_selection import MatchSelectionContext
+from InquirerPy import prompt
+from InquirerPy.validator import PathValidator
+from models.solution import create_solution
+from validators.solution import SolutionValidator
+
 
 @click.command()
 @click.option(
@@ -27,47 +29,43 @@ from src.validators.solution_validator import SolutionValidator
     help="Flag to indicate file submission.",
 )
 @click.pass_context
-def submit(ctx,**kwargs):
+def submit(ctx: click.Context, match: str, competition: str, file: bool) -> None:
     """Submit a solution."""
-    if(kwargs["match"] and kwargs["competition"]):
-        selected_match = kwargs["match"]
-        selected_competition = kwargs["competition"]
-    elif(kwargs["match"]):
-        match_selection = MatchSelectionContext()
-        selected_competition = match_selection.competition_id
-        selected_match = kwargs["match"]
-    else:
-        match_selection = MatchSelectionContext()
-        selected_competition = match_selection.competition_id
-        selected_match = match_selection.match_id
-    if(selected_competition is None or selected_match is None):
+    match_selection_context = MatchSelectionContext()
+    if match is None:
+        match = match_selection_context.match_id
+    if competition is None:
+        competition = match_selection_context.competition_id
+    if competition is None or match is None:
         click.echo("Please select a competition and match first.")
         return
-    if kwargs["file"]: # file submission
+    if file:  # file submission
         questions = [
-        {
-            "name": "file",
-            "type": "filepath",
-            "message": "Submit the solution file (must be a JSON file):",
-            "default": str(Path('~/')),
-            "validate": PathValidator(is_file=True, message="Input is not a file"),
-            "only_files": True,
-        },
+            {
+                "name": "file",
+                "type": "filepath",
+                "message": "Submit the solution file (must be a JSON file):",
+                "default": str(Path("~/")),
+                "validate": PathValidator(is_file=True, message="Input is not a file"),
+                "only_files": True,
+            },
         ]
         result = prompt(questions)
         variable = Path(result).read_text()
-    else: # text submission
+    else:  # text submission
         questions = [
-                {
-                    "name": "solution",
-                    "type": "input",
-                    "message": "Write the solution:",
-                    "validate": SolutionValidator()
-                },
-                ]
+            {
+                "name": "solution",
+                "type": "input",
+                "message": "Write the solution:",
+                "validate": SolutionValidator(),
+            },
+        ]
         result = prompt(questions)
         variable = [float(x) for x in result["solution"].split(",")]
         variable = json.dumps(variable)
-    click.echo(f"Submitting {result} for Competition: {selected_competition}, Match: {selected_match}...")
-    create_solution(selected_competition,selected_match,variable) 
+    click.echo(
+        f"Submitting {result} for Competition: {competition}, Match: {match}...",
+    )
+    create_solution(match, variable)
     click.echo("...Submitted.")
