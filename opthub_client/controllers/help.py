@@ -1,3 +1,5 @@
+"""This module contains the functions related to help command."""
+
 import click
 
 from opthub_client.controllers.auth import auth
