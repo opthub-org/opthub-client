@@ -1,29 +1,29 @@
 {
   "recommendations": [
-    // 基本的なPythonの拡張機能
+    // Basic python extensions
     "ms-python.python",
     "ms-python.debugpy",
     "ms-python.vscode-pylance",
 
-    // 型エラー
+    // Python type hint
     "matangover.mypy",
 
     // Ruff
     "charliermarsh.ruff",
 
-    // エラー表示
+    // Easy to read error message
     "usernamehw.errorlens",
 
-    // tomlファイルのシンタックスハイライト
+    // TOML syntax highlight
     "tamasfe.even-better-toml",
 
-    // GraphQLのシンタックスハイライト
+    // GraphQL syntax highlight
     "graphql.vscode-graphql-syntax",
 
-    // スペルミス検知
+    // Spell check
     "streetsidesoftware.code-spell-checker",
 
-    // TODOハイライト
+    // Todo highlight
     "wayou.vscode-todo-highlight",
 
     // Git emoji
