@@ -26,7 +26,7 @@ def display_trials(trials: list[Trial]) -> None:
     else:
         lines = ""
         for trial in trials:
-            lines += "Trial No: " + str(trial["id"]) + "\n"
+            lines += "Trial No: " + str(trial["trialNo"]) + "\n"
             lines += "Solution: " + str(trial["solution"]["variable"]) + "\n"
             lines += "Evaluation: " + str(trial["evaluation"]["objective"]) + "\n"
             lines += "Score: " + str(trial["score"]["score"]) + "\n"

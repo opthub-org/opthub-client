@@ -1,7 +1,7 @@
 """This module contains the functions related to select command."""
 
 import click
-from InquirerPy import prompt
+from InquirerPy import prompt  # type: ignore[attr-defined]
 
 from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.models.competition import fetch_participated_competitions
@@ -22,9 +22,7 @@ custom_style = {
 @click.command()
 @click.option("-c", "--competition", type=str, help="Competition ID.")
 @click.option("-m", "--match", type=str, help="Match ID.")
-@click.pass_context
 def select(
-    ctx: click.Context,
     competition: str | None,
     match: str | None,
 ) -> None:
@@ -45,7 +43,8 @@ def select(
             },
         ]
         selected_competition = prompt(questions=competition_questions, style=custom_style)
-        competition = selected_competition["competition"]
+        if isinstance(selected_competition["competition"], str):
+            competition = selected_competition["competition"]
 
     if competition not in competition_aliases:
         click.echo("Competition is not found.")
@@ -64,12 +63,14 @@ def select(
             },
         ]
         selected_match = prompt(questions=match_questions, style=custom_style)
-        match = selected_match["match"]
+        if isinstance(selected_match["match"], str):
+            match = selected_match["match"]
 
     if match not in match_aliases:
         click.echo("Match is not found.")
         return
 
+    match_selection_context.update(competition, match)
+
     # show selected competition and match
     click.echo(f"You have selected {competition} - {match}")
-    match_selection_context.update(competition, match)

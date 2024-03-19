@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 import click
-from InquirerPy import prompt
+from InquirerPy import prompt  # type: ignore[attr-defined]
 from InquirerPy.validator import PathValidator
 
 from opthub_client.context.match_selection import MatchSelectionContext
@@ -31,8 +31,7 @@ from opthub_client.validators.solution import SolutionValidator
     is_flag=True,
     help="Flag to indicate file submission.",
 )
-@click.pass_context
-def submit(ctx: click.Context, match: str, competition: str, file: bool) -> None:
+def submit(match: str | None, competition: str | None, file: bool) -> None:
     """Submit a solution."""
     match_selection_context = MatchSelectionContext()
     if match is None:

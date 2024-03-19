@@ -1,5 +1,9 @@
+"""This module contains the class related to match selection context."""
+
 import sys
 from pathlib import Path
+
+import click
 
 
 class MatchSelectionContext:
@@ -30,7 +34,7 @@ class MatchSelectionContext:
                 self.competition_id = parts[0]
                 self.match_id = parts[1]
         except OSError as e:
-            print(
+            click.echo(
                 f"An error occurred while reading the file: {e}. Please select competition and match again",
                 file=sys.stderr,
             )

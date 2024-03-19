@@ -1,6 +1,6 @@
 """This module contains the types and functions related to participant trials."""
 
-from typing import TypedDict
+from typing import Literal, TypedDict
 
 from opthub_client.models.solution import Variable
 
@@ -15,7 +15,7 @@ class Solution(TypedDict):
 class Evaluation(TypedDict):
     """This class represents the evaluation type."""
 
-    status: str
+    status: Literal["waiting", "success", "failed"]
     objective: float | list[float]
     constraint: float | list[float]
     info: object
@@ -26,16 +26,16 @@ class Evaluation(TypedDict):
 class Score(TypedDict):
     """This class represents the score type."""
 
-    status: str
-    score: float
-    started_at: str
-    finished_at: str
+    status: Literal["waiting", "success", "failed"]
+    score: float | None
+    started_at: str | None
+    finished_at: str | None
 
 
 class Trial(TypedDict):
     """This class represents the trial type."""
 
-    id: int
+    trialNo: int
     solution: Solution
     evaluation: Evaluation
     score: Score
@@ -56,7 +56,7 @@ def fetch_trials(competition_id: str, match_id: str, page: int, size: int) -> li
     """
     trials: list[Trial] = [
         {
-            "id": 1,
+            "trialNo": 1,
             "solution": {
                 "variable": 3.0,
                 "created_at": "2021-01-01",
@@ -65,13 +65,13 @@ def fetch_trials(competition_id: str, match_id: str, page: int, size: int) -> li
                 "objective": 3.0,
                 "constraint": 4.0,
                 "info": {},
-                "status": "finished",
+                "status": "success",
                 "started_at": "2021-01-01",
                 "finished_at": "2021-01-01",
             },
             "score": {
                 "score": 3.2,
-                "status": "finished",
+                "status": "success",
                 "started_at": "2021-01-01",
                 "finished_at": "2021-01-01",
             },
