@@ -8,7 +8,7 @@ from prompt_toolkit.application import run_in_terminal
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
 from prompt_toolkit.styles import Style
 
-from opthub_client.context.match_selection import MatchSelectionContext
+from opthub_client.context.match_selection import MatchSelectionContext, match_select
 from opthub_client.models.trial import Trial, fetch_trials
 
 style = Style.from_dict(
@@ -46,15 +46,7 @@ def display_trials(trials: list[Trial]) -> None:
 @click.pass_context
 def history(ctx: click.Context, competition: str | None, match: str | None, size: int) -> None:
     """Check submitted solutions."""
-    # TODO: 他の場所と共通化できる
-    match_selection_context = MatchSelectionContext()
-    if match is None:
-        match = match_selection_context.match_id
-    if competition is None:
-        competition = match_selection_context.competition_id
-    if competition is None or match is None:
-        click.echo("Please select a competition and match first.")
-        return
+    selected_competition,selected_match = match_select(match, competition)
     bindings = KeyBindings()
 
     # n key is to display next batch of solutions
@@ -62,7 +54,7 @@ def history(ctx: click.Context, competition: str | None, match: str | None, size
     def add_trials(event: KeyPressEvent) -> None:
         """Display next batch of solutions."""
         # TODO: ページネーションの実装がおかしい
-        trials = fetch_trials(competition, match, 1, size)
+        trials = fetch_trials(selected_competition["id"], selected_match["id"], 1, size)
         run_in_terminal(lambda: display_trials(trials), render_cli_done=False)
 
     @bindings.add("e")  # e for exit
@@ -77,7 +69,7 @@ def history(ctx: click.Context, competition: str | None, match: str | None, size
 
     # The initial call to display next batch of solutions.
     # (Directly using the logic inside the _ function above.)
-    trials = fetch_trials(competition, match, 1, size)
+    trials = fetch_trials(selected_competition["id"], selected_match["id"], 1, size)
     display_trials(trials)
     while True:
         # Prompt the user for more solutions(n key) or exit(e or q or Ctrl+c).

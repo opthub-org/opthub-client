@@ -5,6 +5,9 @@ from pathlib import Path
 
 import click
 
+from opthub_client.models.competition import Competition, fetch_participated_competitions
+from opthub_client.models.match import Match, fetch_matches_by_competition_alias
+
 
 class MatchSelectionContext:
     """The selection context of match."""
@@ -53,3 +56,26 @@ class MatchSelectionContext:
         self.match_id = match_id
         with Path.open(Path(self.file_path), "w") as file:
             file.write(competition_id + "," + match_id)
+
+def match_select(match: str | None, competition: str | None) ->tuple[Competition,Match]:
+    """Select a match."""
+    match_selection_context = MatchSelectionContext()
+    if match is None:
+        match = match_selection_context.match_id
+    if competition is None:
+        competition = match_selection_context.competition_id
+    if competition is None or match is None:
+        msg = "Please select a competition and match first."
+        raise AssertionError(msg)
+    competitions = fetch_participated_competitions()
+    selected_competition = next((c for c in competitions if c["alias"] == competition), None)
+    matches = fetch_matches_by_competition_alias(competition)
+    selected_match = next((m for m in matches if m["alias"] == match), None)
+    if selected_competition is None:
+        msg = "Competition is not found."
+        raise AssertionError(msg)
+    if selected_match is None:
+        msg = "Match is not found."
+        raise AssertionError(msg)
+    match_selection_context.update(selected_competition["alias"], selected_match["alias"])
+    return selected_competition,selected_match
