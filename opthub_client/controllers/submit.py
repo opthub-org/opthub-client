@@ -1,6 +1,4 @@
 """This module contains the functions related to submit command."""
-
-import json
 from pathlib import Path
 
 import click
@@ -53,7 +51,16 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
             },
         ]
         result = prompt(questions)
-        variable = Path(result).read_text()
+        # read the file
+        if isinstance(result, dict):
+            file_path = result.get("file")
+            if isinstance(file_path, str):
+                full_path = Path(file_path).expanduser()
+                variable = [float(x) for x in full_path.read_text().split(",")]
+            else:
+                # file_path is not a string
+                click.echo("The file path is incorrect. Please provide a valid file path.")
+                return
     else:  # text submission
         questions = [
             {
@@ -64,10 +71,20 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
             },
         ]
         result = prompt(questions)
-        variable = [float(x) for x in result["solution"].split(",")]
-        variable = json.dumps(variable)
+        if isinstance(result, dict) and "solution" in result:
+            solution_value = result["solution"]
+            if isinstance(solution_value, str):
+                variable = [float(x) for x in solution_value.split(",")]
+            else:
+                # solution_value is not a string
+                click.echo("The input format is incorrect. Please enter numbers separated by commas (e.g. 1.5,2.3,4.7)")
+                return
+        else:
+            # result is not a dict or "solution" is not in result
+            click.echo("The input is missing. Please provide the necessary information.")
+            return
     click.echo(
-        f"Submitting {result} for Competition: {competition}, Match: {match}...",
+        f"Submitting {variable} for Competition: {competition}, Match: {match}...",
     )
     create_solution(match, variable)
     click.echo("...Submitted.")
