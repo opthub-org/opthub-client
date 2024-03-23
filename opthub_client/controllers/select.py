@@ -30,7 +30,8 @@ def select(
     match_selection_context = MatchSelectionContext()
 
     # competitions aliases for choices
-    competition_aliases = [competition["alias"] for competition in fetch_participated_competitions()]
+    competitions = fetch_participated_competitions()
+    competition_aliases = [competition["alias"] for competition in competitions]
 
     # if not set -c commands option
     if competition is None:
@@ -42,15 +43,19 @@ def select(
                 "choices": competition_aliases,
             },
         ]
-        selected_competition = prompt(questions=competition_questions, style=custom_style)
-        if isinstance(selected_competition["competition"], str):
-            competition = selected_competition["competition"]
+        result_competition = prompt(questions=competition_questions, style=custom_style)
+        if isinstance(result_competition["competition"], str):
+            competition = result_competition["competition"]
 
     if competition not in competition_aliases:
         click.echo("Competition is not found.")
         return
-
-    match_aliases = [match["alias"] for match in fetch_matches_by_competition_alias(competition)]
+    selected_competition = next((c for c in competitions if c["alias"] == competition), None)
+    if selected_competition is None:
+        click.echo("Competition is not found.")
+        return
+    matches = fetch_matches_by_competition_alias(competition)
+    match_aliases = [match["alias"] for match in matches]
 
     # if not set -m commands option
     if match is None:
@@ -62,15 +67,18 @@ def select(
                 "choices": match_aliases,
             },
         ]
-        selected_match = prompt(questions=match_questions, style=custom_style)
-        if isinstance(selected_match["match"], str):
-            match = selected_match["match"]
+        result_match = prompt(questions=match_questions, style=custom_style)
+        if isinstance(result_match["match"], str):
+            match = result_match["match"]
 
     if match not in match_aliases:
         click.echo("Match is not found.")
         return
-
-    match_selection_context.update(competition, match)
+    selected_match = next((m for m in matches if m["alias"] == match), None)
+    if selected_match is None:
+        click.echo("Match is not found.")
+        return
+    match_selection_context.update(selected_competition, selected_match)
 
     # show selected competition and match
-    click.echo(f"You have selected {competition} - {match}")
+    click.echo(f"You have selected {competition} - {selected_match["alias"]}")
