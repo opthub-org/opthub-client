@@ -32,7 +32,13 @@ from opthub_client.validators.solution import SolutionValidator
     help="Flag to indicate file submission.",
 )
 def submit(match: str | None, competition: str | None, file: bool) -> None:
-    """Submit a solution."""
+    """Submit a solution.
+
+    Args:
+        match (str | None): option for match(-m or --match)
+        competition (str | None): option for competition(-c or --competition)
+        file (bool): option for file(-f or --file). if -f or --file is provided, it will be a file submission.
+    """
     match_selection_context = MatchSelectionContext()
     if match is None:
         match = match_selection_context.match_id
