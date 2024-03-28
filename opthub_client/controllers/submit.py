@@ -1,5 +1,6 @@
 """This module contains the functions related to submit command."""
 
+import json
 from pathlib import Path
 
 import click
@@ -62,7 +63,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
             click.echo("The file path is incorrect. Please provide a valid file path.")
             return
         full_path = Path(file_path).expanduser()
-        variable = [float(x) for x in full_path.read_text().split(",")]
+        variable = json.loads(full_path.read_text())
 
     else:  # text submission
         questions = [
@@ -83,7 +84,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
             # solution_value is not a string
             click.echo("The input format is incorrect. Please enter numbers separated by commas (e.g. 1.5,2.3,4.7)")
             return
-        variable = [float(x) for x in solution_value.split(",")]
+        variable = json.loads(solution_value)
     click.echo(
         f"Submitting {variable} for Competition: {competition}, Match: {match}...",
     )
