@@ -1,4 +1,5 @@
 """This module contains the functions related to submit command."""
+
 from pathlib import Path
 
 import click
