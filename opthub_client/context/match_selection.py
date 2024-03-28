@@ -14,6 +14,8 @@ class MatchSelectionContext:
 
     match_id: str | None
     competition_id: str | None
+    match_alias: str | None
+    competition_alias: str | None
     file_path: str
 
     def __init__(self) -> None:
@@ -29,33 +31,43 @@ class MatchSelectionContext:
             # file is not found
             self.competition_id = None
             self.match_id = None
+            self.competition_alias = None
+            self.match_alias = None
             return
         try:
             with Path.open(Path(self.file_path)) as file:
                 content = file.read()
                 parts = content.split(",")
-                self.competition_id = parts[0]
-                self.match_id = parts[1]
+                self.competition_id = parts[0].split(":")[0]
+                self.competition_alias = parts[0].split(":")[1]
+                self.match_id = parts[1].split(":")[0]
+                self.match_alias = parts[1].split(":")[1]
         except OSError as e:
             click.echo(
                 f"An error occurred while reading the file: {e}. Please select competition and match again",
                 file=sys.stderr,
             )
             self.competition_id = None
+            self.competition_alias = None
             self.match_id = None
+            self.match_alias = None
             return
 
-    def update(self, competition_id: str, match_id: str) -> None:
+    def update(self, competition: Competition, match: Match) -> None:
         """Update the match selection.
 
         Args:
-            competition_id (str): Competition ID
-            match_id (str): Match ID
+            competition (Competition): Competition instance
+            match (Match): Match instance
         """
-        self.competition_id = competition_id
-        self.match_id = match_id
+        self.competition_id = competition["id"]
+        self.competition_alias = competition["alias"]
+        self.match_id = match["id"]
+        self.match_alias = match["alias"]
         with Path.open(Path(self.file_path), "w") as file:
-            file.write(competition_id + "," + match_id)
+            file.write(
+                self.competition_id + ": " + self.competition_alias + "," + self.match_id + ": " + self.match_alias,
+            )
 
     def get_selection(self, match: str | None, competition: str | None) -> tuple[Competition, Match]:
         """Select a match."""
