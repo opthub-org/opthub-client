@@ -26,7 +26,12 @@ def select(
     competition: str | None,
     match: str | None,
 ) -> None:
-    """Select a competition and match."""
+    """Select a competition and match.
+
+    Args:
+        competition (str | None): option for competition(-c or --competition)
+        match (str | None): option for match(-m or --match)
+    """
     match_selection_context = MatchSelectionContext()
 
     # competitions aliases for choices
@@ -46,7 +51,9 @@ def select(
         result_competition = prompt(questions=competition_questions, style=custom_style)
         if isinstance(result_competition["competition"], str):
             competition = result_competition["competition"]
-
+        else:
+            click.echo("Input type is not valid.")
+            return
     if competition not in competition_aliases:
         click.echo("Competition is not found.")
         return
@@ -70,7 +77,9 @@ def select(
         result_match = prompt(questions=match_questions, style=custom_style)
         if isinstance(result_match["match"], str):
             match = result_match["match"]
-
+        else:
+            click.echo("Input type is not valid.")
+            return
     if match not in match_aliases:
         click.echo("Match is not found.")
         return
@@ -81,4 +90,4 @@ def select(
     match_selection_context.update(selected_competition, selected_match)
 
     # show selected competition and match
-    click.echo(f"You have selected {competition} - {selected_match["alias"]}")
+    click.echo(f"You have selected {competition} - {match}")
