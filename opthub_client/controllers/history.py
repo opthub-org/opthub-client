@@ -8,7 +8,7 @@ from prompt_toolkit.application import run_in_terminal
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
 from prompt_toolkit.styles import Style
 
-from opthub_client.context.match_selection import MatchSelectionContext, match_select
+from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.models.trial import Trial, fetch_trials
 
 style = Style.from_dict(
@@ -46,14 +46,14 @@ def display_trials(trials: list[Trial]) -> None:
 @click.pass_context
 def history(ctx: click.Context, competition: str | None, match: str | None, size: int) -> None:
     """Check submitted solutions."""
-    selected_competition,selected_match = match_select(match, competition)
+    match_selection_context = MatchSelectionContext()
+    selected_competition, selected_match = match_selection_context.get_selection(match, competition)
     bindings = KeyBindings()
 
     # n key is to display next batch of solutions
     @bindings.add("n")
     def add_trials(event: KeyPressEvent) -> None:
         """Display next batch of solutions."""
-        # TODO: ページネーションの実装がおかしい
         trials = fetch_trials(selected_competition["id"], selected_match["id"], 1, size)
         run_in_terminal(lambda: display_trials(trials), render_cli_done=False)
 

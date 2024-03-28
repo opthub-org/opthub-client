@@ -7,7 +7,7 @@ import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
 from InquirerPy.validator import PathValidator
 
-from opthub_client.context.match_selection import match_select
+from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.models.solution import create_solution
 from opthub_client.validators.solution import SolutionValidator
 
@@ -33,7 +33,8 @@ from opthub_client.validators.solution import SolutionValidator
 )
 def submit(match: str | None, competition: str | None, file: bool) -> None:
     """Submit a solution."""
-    selected_competition,selected_match = match_select(match, competition)
+    match_selection_context = MatchSelectionContext()
+    selected_competition, selected_match = match_selection_context.get_selection(match, competition)
     if file:  # file submission
         questions = [
             {
