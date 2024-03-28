@@ -74,18 +74,16 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
             },
         ]
         result = prompt(questions)
-        if isinstance(result, dict) and "solution" in result:
-            solution_value = result["solution"]
-            if isinstance(solution_value, str):
-                variable = [float(x) for x in solution_value.split(",")]
-            else:
-                # solution_value is not a string
-                click.echo("The input format is incorrect. Please enter numbers separated by commas (e.g. 1.5,2.3,4.7)")
-                return
-        else:
+        if not isinstance(result, dict) or "solution" not in result:
             # result is not a dict or "solution" is not in result
             click.echo("The input is missing. Please provide the necessary information.")
             return
+        solution_value = result["solution"]
+        if not isinstance(solution_value, str):
+            # solution_value is not a string
+            click.echo("The input format is incorrect. Please enter numbers separated by commas (e.g. 1.5,2.3,4.7)")
+            return
+        variable = [float(x) for x in solution_value.split(",")]
     click.echo(
         f"Submitting {variable} for Competition: {competition}, Match: {match}...",
     )
