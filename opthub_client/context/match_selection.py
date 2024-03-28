@@ -77,5 +77,4 @@ class MatchSelectionContext:
         if selected_match is None:
             msg = "Match is not found."
             raise AssertionError(msg)
-        match_selection_context.update(selected_competition["alias"], selected_match["alias"])
         return selected_competition, selected_match
