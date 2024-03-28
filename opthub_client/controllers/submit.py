@@ -53,15 +53,17 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         ]
         result = prompt(questions)
         # read the file
-        if isinstance(result, dict):
-            file_path = result.get("file")
-            if isinstance(file_path, str):
-                full_path = Path(file_path).expanduser()
-                variable = [float(x) for x in full_path.read_text().split(",")]
-            else:
-                # file_path is not a string
-                click.echo("The file path is incorrect. Please provide a valid file path.")
-                return
+        if not isinstance(result, dict):
+            # result is not a dictionary, cannot proceed
+            return
+        file_path = result.get("file")
+        if not isinstance(file_path, str):
+            # file_path is not a string, indicate error to user
+            click.echo("The file path is incorrect. Please provide a valid file path.")
+            return
+        full_path = Path(file_path).expanduser()
+        variable = [float(x) for x in full_path.read_text().split(",")]
+
     else:  # text submission
         questions = [
             {
