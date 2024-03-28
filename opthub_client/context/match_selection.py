@@ -14,8 +14,8 @@ class MatchSelectionContext:
 
     match_id: str | None
     competition_id: str | None
-    match_alias: str|None
-    competition_alias: str|None
+    match_alias: str | None
+    competition_alias: str | None
     file_path: str
 
     def __init__(self) -> None:
@@ -57,12 +57,14 @@ class MatchSelectionContext:
         """Update the match selection.
 
         Args:
-            competition (Competition): Competition class
-            match (Match): Match class
+            competition (Competition): Competition instance
+            match (Match): Match instance
         """
         self.competition_id = competition["id"]
         self.competition_alias = competition["alias"]
         self.match_id = match["id"]
         self.match_alias = match["alias"]
         with Path.open(Path(self.file_path), "w") as file:
-            file.write(self.competition_id + ": " + self.competition_alias+","+self.match_id+": "+self.match_alias)
+            file.write(
+                self.competition_id + ": " + self.competition_alias + "," + self.match_id + ": " + self.match_alias,
+            )
