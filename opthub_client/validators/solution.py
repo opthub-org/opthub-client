@@ -1,19 +1,19 @@
 """This module contains the solution validator."""
 
-import re
 
-from prompt_toolkit.document import Document
-from prompt_toolkit.validation import ValidationError, Validator
+class SolutionValidator:
+    """The solution validator."""
 
+    @staticmethod
+    def check_solution(variable: list[float]) -> bool:
+        """Check validate the solution.
 
-class SolutionValidator(Validator):
-    """This class validates the solution input."""
+        Args:
+            variable (list[float]): The variable of solution.
 
-    def validate(self, document: Document) -> None:
-        """Validate the solution input."""
-        pattern = r"[^(\d|\d+\.\d+)+(\s*,\s*(\d|\d+\.\d+)+)*\s*$]"
-        if not re.match(pattern, document.text):
-            raise ValidationError(
-                message="Invalid format. Please enter in the format [number,number,...,number]",
-                cursor_position=len(document.text),
-            )
+        Returns:
+            bool: True if the solution is valid, False otherwise.
+        """
+        if not isinstance(variable, list):
+            return False
+        return all(isinstance(value, (int | float)) for value in variable)
