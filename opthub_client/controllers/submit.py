@@ -87,7 +87,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         solution_value = result["solution"]
         if not isinstance(solution_value, str):
             # solution_value is not a string
-            click.echo("The input format is incorrect. Please enter numbers separated by commas (e.g. 1.5,2.3,4.7)")
+            click.echo("The input format is incorrect. Please enter numbers separated by commas (e.g. [1.5,2.3,4.7])")
             return
         variable = json.loads(solution_value)
     if not SolutionValidator.check_solution(variable):
@@ -96,5 +96,5 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
     click.echo(
         f"Submitting {variable} for Competition: {competition}, Match: {match}...",
     )
-    create_solution(match, variable)
+    # create_solution(match, variable)
     click.echo("...Submitted.")
