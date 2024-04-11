@@ -16,5 +16,14 @@ class SolutionValidator:
         Returns:
             bool: True if the solution is valid, False otherwise.
         """
-        variable = list(map(float, variable))
+        # variable is not list
+        if isinstance(variable, list):
+            return True
+        variable = [variable]
+        try:
+            # each element of variable is float or int
+            variable = list(map(float, variable))
+        except ValueError:
+            # if any element of variable is not float or int
+            return False
         return all(isinstance(value, (int | float)) for value in variable)

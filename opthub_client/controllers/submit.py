@@ -93,8 +93,9 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
     if not SolutionValidator.check_solution(variable):
         click.echo("The solution is not valid. Please provide a valid solution.")
         return
+    variable = [float(value) for value in variable]
     click.echo(
         f"Submitting {variable} for Competition: {competition}, Match: {match}...",
     )
-    # create_solution(match, variable)
+    create_solution(match, variable)
     click.echo("...Submitted.")
