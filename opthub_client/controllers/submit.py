@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import List, cast
 
 import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
@@ -93,7 +94,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
     if not SolutionValidator.check_solution(variable):
         click.echo("The solution is not valid. Please provide a valid solution.")
         return
-    variable = [float(value) for value in variable]
+    variable = cast(list[float], variable)
     click.echo(
         f"Submitting {variable} for Competition: {competition}, Match: {match}...",
     )
