@@ -41,13 +41,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         file (bool): option for file(-f or --file). if -f or --file is provided, it will be a file submission.
     """
     match_selection_context = MatchSelectionContext()
-    if match is None:
-        match = match_selection_context.match_id
-    if competition is None:
-        competition = match_selection_context.competition_id
-    if competition is None or match is None:
-        click.echo("Please select a competition and match first.")
-        return
+    selected_competition, selected_match = match_selection_context.get_selection(match, competition)
     if file:  # file submission
         questions = [
             {
@@ -96,7 +90,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         return
     variable = cast(list[float], variable)
     click.echo(
-        f"Submitting {variable} for Competition: {competition}, Match: {match}...",
+        f"Submitting {variable} for Competition: {selected_competition['alias']}, Match: {selected_match['alias']}...",
     )
-    create_solution(match, variable)
+    create_solution(selected_match["id"], variable)
     click.echo("...Submitted.")
