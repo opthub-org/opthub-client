@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import List, cast
 
 import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
@@ -32,7 +33,13 @@ from opthub_client.validators.solution import SolutionValidator
     help="Flag to indicate file submission.",
 )
 def submit(match: str | None, competition: str | None, file: bool) -> None:
-    """Submit a solution."""
+    """Submit a solution.
+
+    Args:
+        match (str | None): option for match(-m or --match)
+        competition (str | None): option for competition(-c or --competition)
+        file (bool): option for file(-f or --file). if -f or --file is provided, it will be a file submission.
+    """
     match_selection_context = MatchSelectionContext()
     selected_competition, selected_match = match_selection_context.get_selection(match, competition)
     if file:  # file submission
@@ -47,21 +54,43 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
             },
         ]
         result = prompt(questions)
-        variable = Path(result).read_text()
+        # read the file
+        if not isinstance(result, dict):
+            # result is not a dictionary, cannot proceed
+            return
+        file_path = result.get("file")
+        if not isinstance(file_path, str):
+            # file_path is not a string, indicate error to user
+            click.echo("The file path is incorrect. Please provide a valid file path.")
+            return
+        full_path = Path(file_path).expanduser()
+        variable = json.loads(full_path.read_text())
+
     else:  # text submission
         questions = [
             {
                 "name": "solution",
                 "type": "input",
                 "message": "Write the solution:",
-                "validate": SolutionValidator(),
             },
         ]
         result = prompt(questions)
-        variable = [float(x) for x in result["solution"].split(",")]
-        variable = json.dumps(variable)
+        if not isinstance(result, dict) or "solution" not in result:
+            # result is not a dict or "solution" is not in result
+            click.echo("The input is missing. Please provide the necessary information.")
+            return
+        solution_value = result["solution"]
+        if not isinstance(solution_value, str):
+            # solution_value is not a string
+            click.echo("The input format is incorrect. Please enter numbers separated by commas (e.g. [1.5,2.3,4.7])")
+            return
+        variable = json.loads(solution_value)
+    if not SolutionValidator.check_solution(variable):
+        click.echo("The solution is not valid. Please provide a valid solution.")
+        return
+    variable = cast(list[float], variable)
     click.echo(
-        f"Submitting {result} for Competition: {selected_competition['alias']}, Match: {selected_match['alias']}...",
+        f"Submitting {variable} for Competition: {selected_competition['alias']}, Match: {selected_match['alias']}...",
     )
     create_solution(selected_match["id"], variable)
     click.echo("...Submitted.")
