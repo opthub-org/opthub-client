@@ -13,21 +13,39 @@ class Credentials:
         temp_dir = tempfile.gettempdir()
         temp_file_name = "credentials"
         self.file_path = Path(temp_dir) / temp_file_name
-        self.db = shelve.open(str(self.file_path))
-        self.load()
 
     def load(self) -> None:
         """Load the credentials from the shelve file."""
-        self.username = self.db.get("user_name")
-        self.password = self.db.get("password")
+        with shelve.open(str(self.file_path)) as db:
+            self.access_token = db.get("access_token")
+            self.refresh_token = db.get("refresh_token ")
+            db.close()
 
-    def update(self, username: str, password: str) -> None:
+    def update(self, access_token: str, refresh_token: str) -> None:
         """Update the credentials in the shelve file.
 
         Args:
-            username (str): _description_
-            password (str): _description_
+            access_token (str): access token
+            refresh_token(str): refresh token
         """
-        self.db["user_name"] = username
-        self.db["password"] = password
-        self.db.sync()
+        with shelve.open(str(self.file_path)) as db:
+            db["access_token"] = access_token
+            db["refresh_token"] = refresh_token
+            db.sync()
+
+    def is_expired_access_token(self) -> bool:
+        """Check if the access token is expired."""
+        if self.access_token is None or not isinstance(self.access_token, (str)):
+            # TODO none or not string type processing
+            return True
+        try:
+            jwt.decode(self.access_token, verify=False)
+        except jwt.ExpiredSignatureError:
+            return True
+        else:
+            return False
+
+    def refresh_token(self) -> None:
+        """Refresh the access token."""
+        # TODO refresh token
+        pass
