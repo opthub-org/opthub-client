@@ -3,21 +3,17 @@
 from gql import Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
-url = "MOCK_URL"
-api_key = "MOCK_API_KEY"
-headers = {"x-api-key": api_key}
-transport = AIOHTTPTransport(url=url, headers=headers)
-client = Client(transport=transport, fetch_schema_from_transport=True)
 
-
-def get_gql_client() -> Client:
+def get_gql_client(access_token: str) -> Client:
     """Get the GraphQL client.
 
     Returns:
         Client: The GraphQL client
     """
-    url = "MOCK_URL"
-    api_key = "MOCK_API_KEY"
-    headers = {"x-api-key": api_key}
+    url = "https://jciqso7l7rhajfkt5s3dhybpcu.appsync-api.ap-northeast-1.amazonaws.com/graphql"
+    # api_key = "da2-kge2w7onkfcodd6wx4m437uie4"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+    }
     transport = AIOHTTPTransport(url=url, headers=headers)
     return Client(transport=transport, fetch_schema_from_transport=True)

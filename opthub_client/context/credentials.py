@@ -2,11 +2,24 @@
 
 import shelve
 import tempfile
+import time
 from pathlib import Path
+
+import boto3
+import jwt
+
+CLIENT_ID = "7et20feq5fv89j4k430f7ren7s"
+SECRET_HASH = "nrTpTfTDw72mKzN8AD3q813oAH81HpVNFu9+j9g9bLs="
 
 
 class Credentials:
     """The credentials class."""
+
+    access_token: str
+    refresh_token: str
+    expire_at: str
+    user_id: str
+    user_name: str
 
     def __init__(self) -> None:
         """Initialize the credentials context with a persistent temporary file."""
@@ -17,35 +30,55 @@ class Credentials:
     def load(self) -> None:
         """Load the credentials from the shelve file."""
         with shelve.open(str(self.file_path)) as db:
-            self.access_token = db.get("access_token")
-            self.refresh_token = db.get("refresh_token ")
+            self.access_token = db.get("access_token", str)
+            self.refresh_token = db.get("refresh_token", str)
+            self.expire_at = db.get("expire_at", str)
+            self.user_id = db.get("user_id", str)
+            self.user_name = db.get("user_name", str)
+            if self.is_expired():
+                self.refresh_access_token()
             db.close()
 
-    def update(self, access_token: str, refresh_token: str) -> None:
+    def update(
+        self,
+        access_token: str,
+        refresh_token: str,
+    ) -> None:
         """Update the credentials in the shelve file.
 
         Args:
             access_token (str): access token
-            refresh_token(str): refresh token
+            refresh_token (str): refresh token
+            user_id (str): user id
         """
         with shelve.open(str(self.file_path)) as db:
             db["access_token"] = access_token
             db["refresh_token"] = refresh_token
+            token = jwt.decode(access_token, options={"verify_signature": False})
+            db["expire_at"] = token.get("exp")
+            db["user_id"] = token.get("sub")
+            db["user_name"] = token.get("username")
             db.sync()
 
-    def is_expired_access_token(self) -> bool:
-        """Check if the access token is expired."""
-        if self.access_token is None or not isinstance(self.access_token, (str)):
-            # TODO none or not string type processing
-            return True
-        try:
-            jwt.decode(self.access_token, verify=False)
-        except jwt.ExpiredSignatureError:
-            return True
-        else:
-            return False
+    def is_expired(self) -> bool:
+        """Determine if the access token has expired.
 
-    def refresh_token(self) -> None:
+        Returns:
+            bool: True if the token has expired, otherwise False.
+        """
+        if self.expire_at is None:
+            return True
+        current_time = int(time.time())
+        expire_at_timestamp = int(self.expire_at)
+        return current_time > expire_at_timestamp
+
+    def refresh_access_token(self) -> None:
         """Refresh the access token."""
-        # TODO refresh token
-        pass
+        client = boto3.client("cognito-idp", region_name="ap-northeast-1")
+        response = client.initiate_auth(
+            AuthFlow="REFRESH_TOKEN_AUTH",
+            AuthParameters={"REFRESH_TOKEN": self.refresh_token, "SECRET_HASH": SECRET_HASH},
+            ClientId=CLIENT_ID,
+        )
+        self.access_token = response["AuthenticationResult"]["AccessToken"]
+        self.expire_at = jwt.decode(self.access_token, options={"verify_signature": False})
