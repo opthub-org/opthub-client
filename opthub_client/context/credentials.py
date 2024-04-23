@@ -13,8 +13,9 @@ SECRET_HASH = "nrTpTfTDw72mKzN8AD3q813oAH81HpVNFu9+j9g9bLs="
 
 
 class Credentials:
-    """The credentials class."""
+    """The credentials class. To store and manage the credentials."""
 
+    file_path: Path
     access_token: str
     refresh_token: str
     expire_at: str
@@ -35,6 +36,7 @@ class Credentials:
             self.expire_at = db.get("expire_at", str)
             self.user_id = db.get("user_id", str)
             self.user_name = db.get("user_name", str)
+            # refresh the access token if it is expired
             if self.is_expired():
                 self.refresh_access_token()
             db.close()
@@ -54,6 +56,7 @@ class Credentials:
         with shelve.open(str(self.file_path)) as db:
             db["access_token"] = access_token
             db["refresh_token"] = refresh_token
+            # decode the access token to get the expire time, user id and user name
             token = jwt.decode(access_token, options={"verify_signature": False})
             db["expire_at"] = token.get("exp")
             db["user_id"] = token.get("sub")
@@ -73,7 +76,7 @@ class Credentials:
         return current_time > expire_at_timestamp
 
     def refresh_access_token(self) -> None:
-        """Refresh the access token."""
+        """Refresh the access token using refresh token."""
         client = boto3.client("cognito-idp", region_name="ap-northeast-1")
         response = client.initiate_auth(
             AuthFlow="REFRESH_TOKEN_AUTH",
@@ -81,4 +84,4 @@ class Credentials:
             ClientId=CLIENT_ID,
         )
         self.access_token = response["AuthenticationResult"]["AccessToken"]
-        self.expire_at = jwt.decode(self.access_token, options={"verify_signature": False})
+        self.expire_at = jwt.decode(self.access_token, options={"verify_signature": False})["exp"]

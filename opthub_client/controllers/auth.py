@@ -4,7 +4,6 @@ import boto3
 import click
 
 from opthub_client.context.credentials import Credentials
-from opthub_client.graphql.auth_client_test import test_auth
 
 CLIENT_ID = "7et20feq5fv89j4k430f7ren7s"
 SECRET_HASH = "nrTpTfTDw72mKzN8AD3q813oAH81HpVNFu9+j9g9bLs="
@@ -26,5 +25,3 @@ def auth(ctx: click.Context, user_name: str, password: str) -> None:
     refresh_token = response["AuthenticationResult"]["RefreshToken"]
     credentials = Credentials()
     credentials.update(access_token, refresh_token)
-    credentials.load()
-    test_auth(credentials.access_token)
