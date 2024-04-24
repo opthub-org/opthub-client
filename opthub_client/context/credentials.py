@@ -19,8 +19,8 @@ class Credentials:
     access_token: str
     refresh_token: str
     expire_at: str
-    user_id: str
-    user_name: str
+    uid: str
+    username: str
 
     def __init__(self) -> None:
         """Initialize the credentials context with a persistent temporary file."""
@@ -34,8 +34,8 @@ class Credentials:
             self.access_token = db.get("access_token", str)
             self.refresh_token = db.get("refresh_token", str)
             self.expire_at = db.get("expire_at", str)
-            self.user_id = db.get("user_id", str)
-            self.user_name = db.get("user_name", str)
+            self.uid = db.get("uid", str)
+            self.username = db.get("username", str)
             # refresh the access token if it is expired
             if self.is_expired():
                 self.refresh_access_token()
@@ -59,8 +59,8 @@ class Credentials:
             # decode the access token to get the expire time, user id and user name
             token = jwt.decode(access_token, options={"verify_signature": False})
             db["expire_at"] = token.get("exp")
-            db["user_id"] = token.get("sub")
-            db["user_name"] = token.get("username")
+            db["uid"] = token.get("sub")
+            db["username"] = token.get("username")
             db.sync()
 
     def is_expired(self) -> bool:
