@@ -15,13 +15,5 @@ SECRET_HASH = "nrTpTfTDw72mKzN8AD3q813oAH81HpVNFu9+j9g9bLs="
 @click.pass_context
 def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
-    client = boto3.client("cognito-idp", region_name="ap-northeast-1")
-    response = client.initiate_auth(
-        AuthFlow="USER_PASSWORD_AUTH",
-        AuthParameters={"USERNAME": username, "PASSWORD": password, "SECRET_HASH": SECRET_HASH},
-        ClientId=CLIENT_ID,
-    )
-    access_token = response["AuthenticationResult"]["AccessToken"]
-    refresh_token = response["AuthenticationResult"]["RefreshToken"]
     credentials = Credentials()
-    credentials.update(access_token, refresh_token)
+    credentials.cognito_login(username, password)

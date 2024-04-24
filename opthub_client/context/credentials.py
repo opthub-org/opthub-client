@@ -41,11 +41,7 @@ class Credentials:
                 self.refresh_access_token()
             db.close()
 
-    def update(
-        self,
-        access_token: str,
-        refresh_token: str,
-    ) -> None:
+    def update(self) -> None:
         """Update the credentials in the shelve file.
 
         Args:
@@ -54,10 +50,10 @@ class Credentials:
             user_id (str): user id
         """
         with shelve.open(str(self.file_path)) as db:
-            db["access_token"] = access_token
-            db["refresh_token"] = refresh_token
+            db["access_token"] = self.access_token
+            db["refresh_token"] = self.refresh_token
             # decode the access token to get the expire time, user id and user name
-            token = jwt.decode(access_token, options={"verify_signature": False})
+            token = jwt.decode(self.access_token, options={"verify_signature": False})
             db["expire_at"] = token.get("exp")
             db["uid"] = token.get("sub")
             db["username"] = token.get("username")
@@ -85,3 +81,21 @@ class Credentials:
         )
         self.access_token = response["AuthenticationResult"]["AccessToken"]
         self.expire_at = jwt.decode(self.access_token, options={"verify_signature": False})["exp"]
+
+    def cognito_login(self, username: str, password: str) -> None:
+        """Login to cognito user pool. And update the credentials.
+
+        Args:
+            username (str): username
+            password (str): password
+        """
+        client = boto3.client("cognito-idp", region_name="ap-northeast-1")
+
+        response = client.initiate_auth(
+            AuthFlow="USER_PASSWORD_AUTH",
+            AuthParameters={"USERNAME": username, "PASSWORD": password, "SECRET_HASH": SECRET_HASH},
+            ClientId=CLIENT_ID,
+        )
+        self.access_token = response["AuthenticationResult"]["AccessToken"]
+        self.refresh_token = response["AuthenticationResult"]["RefreshToken"]
+        self.update()
