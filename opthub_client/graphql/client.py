@@ -9,9 +9,6 @@ from opthub_client.context.credentials import Credentials
 def get_gql_client() -> Client:
     """Get the GraphQL client.
 
-    Args:
-        access_token (str | None): The access token
-
     Returns:
         Client: The GraphQL client
 
