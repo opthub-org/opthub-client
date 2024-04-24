@@ -12,7 +12,6 @@ from opthub_client.controllers.submit import submit
 @click.pass_context
 def help(ctx: click.Context) -> None:  # noqa: A001, ARG001
     """Show commands usage."""
-    click.echo("aaa")
 
 
 help.add_command(history)
