@@ -25,7 +25,7 @@ class Credentials:
     def __init__(self) -> None:
         """Initialize the credentials context with a persistent temporary file."""
         temp_dir = tempfile.gettempdir()
-        temp_file_name = "credentials"
+        temp_file_name = "opthub_credentials"
         self.file_path = Path(temp_dir) / temp_file_name
 
     def load(self) -> None:
