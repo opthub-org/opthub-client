@@ -42,13 +42,7 @@ class Credentials:
             db.close()
 
     def update(self) -> None:
-        """Update the credentials in the shelve file.
-
-        Args:
-            access_token (str): access token
-            refresh_token (str): refresh token
-            user_id (str): user id
-        """
+        """Update the credentials in the shelve file."""
         with shelve.open(str(self.file_path)) as db:
             db["access_token"] = self.access_token
             db["refresh_token"] = self.refresh_token
