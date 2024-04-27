@@ -6,11 +6,18 @@ from opthub_client.graphql.client import get_gql_client
 
 
 class VersionCLIMessage:
-    def __init__(self, label: str, labelColor: str, message: str, messageColor: str):
+    """Version CLI Message."""
+
+    label: str
+    label_color: str
+    message: str
+    message_color: str
+
+    def __init__(self, label: str, label_color: str, message: str, message_color: str):
         self.label = label
-        self.labelColor = labelColor
+        self.labelColor = label_color
         self.message = message
-        self.messageColor = messageColor
+        self.messageColor = message_color
 
 
 def get_messages(version: str) -> VersionCLIMessage:
