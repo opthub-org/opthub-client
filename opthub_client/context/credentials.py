@@ -38,7 +38,10 @@ class Credentials:
             self.username = db.get("username", str)
             # refresh the access token if it is expired
             if self.is_expired():
-                self.refresh_access_token()
+                # refresh token is expired, clear the credentials
+                if not self.refresh_access_token():
+                    self.clear_credentials()
+                    raise Exception("Failed to refresh authentication token. Please re-login.")
             db.close()
 
     def update(self) -> None:
@@ -65,16 +68,20 @@ class Credentials:
         expire_at_timestamp = int(self.expire_at)
         return current_time > expire_at_timestamp
 
-    def refresh_access_token(self) -> None:
+    def refresh_access_token(self) -> bool:
         """Refresh the access token using refresh token."""
         client = boto3.client("cognito-idp", region_name="ap-northeast-1")
-        response = client.initiate_auth(
-            AuthFlow="REFRESH_TOKEN_AUTH",
-            AuthParameters={"REFRESH_TOKEN": self.refresh_token, "SECRET_HASH": SECRET_HASH},
-            ClientId=CLIENT_ID,
-        )
-        self.access_token = response["AuthenticationResult"]["AccessToken"]
-        self.expire_at = jwt.decode(self.access_token, options={"verify_signature": False})["exp"]
+        try:
+            response = client.initiate_auth(
+                AuthFlow="REFRESH_TOKEN_AUTH",
+                AuthParameters={"REFRESH_TOKEN": self.refresh_token, "SECRET_HASH": SECRET_HASH},
+                ClientId=CLIENT_ID,
+            )
+            self.access_token = response["AuthenticationResult"]["AccessToken"]
+            self.expire_at = jwt.decode(self.access_token, options={"verify_signature": False})["exp"]
+            return True
+        except Exception as e:
+            return False
 
     def cognito_login(self, username: str, password: str) -> None:
         """Login to cognito user pool. And update the credentials.
@@ -93,3 +100,18 @@ class Credentials:
         self.access_token = response["AuthenticationResult"]["AccessToken"]
         self.refresh_token = response["AuthenticationResult"]["RefreshToken"]
         self.update()
+
+    def clear_credentials(self) -> None:
+        """Clear the credentials in the shelve file."""
+        with shelve.open(str(self.file_path)) as db:
+            db["access_token"] = ""
+            db["refresh_token"] = ""
+            db["expire_at"] = ""
+            db["uid"] = ""
+            db["username"] = ""
+            db.sync()
+        self.access_token = ""
+        self.refresh_token = ""
+        self.expire_at = ""
+        self.uid = ""
+        self.username = ""
