@@ -8,6 +8,7 @@ from prompt_toolkit.application import run_in_terminal
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
 from prompt_toolkit.styles import Style
 
+from opthub_client import __version__
 from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.controllers.utils import version_message
 from opthub_client.models.trial import Trial, fetch_trials
