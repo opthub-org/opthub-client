@@ -3,7 +3,9 @@
 import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
 
+from opthub_client import __version__
 from opthub_client.context.match_selection import MatchSelectionContext
+from opthub_client.graphql.version_cli import get_messages
 from opthub_client.models.competition import fetch_participated_competitions
 from opthub_client.models.match import fetch_matches_by_competition_alias
 
@@ -32,6 +34,10 @@ def select(
         competition (str | None): option for competition(-c or --competition)
         match (str | None): option for match(-m or --match)
     """
+    message = get_messages(__version__)
+    if message.label == "Error":
+        click.echo(click.style(message.message, fg="red"))
+        return
     match_selection_context = MatchSelectionContext()
 
     # competitions aliases for choices
