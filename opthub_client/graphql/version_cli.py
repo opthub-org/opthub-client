@@ -6,13 +6,14 @@ from opthub_client.graphql.client import get_gql_client
 
 
 class VersionCLIMessage:
-    label: str
-    labelColor: str
-    message: str
-    messageColor: str
+    def __init__(self, label: str, labelColor: str, message: str, messageColor: str):
+        self.label = label
+        self.labelColor = labelColor
+        self.message = message
+        self.messageColor = messageColor
 
 
-def get_messages(version: str) -> VersionCLIMessage | None:
+def get_messages(version: str) -> VersionCLIMessage:
     """Get messages for display in OptHub Client.
 
     Returns:
@@ -32,6 +33,6 @@ def get_messages(version: str) -> VersionCLIMessage | None:
 
     result = client.execute(query, variable_values={"version": version})
     data = result.get("getCLIVersionStatus")
-    if data:
-        return VersionCLIMessage(**data)
-    return None
+    if isinstance(data, list) and data:
+        return VersionCLIMessage(**data[0])
+    raise ValueError("No CLI messages found for version")

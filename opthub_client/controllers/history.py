@@ -48,7 +48,10 @@ def display_trials(trials: list[Trial]) -> None:
 @click.pass_context
 def history(ctx: click.Context, competition: str | None, match: str | None, size: int) -> None:
     """Check submitted solutions."""
-    get_messages(__version__)
+    message = get_messages(__version__)
+    if message.label == "Error":
+        click.echo(click.style(message.message, fg="red"))
+        return
     match_selection_context = MatchSelectionContext()
     selected_competition, selected_match = match_selection_context.get_selection(match, competition)
     bindings = KeyBindings()
