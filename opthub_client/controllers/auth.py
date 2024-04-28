@@ -1,24 +1,10 @@
 """This module contains the functions related to auth command."""
 
-<<<<<<< HEAD
 import botocore
 import click
 
-<<<<<<< HEAD
+from opthub_client.context.credentials import Credentials
 from opthub_client.controllers.utils import version_message
-=======
-from opthub_client import __version__
-=======
-import click
-
-<<<<<<< HEAD
-from opthub_client.context.read_version import get_version
->>>>>>> 6d216d1 (:sparkles: add read version from toml file1)
-from opthub_client.graphql.version_cli import get_messages
->>>>>>> 7c0b044 (:+1: add the cli version message)
-=======
-from opthub_client.controllers.utils import version_message
->>>>>>> e56224c (:art: use compornent)
 
 
 @click.command()
@@ -27,14 +13,7 @@ from opthub_client.controllers.utils import version_message
 @click.pass_context
 def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
-<<<<<<< HEAD
-    message = get_messages(get_version())
-    if message.label == "Error":
-<<<<<<< HEAD
-<<<<<<< HEAD
-        click.echo(click.style(message.label, fg=message.labelColor))
-        click.echo(click.style(message.message, fg=message.messageColor))
-        return
+    version_message()
     credentials = Credentials()
     try:
         credentials.cognito_login(username, password)
@@ -51,14 +30,3 @@ def auth(ctx: click.Context, username: str, password: str) -> None:
     except Exception as e:
         # another exception
         click.echo(f"An unexpected error occurred: {e}")
-=======
-        click.echo(click.style(message.message, fg=message.labelColor))
-=======
-        click.echo(click.style(message.label, fg=message.labelColor))
-        click.echo(click.style(message.message, fg=message.messageColor))
->>>>>>> 6d8be0a (:sparkles: add message label)
-        return
->>>>>>> 7c0b044 (:+1: add the cli version message)
-=======
-    version_message()
->>>>>>> e56224c (:art: use compornent)

@@ -3,7 +3,9 @@
 import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
 
+from opthub_client import __version__
 from opthub_client.context.match_selection import MatchSelectionContext
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -17,6 +19,9 @@ from opthub_client.graphql.version_cli import get_messages
 =======
 from opthub_client.controllers.utils import version_message
 >>>>>>> e56224c (:art: use compornent)
+=======
+from opthub_client.graphql.version_cli import get_messages
+>>>>>>> 8a5b4f8 (:sparkles: add library message)
 from opthub_client.models.competition import fetch_participated_competitions
 from opthub_client.models.match import fetch_matches_by_competition_alias
 
@@ -45,7 +50,14 @@ def select(
         competition (str | None): option for competition(-c or --competition)
         match (str | None): option for match(-m or --match)
     """
+<<<<<<< HEAD
     version_message()
+=======
+    message = get_messages(__version__)
+    if message.label == "Error":
+        click.echo(click.style(message.message, fg="red"))
+        return
+>>>>>>> 8a5b4f8 (:sparkles: add library message)
     match_selection_context = MatchSelectionContext()
 
     # competitions aliases for choices
