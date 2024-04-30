@@ -4,7 +4,6 @@ import botocore
 import click
 
 from opthub_client import __version__
-from opthub_client.context.credentials import Credentials
 from opthub_client.graphql.version_cli import get_messages
 
 
@@ -16,7 +15,7 @@ def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
     message = get_messages(__version__)
     if message.label == "Error":
-        click.echo(click.style(message.message, fg="red"))
+        click.echo(click.style(message.message, fg=message.labelColor))
         return
     credentials = Credentials()
     try:

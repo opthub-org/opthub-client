@@ -36,7 +36,7 @@ def select(
     """
     message = get_messages(__version__)
     if message.label == "Error":
-        click.echo(click.style(message.message, fg="red"))
+        click.echo(click.style(message.message, fg=message.labelColor))
         return
     match_selection_context = MatchSelectionContext()
 
