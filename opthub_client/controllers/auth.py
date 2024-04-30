@@ -3,7 +3,12 @@
 import botocore
 import click
 
+<<<<<<< HEAD
 from opthub_client.controllers.utils import version_message
+=======
+from opthub_client import __version__
+from opthub_client.graphql.version_cli import get_messages
+>>>>>>> 7c0b044 (:+1: add the cli version message)
 
 
 @click.command()
@@ -14,6 +19,7 @@ def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
     message = get_messages(get_version())
     if message.label == "Error":
+<<<<<<< HEAD
         click.echo(click.style(message.label, fg=message.labelColor))
         click.echo(click.style(message.message, fg=message.messageColor))
         return
@@ -33,3 +39,7 @@ def auth(ctx: click.Context, username: str, password: str) -> None:
     except Exception as e:
         # another exception
         click.echo(f"An unexpected error occurred: {e}")
+=======
+        click.echo(click.style(message.message, fg=message.labelColor))
+        return
+>>>>>>> 7c0b044 (:+1: add the cli version message)

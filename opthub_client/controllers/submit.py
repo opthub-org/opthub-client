@@ -47,7 +47,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
 =======
     message = get_messages(__version__)
     if message.label == "Error":
-        click.echo(click.style(message.message, fg="red"))
+        click.echo(click.style(message.message, fg=message.labelColor))
         return
 >>>>>>> 8a5b4f8 (:sparkles: add library message)
     match_selection_context = MatchSelectionContext()
