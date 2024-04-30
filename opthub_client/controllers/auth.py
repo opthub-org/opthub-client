@@ -5,9 +5,6 @@ import click
 
 from opthub_client.context.credentials import Credentials
 
-CLIENT_ID = "7et20feq5fv89j4k430f7ren7s"
-SECRET_HASH = "nrTpTfTDw72mKzN8AD3q813oAH81HpVNFu9+j9g9bLs="
-
 
 @click.command()
 @click.option("--username", "-u", "username", required=True, prompt=True)
@@ -16,4 +13,8 @@ SECRET_HASH = "nrTpTfTDw72mKzN8AD3q813oAH81HpVNFu9+j9g9bLs="
 def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
     credentials = Credentials()
-    credentials.cognito_login(username, password)
+    try:
+        credentials.cognito_login(username, password)
+    except Exception:
+        click.echo("Authentication failed. Please verify that your username and password are correct.")
+        return
