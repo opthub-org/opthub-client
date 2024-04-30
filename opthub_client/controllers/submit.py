@@ -10,11 +10,7 @@ from InquirerPy.validator import PathValidator
 
 from opthub_client import __version__
 from opthub_client.context.match_selection import MatchSelectionContext
-<<<<<<< HEAD
 from opthub_client.controllers.utils import version_message
-=======
-from opthub_client.graphql.version_cli import get_messages
->>>>>>> 8a5b4f8 (:sparkles: add library message)
 from opthub_client.models.solution import create_solution
 from opthub_client.validators.solution import SolutionValidator
 
