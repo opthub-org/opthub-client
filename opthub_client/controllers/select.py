@@ -55,7 +55,8 @@ def select(
 =======
     message = get_messages(__version__)
     if message.label == "Error":
-        click.echo(click.style(message.message, fg=message.labelColor))
+        click.echo(click.style(message.label, fg=message.labelColor))
+        click.echo(click.style(message.message, fg=message.messageColor))
         return
 >>>>>>> 8a5b4f8 (:sparkles: add library message)
     match_selection_context = MatchSelectionContext()
