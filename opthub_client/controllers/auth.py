@@ -15,5 +15,6 @@ def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
     message = get_messages(__version__)
     if message.label == "Error":
-        click.echo(click.style(message.message, fg=message.labelColor))
+        click.echo(click.style(message.label, fg=message.labelColor))
+        click.echo(click.style(message.message, fg=message.messageColor))
         return

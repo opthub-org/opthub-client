@@ -50,7 +50,8 @@ def history(ctx: click.Context, competition: str | None, match: str | None, size
     """Check submitted solutions."""
     message = get_messages(__version__)
     if message.label == "Error":
-        click.echo(click.style(message.message, fg=message.labelColor))
+        click.echo(click.style(message.label, fg=message.labelColor))
+        click.echo(click.style(message.message, fg=message.messageColor))
         return
     match_selection_context = MatchSelectionContext()
     selected_competition, selected_match = match_selection_context.get_selection(match, competition)
