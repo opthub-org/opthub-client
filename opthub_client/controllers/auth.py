@@ -3,7 +3,7 @@
 import botocore
 import click
 
-from opthub_client import __version__
+from opthub_client.context.read_version import get_version
 from opthub_client.graphql.version_cli import get_messages
 
 
@@ -13,7 +13,7 @@ from opthub_client.graphql.version_cli import get_messages
 @click.pass_context
 def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
-    message = get_messages(__version__)
+    message = get_messages(get_version())
     if message.label == "Error":
         click.echo(click.style(message.label, fg=message.labelColor))
         click.echo(click.style(message.message, fg=message.messageColor))
