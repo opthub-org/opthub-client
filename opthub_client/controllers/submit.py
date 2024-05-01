@@ -8,7 +8,6 @@ import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
 from InquirerPy.validator import PathValidator
 
-from opthub_client import __version__
 from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.controllers.utils import version_message
 from opthub_client.models.solution import create_solution

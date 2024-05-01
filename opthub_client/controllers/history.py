@@ -10,7 +10,12 @@ from prompt_toolkit.styles import Style
 
 from opthub_client import __version__
 from opthub_client.context.match_selection import MatchSelectionContext
+<<<<<<< HEAD
 from opthub_client.controllers.utils import version_message
+=======
+from opthub_client.context.read_version import get_version
+from opthub_client.graphql.version_cli import get_messages
+>>>>>>> 6d216d1 (:sparkles: add read version from toml file1)
 from opthub_client.models.trial import Trial, fetch_trials
 
 style = Style.from_dict(
