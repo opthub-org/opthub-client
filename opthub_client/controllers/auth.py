@@ -1,5 +1,6 @@
 """This module contains the functions related to auth command."""
 
+<<<<<<< HEAD
 import botocore
 import click
 
@@ -7,6 +8,11 @@ import click
 from opthub_client.controllers.utils import version_message
 =======
 from opthub_client import __version__
+=======
+import click
+
+from opthub_client.context.read_version import get_version
+>>>>>>> 6d216d1 (:sparkles: add read version from toml file1)
 from opthub_client.graphql.version_cli import get_messages
 >>>>>>> 7c0b044 (:+1: add the cli version message)
 

@@ -11,8 +11,12 @@ from prompt_toolkit.styles import Style
 from opthub_client import __version__
 from opthub_client.context.match_selection import MatchSelectionContext
 <<<<<<< HEAD
+<<<<<<< HEAD
 from opthub_client.controllers.utils import version_message
 =======
+=======
+from opthub_client.context.read_version import get_version
+>>>>>>> 6d216d1 (:sparkles: add read version from toml file1)
 from opthub_client.graphql.version_cli import get_messages
 >>>>>>> cd87f36 (:sparkles: add version graphql)
 from opthub_client.models.trial import Trial, fetch_trials
@@ -53,7 +57,11 @@ def display_trials(trials: list[Trial]) -> None:
 def history(ctx: click.Context, competition: str | None, match: str | None, size: int) -> None:
     """Check submitted solutions."""
 <<<<<<< HEAD
+<<<<<<< HEAD
     message = get_messages(__version__)
+=======
+    message = get_messages(get_version())
+>>>>>>> 6d216d1 (:sparkles: add read version from toml file1)
     if message.label == "Error":
         click.echo(click.style(message.label, fg=message.labelColor))
         click.echo(click.style(message.message, fg=message.messageColor))

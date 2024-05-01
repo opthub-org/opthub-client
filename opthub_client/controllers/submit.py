@@ -10,6 +10,7 @@ from InquirerPy.validator import PathValidator
 
 from opthub_client import __version__
 from opthub_client.context.match_selection import MatchSelectionContext
+from opthub_client.context.read_version import get_version
 from opthub_client.graphql.version_cli import get_messages
 from opthub_client.models.solution import create_solution
 from opthub_client.validators.solution import SolutionValidator
@@ -43,9 +44,13 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         file (bool): option for file(-f or --file). if -f or --file is provided, it will be a file submission.
     """
 <<<<<<< HEAD
+<<<<<<< HEAD
     version_message()
 =======
     message = get_messages(__version__)
+=======
+    message = get_messages(get_version())
+>>>>>>> 6d216d1 (:sparkles: add read version from toml file1)
     if message.label == "Error":
         click.echo(click.style(message.label, fg=message.labelColor))
         click.echo(click.style(message.message, fg=message.messageColor))
