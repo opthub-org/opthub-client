@@ -55,7 +55,8 @@ def history(ctx: click.Context, competition: str | None, match: str | None, size
 <<<<<<< HEAD
     message = get_messages(__version__)
     if message.label == "Error":
-        click.echo(click.style(message.message, fg=message.labelColor))
+        click.echo(click.style(message.label, fg=message.labelColor))
+        click.echo(click.style(message.message, fg=message.messageColor))
         return
 =======
     get_messages(__version__)

@@ -20,6 +20,7 @@ def auth(ctx: click.Context, username: str, password: str) -> None:
     message = get_messages(get_version())
     if message.label == "Error":
 <<<<<<< HEAD
+<<<<<<< HEAD
         click.echo(click.style(message.label, fg=message.labelColor))
         click.echo(click.style(message.message, fg=message.messageColor))
         return
@@ -41,5 +42,9 @@ def auth(ctx: click.Context, username: str, password: str) -> None:
         click.echo(f"An unexpected error occurred: {e}")
 =======
         click.echo(click.style(message.message, fg=message.labelColor))
+=======
+        click.echo(click.style(message.label, fg=message.labelColor))
+        click.echo(click.style(message.message, fg=message.messageColor))
+>>>>>>> 6d8be0a (:sparkles: add message label)
         return
 >>>>>>> 7c0b044 (:+1: add the cli version message)
