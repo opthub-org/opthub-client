@@ -8,10 +8,8 @@ import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
 from InquirerPy.validator import PathValidator
 
-from opthub_client import __version__
 from opthub_client.context.match_selection import MatchSelectionContext
-from opthub_client.context.read_version import get_version
-from opthub_client.graphql.version_cli import get_messages
+from opthub_client.controllers.utils import version_message
 from opthub_client.models.solution import create_solution
 from opthub_client.validators.solution import SolutionValidator
 
@@ -43,11 +41,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         competition (str | None): option for competition(-c or --competition)
         file (bool): option for file(-f or --file). if -f or --file is provided, it will be a file submission.
     """
-    message = get_messages(get_version())
-    if message.label == "Error":
-        click.echo(click.style(message.label, fg=message.labelColor))
-        click.echo(click.style(message.message, fg=message.messageColor))
-        return
+    version_message()
     match_selection_context = MatchSelectionContext()
     selected_competition, selected_match = match_selection_context.get_selection(match, competition)
     if file:  # file submission
