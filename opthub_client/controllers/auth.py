@@ -11,10 +11,14 @@ from opthub_client import __version__
 =======
 import click
 
+<<<<<<< HEAD
 from opthub_client.context.read_version import get_version
 >>>>>>> 6d216d1 (:sparkles: add read version from toml file1)
 from opthub_client.graphql.version_cli import get_messages
 >>>>>>> 7c0b044 (:+1: add the cli version message)
+=======
+from opthub_client.controllers.utils import version_message
+>>>>>>> e56224c (:art: use compornent)
 
 
 @click.command()
@@ -23,6 +27,7 @@ from opthub_client.graphql.version_cli import get_messages
 @click.pass_context
 def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
+<<<<<<< HEAD
     message = get_messages(get_version())
     if message.label == "Error":
 <<<<<<< HEAD
@@ -54,3 +59,6 @@ def auth(ctx: click.Context, username: str, password: str) -> None:
 >>>>>>> 6d8be0a (:sparkles: add message label)
         return
 >>>>>>> 7c0b044 (:+1: add the cli version message)
+=======
+    version_message()
+>>>>>>> e56224c (:art: use compornent)
