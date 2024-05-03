@@ -3,7 +3,6 @@
 import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
 
-from opthub_client import __version__
 from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.controllers.utils import version_message
 from opthub_client.models.competition import fetch_participated_competitions
