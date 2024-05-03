@@ -8,10 +8,8 @@ from prompt_toolkit.application import run_in_terminal
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
 from prompt_toolkit.styles import Style
 
-from opthub_client import __version__
 from opthub_client.context.match_selection import MatchSelectionContext
-from opthub_client.context.read_version import get_version
-from opthub_client.graphql.version_cli import get_messages
+from opthub_client.controllers.utils import version_message
 from opthub_client.models.trial import Trial, fetch_trials
 
 style = Style.from_dict(
@@ -49,11 +47,7 @@ def display_trials(trials: list[Trial]) -> None:
 @click.pass_context
 def history(ctx: click.Context, competition: str | None, match: str | None, size: int) -> None:
     """Check submitted solutions."""
-    message = get_messages(get_version())
-    if message.label == "Error":
-        click.echo(click.style(message.label, fg=message.labelColor))
-        click.echo(click.style(message.message, fg=message.messageColor))
-        return
+    version_message()
     match_selection_context = MatchSelectionContext()
     selected_competition, selected_match = match_selection_context.get_selection(match, competition)
     bindings = KeyBindings()

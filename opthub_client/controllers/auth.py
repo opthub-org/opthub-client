@@ -3,8 +3,7 @@
 import botocore
 import click
 
-from opthub_client.context.read_version import get_version
-from opthub_client.graphql.version_cli import get_messages
+from opthub_client.controllers.utils import version_message
 
 
 @click.command()
