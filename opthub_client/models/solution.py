@@ -29,4 +29,4 @@ def create_solution(match_id: str, variable: Variable) -> None:
             "variable": variable,
         },
     }
-    client.execute(mutation, variable_values=variables)
+    client.execute(mutation, variables)

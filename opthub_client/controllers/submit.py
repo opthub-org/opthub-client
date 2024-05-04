@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import List, cast
+from typing import cast
 
 import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
