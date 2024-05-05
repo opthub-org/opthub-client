@@ -1,9 +1,10 @@
 """This module contains the functions related to auth command."""
 
-import botocore
 import click
+import botocore
 
 from opthub_client.controllers.utils import version_message
+from opthub_client.context.credentials import Credentials
 
 
 @click.command()
@@ -32,4 +33,3 @@ def auth(ctx: click.Context, username: str, password: str) -> None:
             click.echo(f"An error occurred: {error_code}")
     except Exception as e:
         # another exception
-        click.echo(f"An unexpected error occurred: {e}")
