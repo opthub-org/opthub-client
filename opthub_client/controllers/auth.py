@@ -4,7 +4,7 @@ import botocore
 import click
 
 from opthub_client.context.credentials import Credentials
-from opthub_client.controllers.utils import version_message
+from opthub_client.controllers.utils import check_current_version_status
 
 
 @click.command()
@@ -13,7 +13,7 @@ from opthub_client.controllers.utils import version_message
 @click.pass_context
 def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
-    version_message()
+    check_current_version_status()
     credentials = Credentials()
     try:
         credentials.cognito_login(username, password)

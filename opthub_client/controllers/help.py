@@ -7,7 +7,7 @@ from opthub_client.controllers.auth import auth
 from opthub_client.controllers.history import history
 from opthub_client.controllers.select import select
 from opthub_client.controllers.submit import submit
-from opthub_client.graphql.version_cli import get_messages
+from opthub_client.graphql.version_cli import get_version_status_messages
 
 
 @click.group(help="OptHub CLI client.")

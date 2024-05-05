@@ -7,7 +7,7 @@ class VersionNotFoundError(Exception):
     """Exception raised when the version cannot be found or is in an incorrect format."""
 
 
-def get_version() -> str:
+def get_version_from_file() -> str:
     """Read version from pyproject.toml file.
 
     Returns:

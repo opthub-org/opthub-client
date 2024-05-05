@@ -20,7 +20,7 @@ class VersionCLIMessage:
         self.message_color = messageColor
 
 
-def get_messages(version: str) -> list[VersionCLIMessage]:
+def get_version_status_messages(version: str) -> list[VersionCLIMessage]:
     """Get messages for display in OptHub Client.
 
     Returns:
