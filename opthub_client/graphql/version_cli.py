@@ -20,7 +20,7 @@ class VersionCLIMessage:
         self.message_color = messageColor
 
 
-def get_messages(version: str) -> VersionCLIMessage:
+def get_messages(version: str) -> list[VersionCLIMessage]:
     """Get messages for display in OptHub Client.
 
     Returns:
@@ -41,5 +41,6 @@ def get_messages(version: str) -> VersionCLIMessage:
     result = client.execute(query, variable_values={"version": version})
     data = result.get("getCLIVersionStatus")
     if isinstance(data, list) and data:
-        return VersionCLIMessage(**data[0])
+        messages = [VersionCLIMessage(**item) for item in data]
+        return messages
     raise ValueError("No CLI messages found for version")
