@@ -1,8 +1,10 @@
 """This module contains the functions related to auth command."""
 
 import click
+import botocore
 
 from opthub_client.controllers.utils import version_message
+from opthub_client.context.credentials import Credentials
 
 
 @click.command()
@@ -12,3 +14,18 @@ from opthub_client.controllers.utils import version_message
 def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
     version_message()
+    credentials = Credentials()
+    try:
+        credentials.cognito_login(username, password)
+        click.echo("Successfully signed in.")
+    except botocore.exceptions.ClientError as error:
+        error_code = error.response["Error"]["Code"]
+        if error_code == "NotAuthorizedException":
+            # user not exist or incorrect password
+            click.echo("Authentication failed. Please verify that your username and password are correct.")
+        elif error_code == "TooManyRequestsException":
+            click.echo("Too many requests. Please try again later.")
+        else:
+            click.echo(f"An error occurred: {error_code}")
+    except Exception as e:
+        # another exception
