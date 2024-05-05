@@ -12,6 +12,9 @@ def version_message() -> None:
     """This function gets the version message."""
     message = get_messages(get_version())
     if message.label == "Error":
-        click.echo(click.style(message.label, fg=message.labelColor))
-        click.echo(click.style(message.message, fg=message.messageColor))
+        click.echo(
+            click.style(message.label, fg=message.label_color)
+            + ": "
+            + click.style(message.message, fg=message.message_color)
+        )
         sys.exit()

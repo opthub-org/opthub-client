@@ -13,11 +13,11 @@ class VersionCLIMessage:
     message: str
     message_color: str
 
-    def __init__(self, label: str, label_color: str, message: str, message_color: str):
+    def __init__(self, label: str, labelColor: str, message: str, messageColor: str):
         self.label = label
-        self.labelColor = label_color
+        self.label_color = labelColor
         self.message = message
-        self.messageColor = message_color
+        self.message_color = messageColor
 
 
 def get_messages(version: str) -> VersionCLIMessage:
