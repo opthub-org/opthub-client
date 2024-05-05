@@ -41,23 +41,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         competition (str | None): option for competition(-c or --competition)
         file (bool): option for file(-f or --file). if -f or --file is provided, it will be a file submission.
     """
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     version_message()
-=======
-    message = get_messages(__version__)
-=======
-    message = get_messages(get_version())
->>>>>>> 6d216d1 (:sparkles: add read version from toml file1)
-    if message.label == "Error":
-        click.echo(click.style(message.label, fg=message.labelColor))
-        click.echo(click.style(message.message, fg=message.messageColor))
-        return
->>>>>>> 8a5b4f8 (:sparkles: add library message)
-=======
-    version_message()
->>>>>>> e56224c (:art: use compornent)
     match_selection_context = MatchSelectionContext()
     selected_competition, selected_match = match_selection_context.get_selection(match, competition)
     if file:  # file submission
