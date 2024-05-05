@@ -1,11 +1,14 @@
 """This module contains the class related to match selection context."""
 
 import shelve
+import sys
 import tempfile
 from pathlib import Path
 
+import click
+
 from opthub_client.models.competition import Competition, fetch_participated_competitions
-from opthub_client.models.match import Match, fetch_matches_by_competition_alias
+from opthub_client.models.match import Match, fetch_matches_by_competition
 
 
 class MatchSelectionContext:
@@ -55,7 +58,10 @@ class MatchSelectionContext:
             raise AssertionError(msg)
         competitions = fetch_participated_competitions(uid, username)
         selected_competition = next((c for c in competitions if c["alias"] == competition), None)
-        matches = fetch_matches_by_competition_alias(competition)
+        if selected_competition is None:
+            click.echo("Competition is not found.")
+            sys.exit(1)
+        matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
         selected_match = next((m for m in matches if m["alias"] == match), None)
         if selected_competition is None:
             msg = "Competition is not found."
