@@ -18,6 +18,9 @@ custom_style = {
     "text": "",  # normal text style
 }
 
+MOCK_USER_ID = "dd69dc7f-5d82-4f2c-9be7-420a6f77202b"
+MOCK_USER_NAME = "ryuji"
+
 
 @click.command()
 @click.option("-c", "--competition", type=str, help="Competition ID.")
@@ -35,7 +38,7 @@ def select(
     match_selection_context = MatchSelectionContext()
 
     # competitions aliases for choices
-    competitions = fetch_participated_competitions()
+    competitions = fetch_participated_competitions(MOCK_USER_ID, MOCK_USER_NAME)
     competition_aliases = [competition["alias"] for competition in competitions]
 
     # if not set -c commands option

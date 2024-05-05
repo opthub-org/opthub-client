@@ -41,7 +41,9 @@ class MatchSelectionContext:
             db["competition_alias"] = competition["alias"]
             db.sync()
 
-    def get_selection(self, match: str | None, competition: str | None) -> tuple[Competition, Match]:
+    def get_selection(
+        self, uid: str, username: str, match: str | None, competition: str | None
+    ) -> tuple[Competition, Match]:
         """Select a match."""
         match_selection_context = MatchSelectionContext()
         if match is None:
@@ -51,7 +53,7 @@ class MatchSelectionContext:
         if competition is None or match is None:
             msg = "Please select a competition and match first."
             raise AssertionError(msg)
-        competitions = fetch_participated_competitions()
+        competitions = fetch_participated_competitions(uid, username)
         selected_competition = next((c for c in competitions if c["alias"] == competition), None)
         matches = fetch_matches_by_competition_alias(competition)
         selected_match = next((m for m in matches if m["alias"] == match), None)

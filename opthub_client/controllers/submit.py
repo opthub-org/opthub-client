@@ -12,6 +12,9 @@ from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.models.solution import create_solution
 from opthub_client.validators.solution import SolutionValidator
 
+MOCK_USER_ID = "dd69dc7f-5d82-4f2c-9be7-420a6f77202b"
+MOCK_USER_NAME = "ryuji"
+
 
 @click.command()
 @click.option(
@@ -41,7 +44,9 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         file (bool): option for file(-f or --file). if -f or --file is provided, it will be a file submission.
     """
     match_selection_context = MatchSelectionContext()
-    selected_competition, selected_match = match_selection_context.get_selection(match, competition)
+    selected_competition, selected_match = match_selection_context.get_selection(
+        MOCK_USER_ID, MOCK_USER_NAME, match, competition
+    )
     if file:  # file submission
         questions = [
             {
