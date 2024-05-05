@@ -31,17 +31,17 @@ def fetch_participated_competitions(uid: str, username: str) -> list[Competition
         $id: String,
         $name: String
         ) {
-        getCompetitionsByParticipantUser(
-            id: $id,
-            name: $name
-        ) {
-            participating {
-            ...CompetitionFragment
+            getCompetitionsByParticipantUser(
+                id: $id,
+                name: $name
+            ) {
+                participating {
+                ...CompetitionFragment
+                }
+                participated {
+                ...CompetitionFragment
+                }
             }
-            participated {
-            ...CompetitionFragment
-            }
-        }
         }""")
     result = client.execute(query, variable_values={"id": uid, "alias": username})
     data = result.get("getCompetitionsByParticipantUser")
