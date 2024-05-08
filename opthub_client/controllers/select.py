@@ -18,8 +18,8 @@ custom_style = {
     "text": "",  # normal text style
 }
 
-MOCK_USER_ID = "dd69dc7f-5d82-4f2c-9be7-420a6f77202b"
-MOCK_USER_NAME = "ryuji"
+MOCK_USER_ID = "7f0ffdfb-279e-4cb2-900b-347751e1ad24"
+MOCK_USER_NAME = "kumamoto"
 
 
 @click.command()

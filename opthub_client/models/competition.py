@@ -36,13 +36,12 @@ def fetch_participated_competitions(uid: str, username: str) -> list[Competition
                 name: $name
             ) {
                 participating {
-                ...CompetitionFragment
-                }
-                participated {
-                ...CompetitionFragment
+                    id
+                    alias
                 }
             }
-        }""")
+        }
+        """)
     result = client.execute(query, variable_values={"id": uid, "alias": username})
     data = result.get("getCompetitionsByParticipantUser")
     if data and data.get("participating") and isinstance(data.get("participating"), list):
