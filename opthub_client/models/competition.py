@@ -1,7 +1,9 @@
 """This module contains the functions related to competitions."""
 
+import sys
 from typing import TypedDict
 
+import click
 from gql import gql
 
 from opthub_client.graphql.client import get_gql_client
@@ -44,7 +46,13 @@ def fetch_participated_competitions(uid: str, username: str) -> list[Competition
         """)
     result = client.execute(query, variable_values={"id": uid, "alias": username})
     data = result.get("getCompetitionsByParticipantUser")
-    if data and data.get("participating") and isinstance(data.get("participating"), list):
-        return [Competition(id=comp["id"], alias=comp["alias"]) for comp in data.get("participating")]
+    if data:
+        participated_competitions = data.get("participating")
+        if participated_competitions and isinstance(participated_competitions, list):
+            return [Competition(id=comp["id"], alias=comp["alias"]) for comp in participated_competitions]
+        # if no competitions found
+        click.echo("No competitions found that you are participating in.")
+        sys.exit(1)
+    # if fetch failed
     error_message = "Failed to fetch participated competitions."
     raise ValueError(error_message)
