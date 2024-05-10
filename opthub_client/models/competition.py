@@ -6,6 +6,7 @@ from typing import TypedDict
 import click
 from gql import gql
 
+from opthub_client.context.credentials import Credentials
 from opthub_client.graphql.client import get_gql_client
 
 
@@ -16,7 +17,7 @@ class Competition(TypedDict):
     alias: str
 
 
-def fetch_participated_competitions(uid: str, username: str) -> list[Competition]:
+def fetch_participated_competitions() -> list[Competition]:
     """Fetch competitions and matches that the user is participating in.
 
     Args:
@@ -28,6 +29,10 @@ def fetch_participated_competitions(uid: str, username: str) -> list[Competition
         ValueError: If no competitions are found for the user or the fetch fails.
     """
     client = get_gql_client()
+    credentials = Credentials()
+    credentials.load()
+    uid = credentials.uid
+    username = credentials.username
     query = gql("""
         query getCompetitionsByParticipantUser(
         $id: String,

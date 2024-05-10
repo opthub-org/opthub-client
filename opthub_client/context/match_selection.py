@@ -56,7 +56,7 @@ class MatchSelectionContext:
         if competition is None or match is None:
             msg = "Please select a competition and match first."
             raise AssertionError(msg)
-        competitions = fetch_participated_competitions(uid, username)
+        competitions = fetch_participated_competitions()
         selected_competition = next((c for c in competitions if c["alias"] == competition), None)
         if selected_competition is None:
             click.echo("Competition is not found.")
