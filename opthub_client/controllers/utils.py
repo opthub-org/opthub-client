@@ -17,14 +17,20 @@ def check_current_version_status() -> None:
             click.echo(
                 click.style(message.label, fg=message.label_color)
                 + ": "
-                + click.style(message.message, fg=message.message_color)
+                + click.style(
+                    message.message,
+                    fg=message.message_color,
+                ),
             )
             exit_flag = True
         else:
             click.echo(
                 click.style(message.label, fg=message.label_color)
                 + ": "
-                + click.style(message.message, fg=message.message_color)
+                + click.style(
+                    message.message,
+                    fg=message.message_color,
+                ),
             )
     if exit_flag:
         sys.exit(1)
