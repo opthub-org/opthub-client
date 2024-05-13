@@ -21,6 +21,7 @@ custom_style = {
 
 
 @click.group(help="OptHub CLI client.")
+@click.version_option()
 @click.pass_context
 def opt(ctx: click.Context) -> None:  # noqa: ARG001
     """This function is for OptHub CLI client entrypoint."""
