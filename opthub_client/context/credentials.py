@@ -8,8 +8,7 @@ from pathlib import Path
 import boto3
 import jwt
 
-CLIENT_ID = "7et20feq5fv89j4k430f7ren7s"
-SECRET_HASH = "nrTpTfTDw72mKzN8AD3q813oAH81HpVNFu9+j9g9bLs="
+CLIENT_ID = "24nvfsrgbuvu75h4o8oj2c2oek"
 
 
 class Credentials:
@@ -37,11 +36,9 @@ class Credentials:
             self.uid = db.get("uid", str)
             self.username = db.get("username", str)
             # refresh the access token if it is expired
-            if self.is_expired():
-                # refresh token is expired, clear the credentials
-                if not self.refresh_access_token():
-                    self.clear_credentials()
-                    raise Exception("Failed to refresh authentication token. Please re-login.")
+            if self.is_expired() and not self.refresh_access_token():
+                self.clear_credentials()
+                raise Exception("Failed to refresh authentication token. Please re-login.")
             db.close()
 
     def update(self) -> None:
@@ -74,7 +71,7 @@ class Credentials:
         try:
             response = client.initiate_auth(
                 AuthFlow="REFRESH_TOKEN_AUTH",
-                AuthParameters={"REFRESH_TOKEN": self.refresh_token, "SECRET_HASH": SECRET_HASH},
+                AuthParameters={"REFRESH_TOKEN": self.refresh_token},
                 ClientId=CLIENT_ID,
             )
             self.access_token = response["AuthenticationResult"]["AccessToken"]
@@ -94,7 +91,7 @@ class Credentials:
 
         response = client.initiate_auth(
             AuthFlow="USER_PASSWORD_AUTH",
-            AuthParameters={"USERNAME": username, "PASSWORD": password, "SECRET_HASH": SECRET_HASH},
+            AuthParameters={"USERNAME": username, "PASSWORD": password},
             ClientId=CLIENT_ID,
         )
         self.access_token = response["AuthenticationResult"]["AccessToken"]
