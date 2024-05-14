@@ -18,7 +18,8 @@ def fetch_matches_by_competition(comp_id: str, comp_alias: str) -> list[Match]:
     """Fetch matches by competition alias.
 
     Args:
-        alias (str): Competition Alias
+        comp_id (str): Competition ID
+        comp_alias (str): Competition alias
 
     Returns:
         list[Match]: Matches related to the competition
