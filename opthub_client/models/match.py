@@ -35,30 +35,36 @@ def fetch_matches_by_competition(comp_id: str, comp_alias: str) -> list[Match]:
         ) {
             id
             competition {
-            ...CompetitionFragment
+                id
+                alias
             }
             problem {
-            ...ProblemFragment
+                id
+                alias
             }
             indicator {
-            ...IndicatorFragment
+                id
+                alias
             }
-            title
             alias
             successTrialsBudget
             submissionsBudget
             isTutorial
             problemPublicEnvironments {
-            ...KeyValueFragment
+                key
+                value
             }
             indicatorPublicEnvironments {
-            ...KeyValueFragment
+                key
+                value
             }
             problemPrivateEnvironments {
-            ...NullableKeyValueFragment
+                key
+                value
             }
             indicatorPrivateEnvironments {
-            ...NullableKeyValueFragment
+                key
+                value
             }
             openAt
             closeAt
