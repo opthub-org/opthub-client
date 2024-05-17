@@ -44,9 +44,7 @@ class MatchSelectionContext:
             db["competition_alias"] = competition["alias"]
             db.sync()
 
-    def get_selection(
-        self, uid: str, username: str, match: str | None, competition: str | None
-    ) -> tuple[Competition, Match]:
+    def get_selection(self, match: str | None, competition: str | None) -> tuple[Competition, Match]:
         """Select a match."""
         match_selection_context = MatchSelectionContext()
         if match is None:

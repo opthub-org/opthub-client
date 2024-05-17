@@ -17,8 +17,6 @@ style = Style.from_dict(
         "e": "fg:red bold",
     },
 )
-MOCK_USER_ID = "dd69dc7f-5d82-4f2c-9be7-420a6f77202b"
-MOCK_USER_NAME = "ryuji"
 
 
 def display_trials(trials: list[Trial]) -> None:
@@ -49,9 +47,7 @@ def display_trials(trials: list[Trial]) -> None:
 def history(ctx: click.Context, competition: str | None, match: str | None, size: int) -> None:
     """Check submitted solutions."""
     match_selection_context = MatchSelectionContext()
-    selected_competition, selected_match = match_selection_context.get_selection(
-        MOCK_USER_ID, MOCK_USER_NAME, match, competition
-    )
+    selected_competition, selected_match = match_selection_context.get_selection(match, competition)
     bindings = KeyBindings()
 
     # n key is to display next batch of solutions
