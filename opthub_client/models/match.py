@@ -75,5 +75,5 @@ def fetch_matches_by_competition(comp_id: str, comp_alias: str) -> list[Match]:
     data = result.get("getMatchesByCompetition")
     if data and isinstance(data, list):
         return [Match(id=match["id"], alias=match["alias"]) for match in data]
-    error_message = "Failed to fetch participated matches."
+    error_message = "Failed to fetch participating matches."
     raise ValueError(error_message)

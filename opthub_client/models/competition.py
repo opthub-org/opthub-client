@@ -17,7 +17,7 @@ class Competition(TypedDict):
     alias: str
 
 
-def fetch_participated_competitions() -> list[Competition]:
+def fetch_participating_competitions() -> list[Competition]:
     """Fetch competitions and matches that the user is participating in.
 
     Args:
@@ -48,12 +48,12 @@ def fetch_participated_competitions() -> list[Competition]:
     result = client.execute(query)
     data = result.get("getCompetitionsByParticipantUser")
     if data:
-        participated_competitions = data.get("participating")
-        if participated_competitions and isinstance(participated_competitions, list):
-            return [Competition(id=comp["id"], alias=comp["alias"]) for comp in participated_competitions]
+        participating_competitions = data.get("participating")
+        if participating_competitions and isinstance(participating_competitions, list):
+            return [Competition(id=comp["id"], alias=comp["alias"]) for comp in participating_competitions]
         # if no competitions found
         click.echo("No competitions found that you are participating in.")
         sys.exit(1)
     # if fetch failed
-    error_message = "Failed to fetch participated competitions."
+    error_message = "Failed to fetch participating competitions."
     raise ValueError(error_message)

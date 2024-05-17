@@ -7,7 +7,7 @@ from pathlib import Path
 
 import click
 
-from opthub_client.models.competition import Competition, fetch_participated_competitions
+from opthub_client.models.competition import Competition, fetch_participating_competitions
 from opthub_client.models.match import Match, fetch_matches_by_competition
 
 
@@ -54,7 +54,7 @@ class MatchSelectionContext:
         if competition is None or match is None:
             msg = "Please select a competition and match first."
             raise AssertionError(msg)
-        competitions = fetch_participated_competitions()
+        competitions = fetch_participating_competitions()
         selected_competition = next((c for c in competitions if c["alias"] == competition), None)
         if selected_competition is None:
             click.echo("Competition is not found.")
