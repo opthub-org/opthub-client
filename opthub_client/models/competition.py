@@ -29,10 +29,6 @@ def fetch_participated_competitions() -> list[Competition]:
         ValueError: If no competitions are found for the user or the fetch fails.
     """
     client = get_gql_client()
-    credentials = Credentials()
-    credentials.load()
-    uid = credentials.uid
-    username = credentials.username
     query = gql("""
         query getCompetitionsByParticipantUser(
         $id: String,
@@ -49,7 +45,7 @@ def fetch_participated_competitions() -> list[Competition]:
             }
         }
         """)
-    result = client.execute(query, variable_values={"id": uid, "alias": username})
+    result = client.execute(query)
     data = result.get("getCompetitionsByParticipantUser")
     if data:
         participated_competitions = data.get("participating")
