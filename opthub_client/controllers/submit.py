@@ -12,8 +12,6 @@ from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.models.solution import create_solution
 from opthub_client.validators.solution import SolutionValidator
 
-MOCK_USER_ID = "dd69dc7f-5d82-4f2c-9be7-420a6f77202b"
-MOCK_USER_NAME = "ryuji"
 
 
 @click.command()
