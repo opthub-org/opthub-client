@@ -1,21 +1,22 @@
 """This module contains the solution validator."""
 
-from typing import Any
+import json
 
 
 class SolutionValidator:
     """The solution validator."""
 
     @staticmethod
-    def check_solution(variable: Any) -> bool:
+    def check_solution(raw_solution: str) -> bool:
         """Check validate the solution.
 
         Args:
-            variable (Any): The variable of solution.
+            raw_solution (str): The raw data of solution.
 
         Returns:
             bool: True if the solution is valid, False otherwise.
         """
+        variable = json.loads(raw_solution)
         # variable is not list
         if isinstance(variable, list):
             return True

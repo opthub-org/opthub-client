@@ -2,13 +2,11 @@
 
 from typing import Literal, TypedDict
 
-from opthub_client.models.solution import Variable
-
 
 class Solution(TypedDict):
     """This class represents the solution type."""
 
-    variable: Variable
+    variable: str
     created_at: str
 
 
@@ -58,7 +56,7 @@ def fetch_trials(competition_id: str, match_id: str, page: int, size: int) -> li
         {
             "trialNo": 1,
             "solution": {
-                "variable": 3.0,
+                "variable": "3.0",
                 "created_at": "2021-01-01",
             },
             "evaluation": {
