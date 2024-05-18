@@ -2,13 +2,11 @@
 
 from typing import Literal, TypedDict
 
-from opthub_client.models.solution import Variable
-
 
 class Solution(TypedDict):
     """This class represents the solution type."""
 
-    variable: Variable
+    variable: str
     created_at: str
 
 

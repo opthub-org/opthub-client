@@ -4,10 +4,8 @@ from gql import gql
 
 from opthub_client.graphql.client import get_gql_client
 
-Variable = str
 
-
-def create_solution(match_id: str, variable: Variable) -> None:
+def create_solution(match_id: str, variable: str) -> None:
     """Create a solution by AppSync endpoint.
 
     Args:

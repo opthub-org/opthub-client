@@ -85,7 +85,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         click.echo("The solution is not valid. Please provide a valid solution.")
         return
     click.echo(
-        f"Submitting for Competition: {selected_competition['alias']}, Match: {selected_match['alias']}...",
+        f"Submitting to {selected_competition['alias']}/{selected_match['alias']}...",
     )
     create_solution(selected_match["id"], raw_solution_value)
     click.echo("...Submitted.")
