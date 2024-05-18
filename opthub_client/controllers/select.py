@@ -5,8 +5,8 @@ from InquirerPy import prompt  # type: ignore[attr-defined]
 
 from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.controllers.utils import check_current_version_status
-from opthub_client.models.competition import fetch_participated_competitions
-from opthub_client.models.match import fetch_matches_by_competition_alias
+from opthub_client.models.competition import fetch_participating_competitions
+from opthub_client.models.match import fetch_matches_by_competition
 
 custom_style = {
     "question": "fg:#ffff00 bold",  # question text style
@@ -37,7 +37,7 @@ def select(
     match_selection_context = MatchSelectionContext()
 
     # competitions aliases for choices
-    competitions = fetch_participated_competitions()
+    competitions = fetch_participating_competitions()
     competition_aliases = [competition["alias"] for competition in competitions]
 
     # if not set -c commands option
@@ -63,7 +63,7 @@ def select(
     if selected_competition is None:
         click.echo("Competition is not found.")
         return
-    matches = fetch_matches_by_competition_alias(competition)
+    matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
     match_aliases = [match["alias"] for match in matches]
 
     # if not set -m commands option
