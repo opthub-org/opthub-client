@@ -14,13 +14,10 @@ def get_gql_client() -> Client:
 
     """
     url = "https://jciqso7l7rhajfkt5s3dhybpcu.appsync-api.ap-northeast-1.amazonaws.com/graphql"
-    api_key = "da2-kge2w7onkfcodd6wx4m437uie4"
     credentials = Credentials()
     credentials.load()
-    headers = (
-        {"x-api-key": api_key}
-        if credentials.access_token is None
-        else {"Authorization": f"Bearer {credentials.access_token}"}
-    )
+    if credentials.access_token is None:
+        raise Exception("Please login first.")
+    headers = {"Authorization": f"Bearer {credentials.access_token}"}
     transport = AIOHTTPTransport(url=url, headers=headers)
     return Client(transport=transport, fetch_schema_from_transport=True)
