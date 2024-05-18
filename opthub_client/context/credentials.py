@@ -23,9 +23,10 @@ class Credentials:
 
     def __init__(self) -> None:
         """Initialize the credentials context with a persistent temporary file."""
-        temp_dir = tempfile.gettempdir()
-        temp_file_name = "opthub_credentials"
-        self.file_path = Path(temp_dir) / temp_file_name
+        home_dir = Path.home()
+        opthub_client_dir = home_dir / ".opthub_client"
+        opthub_client_dir.mkdir(exist_ok=True)  # Create the directory if it doesn't exist
+        self.file_path = opthub_client_dir / "opthub_credentials"
 
     def load(self) -> None:
         """Load the credentials from the shelve file."""
