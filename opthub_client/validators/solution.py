@@ -7,16 +7,16 @@ class SolutionValidator:
     """The solution validator."""
 
     @staticmethod
-    def check_solution(raw_solution_or_json_path: str) -> bool:
+    def check_solution(raw_solution: str) -> bool:
         """Check validate the solution.
 
         Args:
-            raw_solution_or_json_path (str): The raw data of solution or json file path.
+            raw_solution (str): The raw data of solution.
 
         Returns:
             bool: True if the solution is valid, False otherwise.
         """
-        variable = json.loads(raw_solution_or_json_path)
+        variable = json.loads(raw_solution)
         # variable is not list
         if isinstance(variable, list):
             return True

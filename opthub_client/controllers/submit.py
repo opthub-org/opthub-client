@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
@@ -66,9 +66,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
             click.echo("The file path is incorrect. Please provide a valid file path.")
             return
         full_path = Path(file_path).expanduser()
-        if not SolutionValidator.check_solution(full_path.read_text()):
-            click.echo("The solution is not valid. Please provide a valid solution.")
-        return
+        raw_solution_value = full_path.read_text()
     else:  # text submission
         questions = [
             {
@@ -82,16 +80,12 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
             # result is not a dict or "solution" is not in result
             click.echo("The input is missing. Please provide the necessary information.")
             return
-        raw_solution_value = result["solution"]
-        if not isinstance(raw_solution_value, str):
-            # solution_value is not a string
-            click.echo("The input format is incorrect. Please enter numbers separated by commas (e.g. [1.5,2.3,4.7])")
-            return
+        raw_solution_value = str(result["solution"])
     if not SolutionValidator.check_solution(raw_solution_value):
         click.echo("The solution is not valid. Please provide a valid solution.")
         return
     click.echo(
-        f"Submitting {raw_solution_value} for Competition: {selected_competition['alias']}, Match: {selected_match['alias']}...",
+        f"Submitting for Competition: {selected_competition['alias']}, Match: {selected_match['alias']}...",
     )
     create_solution(selected_match["id"], raw_solution_value)
     click.echo("...Submitted.")
