@@ -4,7 +4,7 @@ from gql import gql
 
 from opthub_client.graphql.client import get_gql_client
 
-Variable = list[float] | float
+Variable = str
 
 
 def create_solution(match_id: str, variable: Variable) -> None:
@@ -16,17 +16,22 @@ def create_solution(match_id: str, variable: Variable) -> None:
     """
     client = get_gql_client()
     mutation = gql("""
-    mutation CreateSolution($input: CreateSolutionInput!) {
-        createSolution(input: $input) {
+    mutation createSolution(
+        $matchId: String!,
+        $variable: AWSJSON!) {
+        createSolution(
+            matchId: $matchId,
+            variable: $variable
+        ) {
             matchId
+            participantType
+            participantId
             trialNo
         }
     }
     """)
-    variables = {
-        "input": {
-            "matchId": match_id,
-            "variable": variable,
-        },
+    solution_input = {
+        "matchId": match_id,
+        "variable": variable,
     }
-    client.execute(mutation, variables)
+    client.execute(mutation, solution_input)

@@ -66,8 +66,9 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
             click.echo("The file path is incorrect. Please provide a valid file path.")
             return
         full_path = Path(file_path).expanduser()
-        variable = json.loads(full_path.read_text())
-
+        if not SolutionValidator.check_solution(full_path.read_text()):
+            click.echo("The solution is not valid. Please provide a valid solution.")
+        return
     else:  # text submission
         questions = [
             {
@@ -81,18 +82,16 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
             # result is not a dict or "solution" is not in result
             click.echo("The input is missing. Please provide the necessary information.")
             return
-        solution_value = result["solution"]
-        if not isinstance(solution_value, str):
+        raw_solution_value = result["solution"]
+        if not isinstance(raw_solution_value, str):
             # solution_value is not a string
             click.echo("The input format is incorrect. Please enter numbers separated by commas (e.g. [1.5,2.3,4.7])")
             return
-        variable = json.loads(solution_value)
-    if not SolutionValidator.check_solution(variable):
+    if not SolutionValidator.check_solution(raw_solution_value):
         click.echo("The solution is not valid. Please provide a valid solution.")
         return
-    variable = cast(list[float], variable)
     click.echo(
-        f"Submitting {variable} for Competition: {selected_competition['alias']}, Match: {selected_match['alias']}...",
+        f"Submitting {raw_solution_value} for Competition: {selected_competition['alias']}, Match: {selected_match['alias']}...",
     )
-    create_solution(selected_match["id"], variable)
+    create_solution(selected_match["id"], raw_solution_value)
     click.echo("...Submitted.")
