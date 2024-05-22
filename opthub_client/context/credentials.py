@@ -8,12 +8,12 @@ from typing import Any
 import boto3
 import jwt
 import requests
-from cryptography.fernet import Fernet
 from jwcrypto import jwk
+
+from opthub_client.context.cipher_suite import CipherSuite
 
 CLIENT_ID = "24nvfsrgbuvu75h4o8oj2c2oek"
 JWKS_URL = "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_1Y69fktA0/.well-known/jwks.json"
-KEY_FILE = Path.home() / ".opthub_client" / "encryption_key"
 ERROR_MESSAGE_FAIL_TO_GET_PUBLIC_KEY = "Failed to get public key."
 ERROR_MESSAGE_FAIL_TO_REFRESH_TOKEN = "Failed to refresh authentication token. Please re-login."
 ERROR_MESSAGE_FAIL_TO_GET_JWKS = "Failed to retrieve JWKS"
@@ -35,39 +35,16 @@ class Credentials:
         OPTHUB_CLIENT_DIR.mkdir(exist_ok=True)  # Create the directory if it doesn't exist
         self.file_path = OPTHUB_CLIENT_DIR / "opthub_credentials"
 
-    def load_or_generate_key(self) -> bytes:
-        """Load the encryption key from the shelve file, or generate a new one if it doesn't exist.
-
-        Returns:
-            bytes: encryption key
-        """
-        with shelve.open(str(self.file_path)) as db:
-            key = db.get("encryption_key")
-            if key is None:
-                key = Fernet.generate_key()
-                db["encryption_key"] = key
-                db.sync()
-            return key
-
-    def get_cipher_suite(self) -> Fernet:
-        """Get the Fernet cipher suite using the encryption key.
-
-        Returns:
-            Fernet: Fernet cipher suite
-        """
-        encryption_key = self.load_or_generate_key()
-        return Fernet(encryption_key)
-
     def load(self) -> None:
         """Load the credentials from the shelve file."""
-        cipher_suite = self.get_cipher_suite()
+        cipher_suite = CipherSuite()
         with shelve.open(str(self.file_path)) as db:
             # decrypt the credentials
-            self.access_token = cipher_suite.decrypt(db.get("access_token", b"")).decode()
-            self.refresh_token = cipher_suite.decrypt(db.get("refresh_token", b"")).decode()
-            self.expire_at = cipher_suite.decrypt(db.get("expire_at", b"")).decode()
-            self.uid = cipher_suite.decrypt(db.get("uid", b"")).decode()
-            self.username = cipher_suite.decrypt(db.get("username", b"")).decode()
+            self.access_token = cipher_suite.decrypt(db.get("access_token", b""))
+            self.refresh_token = cipher_suite.decrypt(db.get("refresh_token", b""))
+            self.expire_at = cipher_suite.decrypt(db.get("expire_at", b""))
+            self.uid = cipher_suite.decrypt(db.get("uid", b""))
+            self.username = cipher_suite.decrypt(db.get("username", b""))
             # refresh the access token if it is expired
             if self.is_expired() and not self.refresh_access_token():
                 self.clear_credentials()
@@ -76,17 +53,17 @@ class Credentials:
 
     def update(self) -> None:
         """Update the credentials in the shelve file."""
-        cipher_suite = self.get_cipher_suite()
+        cipher_suite = CipherSuite()
         with shelve.open(str(self.file_path)) as db:
             # encrypt the credentials
-            db["access_token"] = cipher_suite.encrypt(self.access_token.encode())
-            db["refresh_token"] = cipher_suite.encrypt(self.refresh_token.encode())
+            db["access_token"] = cipher_suite.encrypt(self.access_token)
+            db["refresh_token"] = cipher_suite.encrypt(self.refresh_token)
             # decode the access token to get the expire time, user id and user name
             public_key = self.get_jwks_public_key(self.access_token)
             token = jwt.decode(self.access_token, public_key, algorithms=["RS256"], options={"verify_signature": True})
-            db["expire_at"] = cipher_suite.encrypt(str(token.get("exp")).encode())
-            db["uid"] = cipher_suite.encrypt(token.get("sub").encode())
-            db["username"] = cipher_suite.encrypt(token.get("username").encode())
+            db["expire_at"] = cipher_suite.encrypt(str(token.get("exp")))
+            db["uid"] = cipher_suite.encrypt(token.get("sub"))
+            db["username"] = cipher_suite.encrypt(token.get("username"))
             db.sync()
 
     def is_expired(self) -> bool:
