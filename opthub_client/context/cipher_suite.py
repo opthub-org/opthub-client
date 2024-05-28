@@ -12,7 +12,7 @@ KEY_FILE_PATH = OPTHUB_CLIENT_DIR / "encryption_key"
 class CipherSuite:
     """Cipher suite class for encrypt."""
 
-    def get_cipher_suite(self) -> Fernet:
+    def get(self) -> Fernet:
         """Get the Fernet cipher suite using the encryption key.
 
         Returns:
@@ -44,7 +44,7 @@ class CipherSuite:
         Returns:
             bytes: encrypted data
         """
-        cipher_suite = self.get_cipher_suite()
+        cipher_suite = self.get()
         return cipher_suite.encrypt(data.encode())
 
     def decrypt(self, data: bytes) -> str:
@@ -56,5 +56,5 @@ class CipherSuite:
         Returns:
             str: decrypted data
         """
-        cipher_suite = self.get_cipher_suite()
+        cipher_suite = self.get()
         return cipher_suite.decrypt(data).decode()

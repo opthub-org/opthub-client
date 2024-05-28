@@ -24,11 +24,11 @@ class Credentials:
     """The credentials class. To store and manage the credentials."""
 
     file_path: Path
-    access_token: str
-    refresh_token: str
-    expire_at: str
-    uid: str
-    username: str
+    access_token: str | None
+    refresh_token: str | None
+    expire_at: str | None
+    uid: str | None
+    username: str | None
 
     def __init__(self) -> None:
         """Initialize the credentials context with a persistent temporary file."""
@@ -54,6 +54,8 @@ class Credentials:
     def update(self) -> None:
         """Update the credentials in the shelve file."""
         cipher_suite = CipherSuite()
+        if self.access_token is None or self.refresh_token is None:
+            return
         with shelve.open(str(self.file_path)) as db:
             # encrypt the credentials
             db["access_token"] = cipher_suite.encrypt(self.access_token)
@@ -95,6 +97,8 @@ class Credentials:
             return False
         else:
             self.access_token = response["AuthenticationResult"]["AccessToken"]
+            if self.access_token is None:
+                return False
             public_key = self.get_jwks_public_key(self.access_token)
             self.expire_at = jwt.decode(
                 self.access_token,
@@ -126,11 +130,11 @@ class Credentials:
         with shelve.open(str(self.file_path)) as db:
             db.clear()
             db.sync()
-        self.access_token = ""
-        self.refresh_token = ""
-        self.expire_at = ""
-        self.uid = ""
-        self.username = ""
+        self.access_token = None
+        self.refresh_token = None
+        self.expire_at = None
+        self.uid = None
+        self.username = None
 
     def get_jwks_public_key(self, access_token: str) -> Any:
         """Get the public key from the JWKS URL.
