@@ -2,7 +2,6 @@
 
 import shelve
 import sys
-import tempfile
 from pathlib import Path
 
 import click
@@ -16,9 +15,10 @@ class MatchSelectionContext:
 
     def __init__(self) -> None:
         """Initialize the match selection context with a persistent temporary file."""
-        temp_dir = tempfile.gettempdir()
-        temp_file_name = "match_selection"
-        self.file_path = Path(temp_dir) / temp_file_name
+        home_dir = Path.home()
+        opthub_client_dir = home_dir / ".opthub_client"
+        opthub_client_dir.mkdir(exist_ok=True)  # Create the directory if it doesn't exist
+        self.file_path = opthub_client_dir / "match_selection"
         self.load()
 
     def load(self) -> None:

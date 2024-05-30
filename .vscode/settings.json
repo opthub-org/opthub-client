@@ -23,7 +23,12 @@
   // Spell check setting
   "cSpell.userWords": ["opthub"],
   "cSpell.words": [
-    "aiohttp"
+    "aiohttp",
+    "jwcrypto",
+    "Fernet",
+    "boto3",
+    "botocore",
+    "jwks"
   ],
 
   // Format setting

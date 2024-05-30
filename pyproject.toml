@@ -30,14 +30,19 @@ gql = "^3.5.0"
 aiohttp = "^3.9.3"
 boto3 = "^1.34"
 boto3-stubs = {extras=["dynmodb","cognito"], version="^1.34"}
+cryptography = "^42.0.7"
+jwcrypto = "^1.5.6"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.3"
 mypy = "^1.9.0"
 pytest = "^8.1.1"
 pyjwt = "^2.8.0"
+requests = "^2.31.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
 
 
 
