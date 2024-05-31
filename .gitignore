@@ -1,8 +1,5 @@
 __pycache__/
 *.egg-info/
 .eggs
-file_handler_config.txt
-.match_selection
 .DS_Store
 dist/
-.dmypy.json
