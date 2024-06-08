@@ -33,7 +33,7 @@ def select(
         competition (str | None): option for competition(-c or --competition)
         match (str | None): option for match(-m or --match)
     """
-    check_current_version_status()
+    # check_current_version_status()
     match_selection_context = MatchSelectionContext()
 
     # competitions aliases for choices

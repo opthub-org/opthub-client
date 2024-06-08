@@ -2,6 +2,10 @@
 
 from typing import Literal, TypedDict
 
+from gql import gql
+
+from opthub_client.graphql.client import get_gql_client
+
 
 class Solution(TypedDict):
     """This class represents the solution type."""
@@ -13,7 +17,7 @@ class Solution(TypedDict):
 class Evaluation(TypedDict):
     """This class represents the evaluation type."""
 
-    status: Literal["waiting", "success", "failed"]
+    status: Literal["Success", "Failed"]
     objective: float | list[float]
     constraint: float | list[float]
     info: object
@@ -24,7 +28,7 @@ class Evaluation(TypedDict):
 class Score(TypedDict):
     """This class represents the score type."""
 
-    status: Literal["waiting", "success", "failed"]
+    status: Literal["Success", "Failed"]
     score: float | None
     started_at: str | None
     finished_at: str | None
@@ -35,15 +39,15 @@ class Trial(TypedDict):
 
     trialNo: int
     solution: Solution
-    evaluation: Evaluation
-    score: Score
+    status: Literal["evaluating", "success", "scoring", "evaluator_failed", "scorer_failed"]
+    evaluation: Evaluation | None
+    score: Score | None
 
 
-def fetch_trials(competition_id: str, match_id: str, page: int, size: int) -> list[Trial]:
+async def fetch_trials_async(match_id: str, page: int, size: int) -> list[Trial]:
     """Fetch the history of the user's submitted solutions and their evaluations and scores.
 
     Args:
-        competition_id (str): Competition ID
         match_id (str): Match ID in the competition
         page (int): Page number
         size (int): Size of the page
@@ -52,27 +56,359 @@ def fetch_trials(competition_id: str, match_id: str, page: int, size: int) -> li
         list[Trial]:
             The the history of the user's submitted solutions and their evaluations and scores.
     """
-    trials: list[Trial] = [
-        {
-            "trialNo": 1,
-            "solution": {
-                "variable": "3.0",
-                "created_at": "2021-01-01",
-            },
-            "evaluation": {
-                "objective": 3.0,
-                "constraint": 4.0,
-                "info": {},
-                "status": "success",
-                "started_at": "2021-01-01",
-                "finished_at": "2021-01-01",
-            },
-            "score": {
-                "score": 3.2,
-                "status": "success",
-                "started_at": "2021-01-01",
-                "finished_at": "2021-01-01",
-            },
-        },
-    ]
+    client = get_gql_client()
+    query = gql("""
+            query getMatchTrialsByParticipant(
+            $match: MatchIdentifier!,
+            $participant: ParticipantInput,
+            $range: MatchTrialsRangeInput,
+            $order: Order
+            ) {
+            getMatchTrialsByParticipant(
+                match: $match,
+                participant: $participant,
+                range: $range,
+                order: $order
+            ) {
+                startTrialNo
+                endTrialNo
+                trials {
+                    trialNo
+                    status
+                    solution {
+                        variable
+                        createdAt
+                    }
+                    evaluation {
+                        constraint
+                        feasible
+                        objective
+                        status
+                        startedAt
+                        finishedAt
+                        info
+                    }
+                    score {
+                        status
+                        startedAt
+                        finishedAt
+                        value
+                    }
+                }
+            }}""")
+    result = await client.execute_async(
+        query,
+        variable_values={"match": {"id": match_id}, "range": {"startTrialNo": page * size + 1, "limit": size - 1}},
+    )
+    data = result.get("getMatchTrialsByParticipant")
+    trials = []
+    if data and isinstance(data, dict):
+        trials_data = data.get("trials", [])
+        for trial_data in trials_data:
+            if trial_data.get("status") == "success":
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
+                score = Score(
+                    status=trial_data["score"]["status"],
+                    score=trial_data["score"]["value"],
+                    started_at=trial_data["score"]["startedAt"],
+                    finished_at=trial_data["score"]["finishedAt"],
+                )
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=score,
+                )
+                trials.append(trial)
+            elif trial_data.get("status") == "evaluating":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=None,
+                    score=None,
+                )
+                trials.append(trial)
+            elif trial_data.get("status") == "scoring":
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=None,
+                )
+                trials.append(trial)
     return trials
+
+
+def fetch_trials(match_id: str, size: int, trial_no: int) -> list[Trial]:
+    """Fetch the history of the user's submitted solutions and their evaluations and scores.
+
+    Args:
+        match_id (str): Match ID in the competition
+        size (int): Size of fetch trials
+        trial_no (int): Trial number to start fetching
+
+    Returns:
+        list[Trial]:
+            The the history of the user's submitted solutions and their evaluations and scores.
+    """
+    client = get_gql_client()
+    query = gql("""
+            query getMatchTrialsByParticipant(
+            $match: MatchIdentifier!,
+            $participant: ParticipantInput,
+            $range: MatchTrialsRangeInput,
+            $order: Order
+            ) {
+            getMatchTrialsByParticipant(
+                match: $match,
+                participant: $participant,
+                range: $range,
+                order: $order
+            ) {
+                startTrialNo
+                endTrialNo
+                trials {
+                    trialNo
+                    status
+                    solution {
+                        variable
+                        createdAt
+                    }
+                    evaluation {
+                        constraint
+                        feasible
+                        objective
+                        status
+                        startedAt
+                        finishedAt
+                        info
+                    }
+                    score {
+                        status
+                        startedAt
+                        finishedAt
+                        value
+                    }
+                }
+            }}""")
+    result = client.execute(
+        query,
+        variable_values={"match": {"id": match_id}, "range": {"startTrialNo": trial_no, "limit": size - 1}},
+    )
+    data = result.get("getMatchTrialsByParticipant")
+    trials = []
+    if data and isinstance(data, dict):
+        trials_data = data.get("trials", [])
+        for trial_data in trials_data:
+            if trial_data.get("status") == "success":
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
+                score = Score(
+                    status=trial_data["score"]["status"],
+                    score=trial_data["score"]["value"],
+                    started_at=trial_data["score"]["startedAt"],
+                    finished_at=trial_data["score"]["finishedAt"],
+                )
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=score,
+                )
+                trials.append(trial)
+            elif trial_data.get("status") == "evaluating":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=None,
+                    score=None,
+                )
+                trials.append(trial)
+            elif trial_data.get("status") == "scoring":
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=None,
+                )
+                trials.append(trial)
+    return trials
+
+
+def fetch_trial(match_id: str, trial_no: int) -> Trial:
+    """Fetch the history of the user's submitted solution and their evaluation and score.
+
+    Args:
+        match_id (str): Match ID in the competition
+        trial_no (int): Trial number
+
+    Returns:
+        Trial:
+            The the history of the user's submitted solution and their evaluation and score.
+    """
+    client = get_gql_client()
+    query = gql("""
+            query getMatchTrialsByParticipant(
+            $match: MatchIdentifier!,
+            $participant: ParticipantInput,
+            $range: MatchTrialsRangeInput,
+            $order: Order
+            ) {
+            getMatchTrialsByParticipant(
+                match: $match,
+                participant: $participant,
+                range: $range,
+                order: $order
+            ) {
+                startTrialNo
+                endTrialNo
+                trials {
+                    trialNo
+                    status
+                    solution {
+                        variable
+                        createdAt
+                    }
+                    evaluation {
+                        constraint
+                        feasible
+                        objective
+                        status
+                        startedAt
+                        finishedAt
+                        info
+                    }
+                    score {
+                        status
+                        startedAt
+                        finishedAt
+                        value
+                    }
+                }
+            }}""")
+    result = client.execute(
+        query,
+        variable_values={"match": {"id": match_id}, "range": {"endTrialNo": trial_no, "limit": 1}},
+    )
+    data = result.get("getMatchTrialsByParticipant")
+    if data and isinstance(data, dict):
+        trials_data = data.get("trials", [])
+        for trial_data in trials_data:
+            if trial_data.get("status") == "success":
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
+                score = Score(
+                    status=trial_data["score"]["status"],
+                    score=trial_data["score"]["value"],
+                    started_at=trial_data["score"]["startedAt"],
+                    finished_at=trial_data["score"]["finishedAt"],
+                )
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=score,
+                )
+            elif trial_data.get("status") == "evaluating":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=None,
+                    score=None,
+                )
+            elif trial_data.get("status") == "scoring":
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=None,
+                )
+    return trial

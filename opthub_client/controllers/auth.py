@@ -13,7 +13,7 @@ from opthub_client.controllers.utils import check_current_version_status
 @click.pass_context
 def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
-    check_current_version_status()
+    # check_current_version_status()
     credentials = Credentials()
     try:
         credentials.cognito_login(username, password)

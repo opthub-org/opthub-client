@@ -3,9 +3,10 @@
 import click
 
 from opthub_client.controllers.auth import auth
+from opthub_client.controllers.download import download
 from opthub_client.controllers.help import help
-from opthub_client.controllers.history import history
 from opthub_client.controllers.select import select
+from opthub_client.controllers.show import show
 from opthub_client.controllers.submit import submit
 
 custom_style = {
@@ -27,8 +28,9 @@ def opt(ctx: click.Context) -> None:  # noqa: ARG001
     """This function is for OptHub CLI client entrypoint."""
 
 
-opt.add_command(history)
+opt.add_command(show)
 opt.add_command(select)
 opt.add_command(submit)
 opt.add_command(help)
 opt.add_command(auth)
+opt.add_command(download)
