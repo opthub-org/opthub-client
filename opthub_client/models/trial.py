@@ -44,13 +44,14 @@ class Trial(TypedDict):
     score: Score | None
 
 
-async def fetch_trials_async(match_id: str, page: int, size: int) -> list[Trial]:
+async def fetch_trials_async(match_id: str, page: int, size: int, desc: bool) -> tuple[list[Trial], bool, bool]:
     """Fetch the history of the user's submitted solutions and their evaluations and scores.
 
     Args:
         match_id (str): Match ID in the competition
         page (int): Page number
         size (int): Size of the page
+        desc (bool): True for show trials in descending order, False for ascending order
 
     Returns:
         list[Trial]:
@@ -59,7 +60,7 @@ async def fetch_trials_async(match_id: str, page: int, size: int) -> list[Trial]
     client = get_gql_client()
     query = gql("""
             query getMatchTrialsByParticipant(
-            $match: MatchIdentifier!,
+            $match: MatchIdentifierInput!,
             $participant: ParticipantInput,
             $range: MatchTrialsRangeInput,
             $order: Order
@@ -70,6 +71,8 @@ async def fetch_trials_async(match_id: str, page: int, size: int) -> list[Trial]
                 range: $range,
                 order: $order
             ) {
+                isFirst
+                isLast
                 startTrialNo
                 endTrialNo
                 trials {
@@ -98,11 +101,22 @@ async def fetch_trials_async(match_id: str, page: int, size: int) -> list[Trial]
             }}""")
     result = await client.execute_async(
         query,
-        variable_values={"match": {"id": match_id}, "range": {"startTrialNo": page * size + 1, "limit": size - 1}},
+        variable_values={
+            "match": {"id": match_id},
+            "range": {"endTrialNo": -page * size, "limit": size - 1}
+            if desc
+            else {"startTrialNo": page * size + 1, "limit": size - 1},
+            "order": "descending" if desc else "ascending",
+        },
     )
     data = result.get("getMatchTrialsByParticipant")
+
     trials = []
+    is_first = False
+    is_last = False
     if data and isinstance(data, dict):
+        is_first = data.get("isFirst")
+        is_last = data.get("isLast")
         trials_data = data.get("trials", [])
         for trial_data in trials_data:
             if trial_data.get("status") == "success":
@@ -166,7 +180,7 @@ async def fetch_trials_async(match_id: str, page: int, size: int) -> list[Trial]
                     score=None,
                 )
                 trials.append(trial)
-    return trials
+    return trials, is_first, is_last
 
 
 def fetch_trials(match_id: str, size: int, trial_no: int) -> list[Trial]:
@@ -184,7 +198,7 @@ def fetch_trials(match_id: str, size: int, trial_no: int) -> list[Trial]:
     client = get_gql_client()
     query = gql("""
             query getMatchTrialsByParticipant(
-            $match: MatchIdentifier!,
+            $match: MatchIdentifierInput!,
             $participant: ParticipantInput,
             $range: MatchTrialsRangeInput,
             $order: Order
@@ -308,7 +322,7 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial:
     client = get_gql_client()
     query = gql("""
             query getMatchTrialsByParticipant(
-            $match: MatchIdentifier!,
+            $match: MatchIdentifierInput!,
             $participant: ParticipantInput,
             $range: MatchTrialsRangeInput,
             $order: Order

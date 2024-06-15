@@ -3,17 +3,9 @@
 import click
 
 from opthub_client.context.match_selection import MatchSelectionContext
-from opthub_client.controllers.utils import check_current_version_status, get_trial_info_detail, get_trial_info_general
-from opthub_client.models.trial import Trial, fetch_trial
-
-
-def display_trial(trial: Trial, is_detail: bool) -> None:
-    """Display the trials."""
-    if trial is None:
-        click.echo("No more solutions to display.")
-    else:
-        lines = get_trial_info_detail(trial) if is_detail else get_trial_info_general(trial)
-        click.echo(lines.rstrip())
+from opthub_client.controllers.utils import check_current_version_status
+from opthub_client.models.trial import fetch_trial
+from opthub_client.view.display_trials import display_trial
 
 
 @click.command(name="trial")
@@ -26,9 +18,8 @@ def show_trial(ctx: click.Context, competition: str | None, match: str | None, d
     """Check submitted solutions."""
     # check_current_version_status()
     match_selection_context = MatchSelectionContext()
-    selected_competition, selected_match = match_selection_context.get_selection(match, competition)
+    selected_match = match_selection_context.get_selection_match(match, competition)
 
-    # The initial call to display next batch of solutions.
-    # (Directly using the logic inside the _ function above.)
+    # display batch of solutions.
     trial = fetch_trial(selected_match["id"], trial_no=trial_no)
     display_trial(trial, detail)

@@ -68,3 +68,28 @@ class MatchSelectionContext:
             msg = "Match is not found."
             raise AssertionError(msg)
         return selected_competition, selected_match
+
+    def get_selection_match(self, match: str | None, competition: str | None) -> Match:
+        """Select a match."""
+        match_selection_context = MatchSelectionContext()
+        if match is None:
+            match = match_selection_context.match_alias
+        if competition is None:
+            competition = match_selection_context.competition_alias
+        if competition is None or match is None:
+            msg = "Please select a competition and match first."
+            raise AssertionError(msg)
+        competitions = fetch_participating_competitions()
+        selected_competition = next((c for c in competitions if c["alias"] == competition), None)
+        if selected_competition is None:
+            click.echo("Competition is not found.")
+            sys.exit(1)
+        matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
+        selected_match = next((m for m in matches if m["alias"] == match), None)
+        if selected_competition is None:
+            msg = "Competition is not found."
+            raise AssertionError(msg)
+        if selected_match is None:
+            msg = "Match is not found."
+            raise AssertionError(msg)
+        return selected_match
