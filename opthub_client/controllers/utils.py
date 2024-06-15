@@ -1,8 +1,6 @@
 """Util for opthub_client."""
 
-import asyncio
 import sys
-from typing import Any, Coroutine
 
 import click
 

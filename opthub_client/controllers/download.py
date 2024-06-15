@@ -6,6 +6,7 @@ from pathlib import Path
 import click
 
 from opthub_client.context.match_selection import MatchSelectionContext
+from opthub_client.controllers.utils import check_current_version_status
 from opthub_client.models.trial import fetch_trials
 
 
@@ -29,7 +30,7 @@ from opthub_client.models.trial import fetch_trials
 @click.pass_context
 def download(ctx: click.Context, competition: str | None, match: str | None, limit: int, start: int) -> None:
     """Download trials to a file."""
-    # check_current_version_status()
+    check_current_version_status()
     match_selection_context = MatchSelectionContext()
     selected_match = match_selection_context.get_selection_match(match, competition)
 

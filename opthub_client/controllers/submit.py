@@ -1,8 +1,6 @@
 """This module contains the functions related to submit command."""
 
-import json
 from pathlib import Path
-from typing import Any, cast
 
 import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
@@ -41,7 +39,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         competition (str | None): option for competition(-c or --competition)
         file (bool): option for file(-f or --file). if -f or --file is provided, it will be a file submission.
     """
-    # check_current_version_status()
+    check_current_version_status()
     match_selection_context = MatchSelectionContext()
     selected_competition, selected_match = match_selection_context.get_selection(match, competition)
     if file:  # file submission

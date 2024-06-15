@@ -16,7 +16,7 @@ from opthub_client.view.display_trials import display_trial
 @click.pass_context
 def show_trial(ctx: click.Context, competition: str | None, match: str | None, detail: bool, trial_no: int) -> None:
     """Check submitted solutions."""
-    # check_current_version_status()
+    check_current_version_status()
     match_selection_context = MatchSelectionContext()
     selected_match = match_selection_context.get_selection_match(match, competition)
 

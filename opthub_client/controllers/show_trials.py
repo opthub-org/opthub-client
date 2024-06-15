@@ -48,7 +48,7 @@ def show_trials(
     ctx: click.Context, competition: str | None, match: str | None, size: int, detail: bool, descending: bool
 ) -> None:
     """Check submitted solutions."""
-    # check_current_version_status()
+    check_current_version_status()
     match_selection_context = MatchSelectionContext()
     selected_match = match_selection_context.get_selection_match(match, competition)
     bindings = KeyBindings()
