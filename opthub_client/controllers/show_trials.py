@@ -28,7 +28,10 @@ async def fetch_and_display_trials(selected_match_id: str, page: int, size: int,
     """
     trials, is_first, is_last = await fetch_trials_async(selected_match_id, page, size, desc)
     run_in_terminal(lambda: display_trials(trials, detail), render_cli_done=False)
-    return (desc and is_first) or (not desc and is_last)
+    if (desc and is_first) or (not desc and is_last):
+        run_in_terminal(lambda: click.echo("No more trials."), render_cli_done=False)
+        return False
+    return True
 
 
 @click.command(name="trials")
@@ -63,7 +66,6 @@ def show_trials(
         if has_more_trials:
             # No more trials, display the message and set the flag.
             has_all_trials_displayed = True
-            run_in_terminal(lambda: click.echo("All trials have been displayed."), render_cli_done=False)
 
     # n key is to display next batch of solutions
     @bindings.add("n")
@@ -73,7 +75,7 @@ def show_trials(
             task = asyncio.create_task(next_trials())
             tasks.append(task)
         else:
-            run_in_terminal(lambda: click.echo("All trials have been displayed."), render_cli_done=False)
+            run_in_terminal(lambda: click.echo("No more trials."), render_cli_done=False)
 
     @bindings.add("e")  # e for exit
     @bindings.add("q")  # q for exit
@@ -86,7 +88,9 @@ def show_trials(
     session: PromptSession[str] = PromptSession(key_bindings=bindings)
 
     # The initial call to display next batch of solutions async.
-    asyncio.run(fetch_and_display_trials(selected_match["id"], page, size, detail, descending))
+    has_more_trials = asyncio.run(fetch_and_display_trials(selected_match["id"], page, size, detail, descending))
+    if not has_more_trials:
+        has_all_trials_displayed = True
     # Prompt the user for more solutions(n key) or exit(e or q or Ctrl+c).
     session.prompt(
         HTML(user_interaction_message()),

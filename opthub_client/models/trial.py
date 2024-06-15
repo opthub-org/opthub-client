@@ -109,8 +109,9 @@ async def fetch_trials_async(match_id: str, page: int, size: int, desc: bool) ->
             "order": "descending" if desc else "ascending",
         },
     )
+    if result is None:
+        return [], False, False
     data = result.get("getMatchTrialsByParticipant")
-
     trials = []
     is_first = False
     is_last = False
@@ -180,6 +181,15 @@ async def fetch_trials_async(match_id: str, page: int, size: int, desc: bool) ->
                     score=None,
                 )
                 trials.append(trial)
+            else:
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=None,
+                )
+                trials.append(trial)
     return trials, is_first, is_last
 
 
@@ -239,6 +249,8 @@ def fetch_trials(match_id: str, size: int, trial_no: int) -> list[Trial]:
         query,
         variable_values={"match": {"id": match_id}, "range": {"startTrialNo": trial_no, "limit": size - 1}},
     )
+    if result is None:
+        return []
     data = result.get("getMatchTrialsByParticipant")
     trials = []
     if data and isinstance(data, dict):
@@ -305,6 +317,15 @@ def fetch_trials(match_id: str, size: int, trial_no: int) -> list[Trial]:
                     score=None,
                 )
                 trials.append(trial)
+            else:
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=None,
+                )
+                trials.append(trial)
     return trials
 
 
@@ -363,6 +384,8 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial:
         query,
         variable_values={"match": {"id": match_id}, "range": {"endTrialNo": trial_no, "limit": 1}},
     )
+    if result is None:
+        return None
     data = result.get("getMatchTrialsByParticipant")
     if data and isinstance(data, dict):
         trials_data = data.get("trials", [])
@@ -418,6 +441,14 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial:
                     variable=trial_data["solution"]["variable"],
                     created_at=trial_data["solution"]["createdAt"],
                 )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=None,
+                )
+            else:
                 trial = Trial(
                     trialNo=trial_data["trialNo"],
                     solution=solution,
