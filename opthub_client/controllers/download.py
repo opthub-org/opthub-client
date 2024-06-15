@@ -24,7 +24,7 @@ from opthub_client.models.trial import fetch_trials
     "-s",
     "--start",
     type=click.INT,
-    default=0,
+    default=1,
     help="Starting trial number",
 )
 @click.pass_context
@@ -35,7 +35,7 @@ def download(ctx: click.Context, competition: str | None, match: str | None, lim
     selected_match = match_selection_context.get_selection_match(match, competition)
 
     trials = fetch_trials(selected_match["id"], trial_no=start, size=limit)
-    output_file = Path(f"trials_{selected_match['alias']}_trial_{start}.json")
+    output_file = Path(f"trials_{selected_match['alias']}_trial{start}-{start+limit-1}.json")
 
     # Write trials to a JSON file
     with output_file.open("w") as f:
