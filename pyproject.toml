@@ -1,9 +1,78 @@
-[tool.poetry]
+[project]
+version = "0.0.0"
 name = "opthub_client"
-version = "0.1.0"
-description = ""
-authors = ["OptHub Inc. <dev@opthub.ai>"]
+description = "Library for Opthub CLI tools."
 readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+keywords = ["opthub", "cli"]
+authors = [
+  {email = "dev@opthub.ai", name = "Opthub Inc."}
+]
+maintainers = [
+  {email = "dev@opthub.ai", name = "Opthub Inc."}
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "python >= 3.8",
+    "docker >= 7.1.0",
+    "click >= 8.1.7",
+    "prompt-toolkit >= 3.0.43",
+    "inquirerpy >= 0.3.4",
+    "gql >= 3.5.0",
+    "aiohttp >= 3.9.3",
+    "boto3 >= 1.34",
+    "cryptography >= 42.0.7",
+    "jwcrypto >= 1.5.6"
+]
+
+[project.urls]
+Homepage = "https://github.com/opthub-org/opthub-client"
+Documentation = "https://github.com/opthub-org/opthub-client"
+Repository = "https://github.com/opthub-org/opthub-client"
+
+[tool.poetry]
+version = "0.0.0" # using poetry-dynamic-versioning
+name = "opthub_client"
+description = "Library for Opthub CLI tools."
+authors = ["Opthub Inc. <dev@opthub.ai>"]
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/opthub-org/opthub-client"
+repository = "https://github.com/opthub-org/opthub-client"
+documentation = "https://github.com/opthub-org/opthub-client"
+keywords = ["opthub", "cli"]
+
+[tool.poetry-dynamic-versioning]
+enable = true
+format-jinja = "{% if distance == 0 %}{{ base }}{% else %}{{ base }}.post{{ distance }}{% endif %}"
+
+[tool.poetry.dependencies]
+python = "3.12.1"
+click = "^8.1.7"
+prompt-toolkit = "^3.0.43"
+inquirerpy = "^0.3.4"
+gql = "^3.5.0"
+aiohttp = "^3.9.3"
+boto3 = "^1.34"
+boto3-stubs = {extras=["dynmodb","cognito"], version="^1.34"}
+cryptography = "^42.0.7"
+jwcrypto = "^1.5.6"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.3"
+mypy = "^1.9.0"
+pytest = "^8.1.1"
+pyjwt = "^2.8.0"
+requests = "^2.31.0"
 
 [tool.ruff]
 target-version = "py312"
@@ -24,34 +93,9 @@ lint.ignore = [
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.poetry.dependencies]
-python = "3.12.1"
-click = "^8.1.7"
-prompt-toolkit = "^3.0.43"
-inquirerpy = "^0.3.4"
-gql = "^3.5.0"
-aiohttp = "^3.9.3"
-boto3 = "^1.34"
-boto3-stubs = {extras=["dynmodb","cognito"], version="^1.34"}
-cryptography = "^42.0.7"
-jwcrypto = "^1.5.6"
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.3.3"
-mypy = "^1.9.0"
-pytest = "^8.1.1"
-pyjwt = "^2.8.0"
-requests = "^2.31.0"
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-
-
-
-
-
-
-
-
 [tool.poetry.scripts]
 opt = "opthub_client.opt:opt"
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
