@@ -44,14 +44,14 @@ class Trial(TypedDict):
     score: Score | None
 
 
-async def fetch_trials_async(match_id: str, page: int, size: int, desc: bool) -> tuple[list[Trial], bool, bool]:
+async def fetch_trials_async(match_id: str, page: int, size: int, asc: bool) -> tuple[list[Trial], bool, bool]:
     """Fetch the history of the user's submitted solutions and their evaluations and scores.
 
     Args:
         match_id (str): Match ID in the competition
         page (int): Page number
         size (int): Size of the page
-        desc (bool): True for show trials in descending order, False for ascending order
+        asc (bool): True for show trials in ascending order, False for descending order
 
     Returns:
         list[Trial]:
@@ -103,10 +103,10 @@ async def fetch_trials_async(match_id: str, page: int, size: int, desc: bool) ->
         query,
         variable_values={
             "match": {"id": match_id},
-            "range": {"endTrialNo": -page * size, "limit": size - 1}
-            if desc
-            else {"startTrialNo": page * size + 1, "limit": size - 1},
-            "order": "descending" if desc else "ascending",
+            "range": {"startTrialNo": page * size + 1, "limit": size - 1}
+            if asc
+            else {"endTrialNo": -page * size, "limit": size - 1},
+            "order": "ascending" if asc else "descending",
         },
     )
     if result is None:
@@ -181,7 +181,19 @@ async def fetch_trials_async(match_id: str, page: int, size: int, desc: bool) ->
                     score=None,
                 )
                 trials.append(trial)
-            else:
+            elif trial_data.get("status") == "scorer_failed":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
                 trial = Trial(
                     trialNo=trial_data["trialNo"],
                     solution=solution,
@@ -190,6 +202,21 @@ async def fetch_trials_async(match_id: str, page: int, size: int, desc: bool) ->
                     score=None,
                 )
                 trials.append(trial)
+            elif trial_data.get("status") == "evaluator_failed":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=None,
+                    score=None,
+                )
+                trials.append(trial)
+            else:
+                raise AssertionError("Unknown trial status")
     return trials, is_first, is_last
 
 
@@ -317,7 +344,19 @@ def fetch_trials(match_id: str, size: int, trial_no: int) -> list[Trial]:
                     score=None,
                 )
                 trials.append(trial)
-            else:
+            elif trial_data.get("status") == "scorer_failed":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
                 trial = Trial(
                     trialNo=trial_data["trialNo"],
                     solution=solution,
@@ -326,6 +365,21 @@ def fetch_trials(match_id: str, size: int, trial_no: int) -> list[Trial]:
                     score=None,
                 )
                 trials.append(trial)
+            elif trial_data.get("status") == "evaluator_failed":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=None,
+                    score=None,
+                )
+                trials.append(trial)
+            else:
+                raise AssertionError("Unknown trial status")
     return trials
 
 
@@ -448,7 +502,19 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial:
                     evaluation=evaluation,
                     score=None,
                 )
-            else:
+            elif trial_data.get("status") == "scorer_failed":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
                 trial = Trial(
                     trialNo=trial_data["trialNo"],
                     solution=solution,
@@ -456,4 +522,18 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial:
                     evaluation=evaluation,
                     score=None,
                 )
+            elif trial_data.get("status") == "evaluator_failed":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=None,
+                    score=None,
+                )
+            else:
+                raise AssertionError("Unknown trial status")
     return trial

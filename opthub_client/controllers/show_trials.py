@@ -13,7 +13,7 @@ from opthub_client.models.trial import fetch_trials_async
 from opthub_client.view.display_trials import display_trials, user_interaction_message, user_interaction_message_style
 
 
-async def fetch_and_display_trials(selected_match_id: str, page: int, size: int, detail: bool, desc: bool) -> bool:
+async def fetch_and_display_trials(selected_match_id: str, page: int, size: int, detail: bool, asc: bool) -> bool:
     """Fetch and display the trials. Returns True if more trials are available, False if no more trials.
 
     Args:
@@ -21,14 +21,14 @@ async def fetch_and_display_trials(selected_match_id: str, page: int, size: int,
         page (int): Page number
         size (int): Number of trials to display
         detail (bool): True for detailed information, false for general information
-        desc (bool): True for show trials in descending order, false for ascending order
+        asc (bool): True for show trials in ascending order, false for descending order
 
     Returns:
         bool: True if more trials are available, False if no more trials
     """
-    trials, is_first, is_last = await fetch_trials_async(selected_match_id, page, size, desc)
+    trials, is_first, is_last = await fetch_trials_async(selected_match_id, page, size, asc)
     run_in_terminal(lambda: display_trials(trials, detail), render_cli_done=False)
-    if (desc and is_first) or (not desc and is_last):
+    if (asc and is_last) or (not asc and is_first):
         run_in_terminal(lambda: click.echo("No more trials."), render_cli_done=False)
         return False
     return True
@@ -45,10 +45,10 @@ async def fetch_and_display_trials(selected_match_id: str, page: int, size: int,
     default=20,
     help="Number of trials to display (1-50).",
 )
-@click.option("-desc", "--descending", is_flag=True, help="Show trials in descending order")
+@click.option("-asc", "--ascending", is_flag=True, help="Show trials in ascending order")
 @click.pass_context
 def show_trials(
-    ctx: click.Context, competition: str | None, match: str | None, size: int, detail: bool, descending: bool
+    ctx: click.Context, competition: str | None, match: str | None, size: int, detail: bool, ascending: bool
 ) -> None:
     """Check submitted solutions."""
     check_current_version_status()
@@ -62,7 +62,7 @@ def show_trials(
     async def next_trials() -> None:
         nonlocal page, has_all_trials_displayed
         page += 1
-        has_more_trials = await fetch_and_display_trials(selected_match["id"], page, size, detail, descending)
+        has_more_trials = await fetch_and_display_trials(selected_match["id"], page, size, detail, ascending)
         if has_more_trials:
             # No more trials, display the message and set the flag.
             has_all_trials_displayed = True
@@ -88,7 +88,7 @@ def show_trials(
     session: PromptSession[str] = PromptSession(key_bindings=bindings)
 
     # The initial call to display next batch of solutions async.
-    has_more_trials = asyncio.run(fetch_and_display_trials(selected_match["id"], page, size, detail, descending))
+    has_more_trials = asyncio.run(fetch_and_display_trials(selected_match["id"], page, size, detail, ascending))
     if not has_more_trials:
         has_all_trials_displayed = True
     # Prompt the user for more solutions(n key) or exit(e or q or Ctrl+c).
