@@ -3,7 +3,6 @@
 import click
 from prompt_toolkit.styles import Style
 
-from opthub_client.controllers.utils import get_trial_info_detail, get_trial_info_general
 from opthub_client.models.trial import Trial
 
 
@@ -41,3 +40,39 @@ def user_interaction_message_style() -> Style:
         },
     )
     return style
+
+
+def get_trial_info_general(trial: Trial) -> str:
+    """Display the general information of a trial.
+
+    Args:
+        trial (Trial): The trial to display.
+
+    Returns:
+        str: The general information of the trial.
+    """
+    lines = (
+        f"Trial No: {trial['trialNo']}, status: {trial['status']}, Score: {trial['score']['score']}\n"
+        if trial["score"]
+        else f"Trial No: {trial['trialNo']}, status: {trial['status']}\n"
+    )
+
+    return lines
+
+
+def get_trial_info_detail(trial: Trial) -> str:
+    """Display the general information of a trial.
+
+    Args:
+        trial (Trial): The trial to display.
+
+    Returns:
+        str: The general information of the trial.
+    """
+    lines = ""
+    lines += "Trial No: " + str(trial["trialNo"]) + "\n"
+    lines += "status: " + str(trial["status"]) + "\n"
+    lines += "Solution: " + str(trial["solution"]["variable"]) + "\n"
+    lines += "Evaluation: " + str(trial["evaluation"]["objective"]) + "\n" if trial["evaluation"] else ""
+    lines += "Score: " + str(trial["score"]["score"]) + "\n" if trial["score"] else ""
+    return lines
