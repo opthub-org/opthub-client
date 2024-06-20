@@ -53,7 +53,7 @@ def show_trials(
     """Check submitted solutions."""
     check_current_version_status()
     match_selection_context = MatchSelectionContext()
-    selected_match = match_selection_context.get_selection_match(match, competition)
+    selected_match = match_selection_context.get_match(match, competition)
     bindings = KeyBindings()
     page = 0
     has_all_trials_displayed = False

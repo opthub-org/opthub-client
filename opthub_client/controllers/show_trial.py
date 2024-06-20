@@ -18,7 +18,7 @@ def show_trial(ctx: click.Context, competition: str | None, match: str | None, d
     """Check submitted solutions."""
     check_current_version_status()
     match_selection_context = MatchSelectionContext()
-    selected_match = match_selection_context.get_selection_match(match, competition)
+    selected_match = match_selection_context.get_match(match, competition)
 
     # display batch of solutions.
     trial = fetch_trial(selected_match["id"], trial_no=trial_no)

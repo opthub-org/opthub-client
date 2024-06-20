@@ -69,7 +69,7 @@ class MatchSelectionContext:
             raise AssertionError(msg)
         return selected_competition, selected_match
 
-    def get_selection_match(self, match: str | None, competition: str | None) -> Match:
+    def get_match(self, match: str | None, competition: str | None) -> Match:
         """Select a match."""
         match_selection_context = MatchSelectionContext()
         if match is None:

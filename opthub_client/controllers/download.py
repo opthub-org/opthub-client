@@ -32,7 +32,7 @@ def download(ctx: click.Context, competition: str | None, match: str | None, lim
     """Download trials to a file."""
     check_current_version_status()
     match_selection_context = MatchSelectionContext()
-    selected_match = match_selection_context.get_selection_match(match, competition)
+    selected_match = match_selection_context.get_match(match, competition)
 
     trials = fetch_trials(selected_match["id"], trial_no=start, size=limit)
     output_file = Path(f"trials_{selected_match['alias']}_trial{start}-{start+limit-1}.json")
