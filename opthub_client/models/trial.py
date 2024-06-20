@@ -44,7 +44,9 @@ class Trial(TypedDict):
     score: Score | None
 
 
-async def fetch_trials_async(match_id: str, page: int, size: int, asc: bool) -> tuple[list[Trial], bool, bool]:
+async def fetch_trials_async(
+    match_id: str, page: int, size: int, trial_from: int, asc: bool
+) -> tuple[list[Trial], bool, bool]:
     """Fetch the history of the user's submitted solutions and their evaluations and scores.
 
     Args:
@@ -103,9 +105,9 @@ async def fetch_trials_async(match_id: str, page: int, size: int, asc: bool) -> 
         query,
         variable_values={
             "match": {"id": match_id},
-            "range": {"startTrialNo": page * size + 1, "limit": size - 1}
+            "range": {"startTrialNo": (trial_from - 1) + page * size + 1, "limit": size - 1}
             if asc
-            else {"endTrialNo": -page * size, "limit": size - 1},
+            else {"endTrialNo": trial_from + -page * size, "limit": size - 1},
             "order": "ascending" if asc else "descending",
         },
     )
