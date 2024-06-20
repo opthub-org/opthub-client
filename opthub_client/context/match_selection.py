@@ -45,7 +45,22 @@ class MatchSelectionContext:
             db.sync()
 
     def get_selection(self, match: str | None, competition: str | None) -> tuple[Competition, Match]:
-        """Select a match."""
+        """Select a competition and match based on the provided aliases.
+
+        This method allows you to select a competition and a match by their aliases.
+        If no aliases are provided, it will use default values from `MatchSelectionContext`.
+        If the competition or match cannot be found, it raises an appropriate error or exits the program.
+
+        Args:
+            match (str | None): The alias of the match to select.
+                                If None, it uses the default value from `MatchSelectionContext`.
+            competition (str | None): The alias of the competition to select.
+                                      If None, it uses the default value from `MatchSelectionContext`.
+
+        Returns:
+            tuple[Competition, Match]: A tuple containing the selected competition and match objects.
+
+        """
         match_selection_context = MatchSelectionContext()
         if match is None:
             match = match_selection_context.match_alias
@@ -70,7 +85,21 @@ class MatchSelectionContext:
         return selected_competition, selected_match
 
     def get_match(self, match: str | None, competition: str | None) -> Match:
-        """Select a match."""
+        """Select a match based on the provided aliases.
+
+        This method allows you to select a match by its alias within a specified competition.
+        If no aliases are provided, it will use default values from `MatchSelectionContext`.
+        If the competition or match cannot be found, it raises an appropriate error or exits the program.
+
+        Args:
+            match (str | None): The alias of the match to select.
+                                If None, it uses the default value from `MatchSelectionContext`.
+            competition (str | None): The alias of the competition to select.
+                                      If None, it uses the default value from `MatchSelectionContext`.
+
+        Returns:
+            Match: The selected match object.
+        """
         match_selection_context = MatchSelectionContext()
         if match is None:
             match = match_selection_context.match_alias
