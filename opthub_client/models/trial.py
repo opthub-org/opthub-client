@@ -45,7 +45,12 @@ class Trial(TypedDict):
 
 
 async def fetch_trials_async(
-    match_id: str, page: int, size: int, trial_from: int, asc: bool
+    match_id: str,
+    page: int,
+    size: int,
+    trial_from: int,
+    is_asc: bool,
+    display_only_success: bool,
 ) -> tuple[list[Trial], bool, bool]:
     """Fetch the history of the user's submitted solutions and their evaluations and scores.
 
@@ -105,10 +110,10 @@ async def fetch_trials_async(
         query,
         variable_values={
             "match": {"id": match_id},
-            "range": {"startTrialNo": (trial_from - 1) + page * size + 1, "limit": size - 1}
-            if asc
+            "range": {"startTrialNo": trial_from + 1 + page * size, "limit": size - 1}
+            if is_asc
             else {"endTrialNo": trial_from + -page * size, "limit": size - 1},
-            "order": "ascending" if asc else "descending",
+            "order": "ascending" if is_asc else "descending",
         },
     )
     if result is None:
@@ -161,7 +166,7 @@ async def fetch_trials_async(
                     evaluation=None,
                     score=None,
                 )
-                trials.append(trial)
+                trials.append(trial) if not display_only_success else None
             elif trial_data.get("status") == "scoring":
                 evaluation = Evaluation(
                     status=trial_data["evaluation"]["status"],
@@ -182,7 +187,7 @@ async def fetch_trials_async(
                     evaluation=evaluation,
                     score=None,
                 )
-                trials.append(trial)
+                trials.append(trial) if not display_only_success else None
             elif trial_data.get("status") == "scorer_failed":
                 solution = Solution(
                     variable=trial_data["solution"]["variable"],
@@ -203,7 +208,7 @@ async def fetch_trials_async(
                     evaluation=evaluation,
                     score=None,
                 )
-                trials.append(trial)
+                trials.append(trial) if not display_only_success else None
             elif trial_data.get("status") == "evaluator_failed":
                 solution = Solution(
                     variable=trial_data["solution"]["variable"],
@@ -216,7 +221,7 @@ async def fetch_trials_async(
                     evaluation=None,
                     score=None,
                 )
-                trials.append(trial)
+                trials.append(trial) if not display_only_success else None
             else:
                 raise AssertionError("Unknown trial status")
     return trials, is_first, is_last

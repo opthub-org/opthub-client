@@ -14,7 +14,13 @@ from opthub_client.view.display_trials import display_trials, user_interaction_m
 
 
 async def fetch_and_display_trials(
-    selected_match_id: str, page: int, size: int, trial_from: int, detail: bool, asc: bool
+    selected_match_id: str,
+    page: int,
+    size: int,
+    trial_from: int,
+    detail: bool,
+    asc: bool,
+    success: bool,
 ) -> bool:
     """Fetch and display the trials. Returns True if more trials are available, False if no more trials.
 
@@ -28,7 +34,7 @@ async def fetch_and_display_trials(
     Returns:
         bool: True if more trials are available, False if no more trials
     """
-    trials, is_first, is_last = await fetch_trials_async(selected_match_id, page, size, trial_from, asc)
+    trials, is_first, is_last = await fetch_trials_async(selected_match_id, page, size, trial_from, asc, success)
     run_in_terminal(lambda: display_trials(trials, detail), render_cli_done=False)
     if (asc and is_last) or (not asc and is_first):
         run_in_terminal(lambda: click.echo("No more trials."), render_cli_done=False)
@@ -56,21 +62,25 @@ async def fetch_and_display_trials(
     help="Number of trials to display (1-50).",
 )
 @click.option("-asc", "--ascending", is_flag=True, help="Show trials in ascending order")
+@click.option("-suc", "--success", is_flag=True, help="Show only successful trials")
 @click.pass_context
 def show_trials(
     ctx: click.Context,
     competition: str | None,
     match: str | None,
     size: int,
+    trial_from: int,
     detail: bool,
     ascending: bool,
-    trial_from: int,
+    success: bool,
 ) -> None:
     """Check submitted solutions."""
-    # check_current_version_status()
+    check_current_version_status()
     match_selection_context = MatchSelectionContext()
     selected_match = match_selection_context.get_match(match, competition)
     bindings = KeyBindings()
+    # trial_from is decremented by 1 if it is greater than 0 and ascending is True
+    trial_from = trial_from - 1 if trial_from > 0 and ascending else trial_from
     page = 0
     has_all_trials_displayed = False
     tasks = []
@@ -85,8 +95,9 @@ def show_trials(
             trial_from,
             detail,
             ascending,
+            success,
         )
-        if has_more_trials:
+        if not has_more_trials:
             # No more trials, display the message and set the flag.
             has_all_trials_displayed = True
 
@@ -119,6 +130,7 @@ def show_trials(
             trial_from,
             detail,
             ascending,
+            success,
         ),
     )
     if not has_more_trials:
