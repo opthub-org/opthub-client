@@ -29,8 +29,18 @@ SIZE_FETCH_TRIALS = 50
     default=SIZE_FETCH_TRIALS,
     help="End trial number",
 )
+@click.option("-desc", "--descending", is_flag=True, help="Show trials in descending order")
+@click.option("-suc", "--success", is_flag=True, help="Show only successful trials")
 @click.pass_context
-def download(ctx: click.Context, competition: str | None, match: str | None, start: int, end: int) -> None:
+def download(
+    ctx: click.Context,
+    competition: str | None,
+    match: str | None,
+    start: int,
+    end: int,
+    descending: bool,
+    success: bool,
+) -> None:
     """Download trials to a file."""
     check_current_version_status()
     match_selection_context = MatchSelectionContext()
@@ -47,11 +57,23 @@ def download(ctx: click.Context, competition: str | None, match: str | None, sta
             for batch_start in range(start, end + 1, SIZE_FETCH_TRIALS):
                 limit = min(SIZE_FETCH_TRIALS, end - batch_start + 1)
                 if limit == 1:
-                    trials, is_last = fetch_trials(selected_match["id"], start=batch_start - 1, limit=limit + 1)
+                    trials, is_first, is_last = fetch_trials(
+                        selected_match["id"],
+                        start=batch_start - 1,
+                        limit=limit + 1,
+                        is_desc=descending,
+                        display_only_success=success,
+                    )
                 else:
-                    trials, is_last = fetch_trials(selected_match["id"], start=batch_start, limit=limit)
+                    trials, is_first, is_last = fetch_trials(
+                        selected_match["id"],
+                        start=batch_start,
+                        limit=limit,
+                        is_desc=descending,
+                        display_only_success=success,
+                    )
                 all_trials.extend(trials)
-                if is_last:
+                if (is_first and descending) or (is_last and not descending):
                     bar.update(total_trials)
                     break
                 bar.update(limit)

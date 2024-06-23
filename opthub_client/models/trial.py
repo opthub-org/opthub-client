@@ -231,13 +231,16 @@ def fetch_trials(
     match_id: str,
     start: int,
     limit: int,
-) -> tuple[list[Trial], bool]:
+    is_desc: bool,
+    display_only_success: bool,
+) -> tuple[list[Trial], bool, bool]:
     """Fetch the history of the user's submitted solutions and their evaluations and scores.
 
     Args:
         match_id (str): Match ID in the competition
         start (int): Trial number to start fetching
         limit (int): Number of trials to fetch
+        display_only_success (bool): True to display only successful trials
     Returns:
         list[Trial]:
             The the history of the user's submitted solutions and their evaluations and scores.
@@ -287,6 +290,7 @@ def fetch_trials(
         query,
         variable_values={
             "match": {"id": match_id},
+            "order": "descending" if is_desc else "ascending",
             "range": {
                 "startTrialNo": start,
                 "limit": limit - 1,
@@ -298,9 +302,11 @@ def fetch_trials(
     data = result.get("getMatchTrialsByParticipant")
     trials = []
     is_last = False
+    is_first = False
     if data and isinstance(data, dict):
         trials_data = data.get("trials", [])
         is_last = data.get("isLast")
+        is_first = data.get("isFirst")
         for trial_data in trials_data:
             if trial_data.get("status") == "success":
                 evaluation = Evaluation(
@@ -341,7 +347,7 @@ def fetch_trials(
                     evaluation=None,
                     score=None,
                 )
-                trials.append(trial)
+                trials.append(trial) if not display_only_success else None
             elif trial_data.get("status") == "scoring":
                 evaluation = Evaluation(
                     status=trial_data["evaluation"]["status"],
@@ -362,7 +368,7 @@ def fetch_trials(
                     evaluation=evaluation,
                     score=None,
                 )
-                trials.append(trial)
+                trials.append(trial) if not display_only_success else None
             elif trial_data.get("status") == "scorer_failed":
                 solution = Solution(
                     variable=trial_data["solution"]["variable"],
@@ -383,7 +389,7 @@ def fetch_trials(
                     evaluation=evaluation,
                     score=None,
                 )
-                trials.append(trial)
+                trials.append(trial) if not display_only_success else None
             elif trial_data.get("status") == "evaluator_failed":
                 solution = Solution(
                     variable=trial_data["solution"]["variable"],
@@ -396,10 +402,10 @@ def fetch_trials(
                     evaluation=None,
                     score=None,
                 )
-                trials.append(trial)
+                trials.append(trial) if not display_only_success else None
             else:
                 raise AssertionError("Unknown trial status")
-    return trials, is_last
+    return trials, is_first, is_last
 
 
 def fetch_trial(match_id: str, trial_no: int) -> Trial:

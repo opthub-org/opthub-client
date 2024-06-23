@@ -1,0 +1,402 @@
+[
+    {
+        "trialNo": 27,
+        "solution": {
+            "variable": "88",
+            "created_at": "2024-06-20T02:24:09.801Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "7744",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:30:30.983875",
+            "finished_at": "2024-06-21T21:30:35.445501"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 26,
+        "solution": {
+            "variable": "987654",
+            "created_at": "2024-06-20T02:24:00.525Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "975460423716",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:30:14.015869",
+            "finished_at": "2024-06-21T21:30:18.430376"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 25,
+        "solution": {
+            "variable": "12345",
+            "created_at": "2024-06-20T02:23:54.816Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "152399025",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:30:25.921977",
+            "finished_at": "2024-06-21T21:30:30.187217"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 24,
+        "solution": {
+            "variable": "90",
+            "created_at": "2024-06-20T02:23:49.130Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "8100",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:29:18.904939",
+            "finished_at": "2024-06-21T21:29:25.014769"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 23,
+        "solution": {
+            "variable": "24",
+            "created_at": "2024-06-20T02:23:13.010Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "576",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:30:05.959204",
+            "finished_at": "2024-06-21T21:30:12.742441"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 22,
+        "solution": {
+            "variable": "23",
+            "created_at": "2024-06-20T02:23:06.362Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "529",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:30:00.538627",
+            "finished_at": "2024-06-21T21:30:04.965540"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 21,
+        "solution": {
+            "variable": "22",
+            "created_at": "2024-06-20T02:22:58.195Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "484",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:29:01.220611",
+            "finished_at": "2024-06-21T21:29:08.741345"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 20,
+        "solution": {
+            "variable": "21",
+            "created_at": "2024-06-20T02:22:53.215Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "441",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:29:41.659698",
+            "finished_at": "2024-06-21T21:29:46.783146"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 19,
+        "solution": {
+            "variable": "20",
+            "created_at": "2024-06-20T02:22:49.421Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "400",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:29:54.320757",
+            "finished_at": "2024-06-21T21:29:58.959859"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 18,
+        "solution": {
+            "variable": "19",
+            "created_at": "2024-06-20T02:22:44.500Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "361",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:29:10.166579",
+            "finished_at": "2024-06-21T21:29:16.880732"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 17,
+        "solution": {
+            "variable": "18",
+            "created_at": "2024-06-20T02:22:36.197Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "324",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:30:19.886916",
+            "finished_at": "2024-06-21T21:30:24.666428"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 16,
+        "solution": {
+            "variable": "17",
+            "created_at": "2024-06-20T02:22:32.070Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "289",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:29:47.795086",
+            "finished_at": "2024-06-21T21:29:52.430465"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 15,
+        "solution": {
+            "variable": "16",
+            "created_at": "2024-06-20T02:22:27.268Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "256",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:29:26.132022",
+            "finished_at": "2024-06-21T21:29:33.884771"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 14,
+        "solution": {
+            "variable": "13",
+            "created_at": "2024-06-20T02:22:21.696Z"
+        },
+        "status": "scoring",
+        "evaluation": {
+            "status": "Success",
+            "objective": "169",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-21T21:29:34.903950",
+            "finished_at": "2024-06-21T21:29:40.267688"
+        },
+        "score": null
+    },
+    {
+        "trialNo": 13,
+        "solution": {
+            "variable": "[0.2,0.2]",
+            "created_at": "2024-06-15T10:03:03.390Z"
+        },
+        "status": "evaluator_failed",
+        "evaluation": null,
+        "score": null
+    },
+    {
+        "trialNo": 12,
+        "solution": {
+            "variable": "0.001",
+            "created_at": "2024-06-15T10:00:42.512Z"
+        },
+        "status": "success",
+        "evaluation": {
+            "status": "Success",
+            "objective": "1.0E-6",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-15T19:00:43.817964",
+            "finished_at": "2024-06-15T19:00:49.001341"
+        },
+        "score": {
+            "status": "Success",
+            "score": 1e-06,
+            "started_at": "2024-06-15T19:05:42.787093",
+            "finished_at": "2024-06-15T19:05:47.220328"
+        }
+    },
+    {
+        "trialNo": 11,
+        "solution": {
+            "variable": "0.02",
+            "created_at": "2024-06-15T09:57:17.537Z"
+        },
+        "status": "success",
+        "evaluation": {
+            "status": "Success",
+            "objective": "4.0E-4",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-15T18:58:43.054821",
+            "finished_at": "2024-06-15T18:58:47.028232"
+        },
+        "score": {
+            "status": "Success",
+            "score": 0.0001,
+            "started_at": "2024-06-15T18:58:47.845814",
+            "finished_at": "2024-06-15T18:58:51.742974"
+        }
+    },
+    {
+        "trialNo": 10,
+        "solution": {
+            "variable": "0.01",
+            "created_at": "2024-06-15T09:56:37.066Z"
+        },
+        "status": "success",
+        "evaluation": {
+            "status": "Success",
+            "objective": "1.0E-4",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-15T18:56:39.596956",
+            "finished_at": "2024-06-15T18:56:43.968375"
+        },
+        "score": {
+            "status": "Success",
+            "score": 0.0001,
+            "started_at": "2024-06-15T18:57:58.368856",
+            "finished_at": "2024-06-15T18:58:02.632017"
+        }
+    },
+    {
+        "trialNo": 9,
+        "solution": {
+            "variable": "[1,1,1]",
+            "created_at": "2024-06-15T09:49:22.888Z"
+        },
+        "status": "evaluator_failed",
+        "evaluation": null,
+        "score": null
+    },
+    {
+        "trialNo": 8,
+        "solution": {
+            "variable": "2.2",
+            "created_at": "2024-06-15T09:47:21.066Z"
+        },
+        "status": "success",
+        "evaluation": {
+            "status": "Success",
+            "objective": "4.840000000000001",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-15T18:47:24.204160",
+            "finished_at": "2024-06-15T18:47:28.438676"
+        },
+        "score": {
+            "status": "Success",
+            "score": 0.010000000000000002,
+            "started_at": "2024-06-15T18:48:05.049198",
+            "finished_at": "2024-06-15T18:48:09.079671"
+        }
+    },
+    {
+        "trialNo": 7,
+        "solution": {
+            "variable": "1.1",
+            "created_at": "2024-06-15T09:46:18.584Z"
+        },
+        "status": "success",
+        "evaluation": {
+            "status": "Success",
+            "objective": "1.2100000000000002",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-15T18:46:24.078144",
+            "finished_at": "2024-06-15T18:46:28.690421"
+        },
+        "score": {
+            "status": "Success",
+            "score": 0.010000000000000002,
+            "started_at": "2024-06-15T18:47:59.475689",
+            "finished_at": "2024-06-15T18:48:04.001626"
+        }
+    },
+    {
+        "trialNo": 6,
+        "solution": {
+            "variable": "[6,6]",
+            "created_at": "2024-06-15T08:34:22.282Z"
+        },
+        "status": "evaluator_failed",
+        "evaluation": null,
+        "score": null
+    },
+    {
+        "trialNo": 5,
+        "solution": {
+            "variable": "0.1",
+            "created_at": "2024-06-15T07:59:56.816Z"
+        },
+        "status": "success",
+        "evaluation": {
+            "status": "Success",
+            "objective": "0.010000000000000002",
+            "constraint": null,
+            "info": "{}",
+            "started_at": "2024-06-15T16:59:58.310129",
+            "finished_at": "2024-06-15T17:00:02.393867"
+        },
+        "score": {
+            "status": "Success",
+            "score": 0.010000000000000002,
+            "started_at": "2024-06-15T17:00:03.256279",
+            "finished_at": "2024-06-15T17:00:07.118017"
+        }
+    }
+]
