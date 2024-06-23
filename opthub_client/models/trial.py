@@ -227,14 +227,17 @@ async def fetch_trials_async(
     return trials, is_first, is_last
 
 
-def fetch_trials(match_id: str, size: int, trial_no: int) -> list[Trial]:
+def fetch_trials(
+    match_id: str,
+    start: int,
+    limit: int,
+) -> tuple[list[Trial], bool]:
     """Fetch the history of the user's submitted solutions and their evaluations and scores.
 
     Args:
         match_id (str): Match ID in the competition
-        size (int): Size of fetch trials
-        trial_no (int): Trial number to start fetching
-
+        start (int): Trial number to start fetching
+        limit (int): Number of trials to fetch
     Returns:
         list[Trial]:
             The the history of the user's submitted solutions and their evaluations and scores.
@@ -253,6 +256,7 @@ def fetch_trials(match_id: str, size: int, trial_no: int) -> list[Trial]:
                 range: $range,
                 order: $order
             ) {
+                isLast
                 startTrialNo
                 endTrialNo
                 trials {
@@ -281,14 +285,22 @@ def fetch_trials(match_id: str, size: int, trial_no: int) -> list[Trial]:
             }}""")
     result = client.execute(
         query,
-        variable_values={"match": {"id": match_id}, "range": {"startTrialNo": trial_no, "limit": size - 1}},
+        variable_values={
+            "match": {"id": match_id},
+            "range": {
+                "startTrialNo": start,
+                "limit": limit - 1,
+            },
+        },
     )
     if result is None:
         return []
     data = result.get("getMatchTrialsByParticipant")
     trials = []
+    is_last = False
     if data and isinstance(data, dict):
         trials_data = data.get("trials", [])
+        is_last = data.get("isLast")
         for trial_data in trials_data:
             if trial_data.get("status") == "success":
                 evaluation = Evaluation(
@@ -387,7 +399,7 @@ def fetch_trials(match_id: str, size: int, trial_no: int) -> list[Trial]:
                 trials.append(trial)
             else:
                 raise AssertionError("Unknown trial status")
-    return trials
+    return trials, is_last
 
 
 def fetch_trial(match_id: str, trial_no: int) -> Trial:
