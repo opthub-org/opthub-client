@@ -52,26 +52,17 @@ def download(
         all_trials = []
         with click.progressbar(
             length=total_trials,
-            label="Fetching trials",
+            label="Downloading trials",
         ) as bar:
             for batch_start in range(start, end + 1, SIZE_FETCH_TRIALS):
                 limit = min(SIZE_FETCH_TRIALS, end - batch_start + 1)
-                if limit == 1:
-                    trials, is_first, is_last = fetch_trials(
-                        selected_match["id"],
-                        start=batch_start - 1,
-                        limit=limit + 1,
-                        is_desc=descending,
-                        display_only_success=success,
-                    )
-                else:
-                    trials, is_first, is_last = fetch_trials(
-                        selected_match["id"],
-                        start=batch_start,
-                        limit=limit,
-                        is_desc=descending,
-                        display_only_success=success,
-                    )
+                trials, is_first, is_last = fetch_trials(
+                    selected_match["id"],
+                    start=batch_start,
+                    limit=limit,
+                    is_desc=descending,
+                    display_only_success=success,
+                )
                 all_trials.extend(trials)
                 if (is_first and descending) or (is_last and not descending):
                     bar.update(total_trials)
