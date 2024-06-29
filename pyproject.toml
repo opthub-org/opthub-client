@@ -3,7 +3,7 @@ version = "0.0.0"
 name = "opthub_client"
 description = "Library for Opthub CLI tools."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = {text = "MIT"}
 keywords = ["opthub", "cli"]
 authors = [
@@ -15,14 +15,12 @@ maintainers = [
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "python >= 3.8",
+    "python >= 3.10, < 4.0",
     "docker >= 7.1.0",
     "click >= 8.1.7",
     "prompt-toolkit >= 3.0.43",
@@ -56,7 +54,7 @@ enable = true
 format-jinja = "{% if distance == 0 %}{{ base }}{% else %}{{ base }}.post{{ distance }}{% endif %}"
 
 [tool.poetry.dependencies]
-python = "3.12.1"
+python = ">=3.10,<4.0"
 click = "^8.1.7"
 prompt-toolkit = "^3.0.43"
 inquirerpy = "^0.3.4"
