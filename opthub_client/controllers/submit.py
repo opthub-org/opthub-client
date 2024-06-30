@@ -1,8 +1,6 @@
 """This module contains the functions related to submit command."""
 
-import json
 from pathlib import Path
-from typing import Any, cast
 
 import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
