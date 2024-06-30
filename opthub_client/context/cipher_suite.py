@@ -5,8 +5,7 @@ from pathlib import Path
 
 from cryptography.fernet import Fernet
 
-OPTHUB_CLIENT_DIR = Path.home() / ".opthub_client"
-KEY_FILE_PATH = OPTHUB_CLIENT_DIR / "encryption_key"
+KEY_FILE_PATH = Path.home() / ".opthub_client" / "encryption_key"
 
 
 class CipherSuite:

@@ -8,16 +8,13 @@ from typing import Any
 import boto3
 import jwt
 import requests
-from jwcrypto import jwk
+from jwcrypto import jwk  # type: ignore[import]
 
 from opthub_client.context.cipher_suite import CipherSuite
+from opthub_client.errors.authentication_error import AuthenticationError, AuthenticationErrorMessage
 
 CLIENT_ID = "24nvfsrgbuvu75h4o8oj2c2oek"
 JWKS_URL = "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_1Y69fktA0/.well-known/jwks.json"
-ERROR_MESSAGE_FAIL_TO_GET_PUBLIC_KEY = "Failed to get public key."
-ERROR_MESSAGE_FAIL_TO_REFRESH_TOKEN = "Failed to refresh authentication token. Please re-login."
-ERROR_MESSAGE_FAIL_TO_GET_JWKS = "Failed to retrieve JWKS"
-OPTHUB_CLIENT_DIR = Path.home() / ".opthub_client"
 
 
 class Credentials:
@@ -32,8 +29,9 @@ class Credentials:
 
     def __init__(self) -> None:
         """Initialize the credentials context with a persistent temporary file."""
-        OPTHUB_CLIENT_DIR.mkdir(exist_ok=True)  # Create the directory if it doesn't exist
-        self.file_path = OPTHUB_CLIENT_DIR / "opthub_credentials"
+        opthub_dir = Path.home() / ".opthub_client"
+        opthub_dir.mkdir(exist_ok=True)  # Create the directory if it doesn't exist
+        self.file_path = opthub_dir / "credentials"
 
     def load(self) -> None:
         """Load the credentials from the shelve file."""
@@ -46,27 +44,26 @@ class Credentials:
             self.uid = cipher_suite.decrypt(db.get("uid", b""))
             self.username = cipher_suite.decrypt(db.get("username", b""))
             # refresh the access token if it is expired
-            if self.is_expired() and not self.refresh_access_token():
-                self.clear_credentials()
-                raise Exception(ERROR_MESSAGE_FAIL_TO_REFRESH_TOKEN)
+            if self.is_expired():
+                self.refresh_access_token()
             db.close()
 
-    def update(self) -> None:
+    def update(self, access_token: str, refresh_token: str) -> None:
         """Update the credentials in the shelve file."""
         cipher_suite = CipherSuite()
-        if self.access_token is None or self.refresh_token is None:
-            return
         with shelve.open(str(self.file_path)) as db:
             # encrypt the credentials
-            db["access_token"] = cipher_suite.encrypt(self.access_token)
-            db["refresh_token"] = cipher_suite.encrypt(self.refresh_token)
+            db["access_token"] = cipher_suite.encrypt(access_token)
+            db["refresh_token"] = cipher_suite.encrypt(refresh_token)
             # decode the access token to get the expire time, user id and user name
-            public_key = self.get_jwks_public_key(self.access_token)
-            token = jwt.decode(self.access_token, public_key, algorithms=["RS256"], options={"verify_signature": True})
+            public_key = self.get_jwks_public_key(access_token)
+            token = jwt.decode(access_token, public_key, algorithms=["RS256"], options={"verify_signature": True})
             db["expire_at"] = cipher_suite.encrypt(str(token.get("exp")))
             db["uid"] = cipher_suite.encrypt(token.get("sub"))
             db["username"] = cipher_suite.encrypt(token.get("username"))
             db.sync()
+        self.access_token = access_token
+        self.refresh_token = refresh_token
 
     def is_expired(self) -> bool:
         """Determine if the access token has expired.
@@ -80,25 +77,23 @@ class Credentials:
         expire_at_timestamp = int(self.expire_at)
         return current_time > expire_at_timestamp
 
-    def refresh_access_token(self) -> bool:
+    def refresh_access_token(self) -> None:
         """Refresh the access token using refresh token.
 
         Returns:
             bool: true if the access token is refreshed successfully, otherwise false.
         """
-        client = boto3.client("cognito-idp", region_name="ap-northeast-1")
         try:
+            client = boto3.client("cognito-idp", region_name="ap-northeast-1")
             response = client.initiate_auth(
                 AuthFlow="REFRESH_TOKEN_AUTH",
                 AuthParameters={"REFRESH_TOKEN": self.refresh_token},
                 ClientId=CLIENT_ID,
             )
-        except Exception:
-            return False
-        else:
             self.access_token = response["AuthenticationResult"]["AccessToken"]
             if self.access_token is None:
-                return False
+                self.clear_credentials()
+                return
             public_key = self.get_jwks_public_key(self.access_token)
             self.expire_at = jwt.decode(
                 self.access_token,
@@ -106,7 +101,8 @@ class Credentials:
                 algorithms=["RS256"],
                 options={"verify_signature": True},
             )["exp"]
-        return True
+        except:
+            self.clear_credentials()
 
     def cognito_login(self, username: str, password: str) -> None:
         """Login to cognito user pool. And update the credentials.
@@ -115,15 +111,18 @@ class Credentials:
             username (str): username
             password (str): password
         """
-        client = boto3.client("cognito-idp", region_name="ap-northeast-1")
-        response = client.initiate_auth(
-            AuthFlow="USER_PASSWORD_AUTH",
-            AuthParameters={"USERNAME": username, "PASSWORD": password},
-            ClientId=CLIENT_ID,
-        )
-        self.access_token = response["AuthenticationResult"]["AccessToken"]
-        self.refresh_token = response["AuthenticationResult"]["RefreshToken"]
-        self.update()
+        try:
+            client = boto3.client("cognito-idp", region_name="ap-northeast-1")
+            response = client.initiate_auth(
+                AuthFlow="USER_PASSWORD_AUTH",
+                AuthParameters={"USERNAME": username, "PASSWORD": password},
+                ClientId=CLIENT_ID,
+            )
+            access_token = response["AuthenticationResult"]["AccessToken"]
+            refresh_token = response["AuthenticationResult"]["RefreshToken"]
+            self.update(access_token, refresh_token)
+        except Exception as e:
+            raise AuthenticationError(AuthenticationErrorMessage.LOGIN_FAILED) from e
 
     def clear_credentials(self) -> None:
         """Clear the credentials in the shelve file."""
@@ -136,7 +135,7 @@ class Credentials:
         self.uid = None
         self.username = None
 
-    def get_jwks_public_key(self, access_token: str) -> Any:
+    def get_jwks_public_key(self, access_token: str) -> Any:  # noqa: ANN401
         """Get the public key from the JWKS URL.
 
         Args:
@@ -153,7 +152,7 @@ class Credentials:
             response = requests.get(JWKS_URL, timeout=10)  # set timeout 10 seconds
             response.raise_for_status()
         except requests.RequestException as e:
-            raise ValueError(ERROR_MESSAGE_FAIL_TO_GET_JWKS) from e
+            raise AuthenticationError(AuthenticationErrorMessage.GET_JWKS_PUBLIC_KEY_FAILED) from e
         jwks = response.json()
         headers = jwt.get_unverified_header(access_token)
         kid = headers["kid"]
@@ -162,4 +161,4 @@ class Credentials:
                 jwk_obj = jwk.JWK(**key)
                 public_key_pem = jwk_obj.export_to_pem()
                 return public_key_pem
-        raise ValueError(ERROR_MESSAGE_FAIL_TO_GET_PUBLIC_KEY)
+        raise AuthenticationError(AuthenticationErrorMessage.GET_JWKS_PUBLIC_KEY_FAILED)
