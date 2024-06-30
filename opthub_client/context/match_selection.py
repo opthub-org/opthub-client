@@ -45,7 +45,22 @@ class MatchSelectionContext:
             db.sync()
 
     def get_selection(self, match: str | None, competition: str | None) -> tuple[Competition, Match]:
-        """Select a match."""
+        """Select a competition and match based on the provided aliases.
+
+        This method allows you to select a competition and a match by their aliases.
+        If no aliases are provided, it will use default values from `MatchSelectionContext`.
+        If the competition or match cannot be found, it raises an appropriate error or exits the program.
+
+        Args:
+            match (str | None): The alias of the match to select.
+                                If None, it uses the default value from `MatchSelectionContext`.
+            competition (str | None): The alias of the competition to select.
+                                      If None, it uses the default value from `MatchSelectionContext`.
+
+        Returns:
+            tuple[Competition, Match]: A tuple containing the selected competition and match objects.
+
+        """
         match_selection_context = MatchSelectionContext()
         if match is None:
             match = match_selection_context.match_alias
@@ -68,3 +83,42 @@ class MatchSelectionContext:
             msg = "Match is not found."
             raise AssertionError(msg)
         return selected_competition, selected_match
+
+    def get_match(self, match: str | None, competition: str | None) -> Match:
+        """Select a match based on the provided aliases.
+
+        This method allows you to select a match by its alias within a specified competition.
+        If no aliases are provided, it will use default values from `MatchSelectionContext`.
+        If the competition or match cannot be found, it raises an appropriate error or exits the program.
+
+        Args:
+            match (str | None): The alias of the match to select.
+                                If None, it uses the default value from `MatchSelectionContext`.
+            competition (str | None): The alias of the competition to select.
+                                      If None, it uses the default value from `MatchSelectionContext`.
+
+        Returns:
+            Match: The selected match object.
+        """
+        match_selection_context = MatchSelectionContext()
+        if match is None:
+            match = match_selection_context.match_alias
+        if competition is None:
+            competition = match_selection_context.competition_alias
+        if competition is None or match is None:
+            msg = "Please select a competition and match first."
+            raise AssertionError(msg)
+        competitions = fetch_participating_competitions()
+        selected_competition = next((c for c in competitions if c["alias"] == competition), None)
+        if selected_competition is None:
+            click.echo("Competition is not found.")
+            sys.exit(1)
+        matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
+        selected_match = next((m for m in matches if m["alias"] == match), None)
+        if selected_competition is None:
+            msg = "Competition is not found."
+            raise AssertionError(msg)
+        if selected_match is None:
+            msg = "Match is not found."
+            raise AssertionError(msg)
+        return selected_match
