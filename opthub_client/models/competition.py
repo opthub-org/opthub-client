@@ -6,7 +6,6 @@ from typing import TypedDict
 import click
 from gql import gql
 
-from opthub_client.context.credentials import Credentials
 from opthub_client.graphql.client import get_gql_client
 
 
