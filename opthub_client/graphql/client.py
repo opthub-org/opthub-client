@@ -4,6 +4,9 @@ from gql import Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
 from opthub_client.context.credentials import Credentials
+from opthub_client.errors.authentication_error import AuthenticationError, AuthenticationErrorMessage
+
+URL = "https://jciqso7l7rhajfkt5s3dhybpcu.appsync-api.ap-northeast-1.amazonaws.com/graphql"
 
 
 def get_gql_client() -> Client:
@@ -12,12 +15,14 @@ def get_gql_client() -> Client:
     Returns:
         Client: The GraphQL client
 
+    Raises:
+        AuthenticationError: If authentication fails
     """
-    url = "https://jciqso7l7rhajfkt5s3dhybpcu.appsync-api.ap-northeast-1.amazonaws.com/graphql"
-    credentials = Credentials()
-    credentials.load()
-    if credentials.access_token is None:
-        raise Exception("Please login first.")
-    headers = {"Authorization": f"Bearer {credentials.access_token}"}
-    transport = AIOHTTPTransport(url=url, headers=headers)
-    return Client(transport=transport, fetch_schema_from_transport=True)
+    try:
+        credentials = Credentials()
+        credentials.load()
+        headers = {"Authorization": f"Bearer {credentials.access_token}"}
+        transport = AIOHTTPTransport(url=URL, headers=headers)
+        return Client(transport=transport, fetch_schema_from_transport=True)
+    except Exception as e:
+        raise AuthenticationError(AuthenticationErrorMessage.GET_GRAPHQL_CLIENT_FAILED) from e

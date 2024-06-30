@@ -1,10 +1,9 @@
 """Read version from toml file."""
 
 import tomllib
+from pathlib import Path
 
-
-class VersionNotFoundError(Exception):
-    """Exception raised when the version cannot be found or is in an incorrect format."""
+from opthub_client.errors.cache_io_error import CacheIOError, CacheIOErrorMessage
 
 
 def get_version_from_file() -> str:
@@ -16,13 +15,10 @@ def get_version_from_file() -> str:
     Raises:
         VersionNotFoundError: If the version cannot be found or is in an incorrect format.
     """
-    try:
-        with open("pyproject.toml", "rb") as file:
-            data = tomllib.load(file)
-        version = data["tool"]["poetry"]["version"]
-        if isinstance(version, str):
-            return version
-        else:
-            raise VersionNotFoundError("Version is not a string.")
-    except (KeyError, FileNotFoundError, PermissionError, tomllib.TOMLDecodeError) as e:
-        raise VersionNotFoundError(f"Error reading version: {e}")
+    path = Path("pyproject.toml")
+    with path.open("rb") as file:
+        data = tomllib.load(file)
+    version = data["tool"]["poetry"]["version"]
+    if isinstance(version, str):
+        return version
+    raise CacheIOError(CacheIOErrorMessage.VERSION_FILE_READ_FAILED)
