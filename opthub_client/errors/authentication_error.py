@@ -1,6 +1,9 @@
 """This module contains the AuthenticationError class."""
 
+import sys
 from enum import Enum
+
+import click
 
 
 class AuthenticationErrorMessage(Enum):
@@ -17,3 +20,8 @@ class AuthenticationError(Exception):
     def __init__(self, error_type: AuthenticationErrorMessage) -> None:
         """Initialize the AuthenticationError class."""
         super().__init__(error_type.value)
+
+    def error_handler(self) -> None:
+        """Handle the GraphQL error."""
+        click.echo(str(self))
+        sys.exit(1)

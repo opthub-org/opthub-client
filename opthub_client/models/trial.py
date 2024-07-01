@@ -3,7 +3,10 @@
 from typing import Literal, TypedDict
 
 from gql import gql
+from gql.transport.exceptions import TransportQueryError
 
+from opthub_client.errors.graphql_error import GraphQLError
+from opthub_client.errors.query_error import QueryError
 from opthub_client.graphql.client import get_gql_client
 
 
@@ -106,125 +109,129 @@ async def fetch_trials_async(
                     }
                 }
             }}""")
-    result = await client.execute_async(
-        query,
-        variable_values={
-            "match": {"id": match_id},
-            "range": {"startTrialNo": trial_from + 1 + page * limit, "limit": limit}
-            if is_asc
-            else {"endTrialNo": trial_from + -page * limit, "limit": limit},
-            "order": "ascending" if is_asc else "descending",
-        },
-    )
-    if result is None:
-        return [], False, False
-    data = result.get("getMatchTrialsByParticipant")
-    trials = []
-    is_first = False
-    is_last = False
-    if data and isinstance(data, dict):
-        is_first = data.get("isFirst")
-        is_last = data.get("isLast")
-        trials_data = data.get("trials", [])
-        for trial_data in trials_data:
-            if trial_data.get("status") == "success":
-                evaluation = Evaluation(
-                    status=trial_data["evaluation"]["status"],
-                    objective=trial_data["evaluation"]["objective"],
-                    constraint=trial_data["evaluation"]["constraint"],
-                    info=trial_data["evaluation"]["info"],
-                    started_at=trial_data["evaluation"]["startedAt"],
-                    finished_at=trial_data["evaluation"]["finishedAt"],
-                )
-                score = Score(
-                    status=trial_data["score"]["status"],
-                    score=trial_data["score"]["value"],
-                    started_at=trial_data["score"]["startedAt"],
-                    finished_at=trial_data["score"]["finishedAt"],
-                )
-                solution = Solution(
-                    variable=trial_data["solution"]["variable"],
-                    created_at=trial_data["solution"]["createdAt"],
-                )
-                trial = Trial(
-                    trialNo=trial_data["trialNo"],
-                    solution=solution,
-                    status=trial_data["status"],
-                    evaluation=evaluation,
-                    score=score,
-                )
-                trials.append(trial)
-            elif trial_data.get("status") == "evaluating":
-                solution = Solution(
-                    variable=trial_data["solution"]["variable"],
-                    created_at=trial_data["solution"]["createdAt"],
-                )
-                trial = Trial(
-                    trialNo=trial_data["trialNo"],
-                    solution=solution,
-                    status=trial_data["status"],
-                    evaluation=None,
-                    score=None,
-                )
-                trials.append(trial) if not display_only_success else None
-            elif trial_data.get("status") == "scoring":
-                evaluation = Evaluation(
-                    status=trial_data["evaluation"]["status"],
-                    objective=trial_data["evaluation"]["objective"],
-                    constraint=trial_data["evaluation"]["constraint"],
-                    info=trial_data["evaluation"]["info"],
-                    started_at=trial_data["evaluation"]["startedAt"],
-                    finished_at=trial_data["evaluation"]["finishedAt"],
-                )
-                solution = Solution(
-                    variable=trial_data["solution"]["variable"],
-                    created_at=trial_data["solution"]["createdAt"],
-                )
-                trial = Trial(
-                    trialNo=trial_data["trialNo"],
-                    solution=solution,
-                    status=trial_data["status"],
-                    evaluation=evaluation,
-                    score=None,
-                )
-                trials.append(trial) if not display_only_success else None
-            elif trial_data.get("status") == "scorer_failed":
-                solution = Solution(
-                    variable=trial_data["solution"]["variable"],
-                    created_at=trial_data["solution"]["createdAt"],
-                )
-                evaluation = Evaluation(
-                    status=trial_data["evaluation"]["status"],
-                    objective=trial_data["evaluation"]["objective"],
-                    constraint=trial_data["evaluation"]["constraint"],
-                    info=trial_data["evaluation"]["info"],
-                    started_at=trial_data["evaluation"]["startedAt"],
-                    finished_at=trial_data["evaluation"]["finishedAt"],
-                )
-                trial = Trial(
-                    trialNo=trial_data["trialNo"],
-                    solution=solution,
-                    status=trial_data["status"],
-                    evaluation=evaluation,
-                    score=None,
-                )
-                trials.append(trial) if not display_only_success else None
-            elif trial_data.get("status") == "evaluator_failed":
-                solution = Solution(
-                    variable=trial_data["solution"]["variable"],
-                    created_at=trial_data["solution"]["createdAt"],
-                )
-                trial = Trial(
-                    trialNo=trial_data["trialNo"],
-                    solution=solution,
-                    status=trial_data["status"],
-                    evaluation=None,
-                    score=None,
-                )
-                trials.append(trial) if not display_only_success else None
-            else:
-                raise AssertionError("Unknown trial status")
-    return trials, is_first, is_last
+    try:
+        result = await client.execute_async(
+            query,
+            variable_values={
+                "match": {"id": match_id},
+                "range": {"startTrialNo": trial_from + 1 + page * limit, "limit": limit}
+                if is_asc
+                else {"endTrialNo": trial_from + -page * limit, "limit": limit},
+                "order": "ascending" if is_asc else "descending",
+            },
+        )
+        if result is None:
+            return [], False, False
+        data = result.get("getMatchTrialsByParticipant")
+        trials = []
+        is_first = False
+        is_last = False
+        if data and isinstance(data, dict):
+            is_first = data.get("isFirst")
+            is_last = data.get("isLast")
+            trials_data = data.get("trials", [])
+            for trial_data in trials_data:
+                if trial_data.get("status") == "success":
+                    evaluation = Evaluation(
+                        status=trial_data["evaluation"]["status"],
+                        objective=trial_data["evaluation"]["objective"],
+                        constraint=trial_data["evaluation"]["constraint"],
+                        info=trial_data["evaluation"]["info"],
+                        started_at=trial_data["evaluation"]["startedAt"],
+                        finished_at=trial_data["evaluation"]["finishedAt"],
+                    )
+                    score = Score(
+                        status=trial_data["score"]["status"],
+                        score=trial_data["score"]["value"],
+                        started_at=trial_data["score"]["startedAt"],
+                        finished_at=trial_data["score"]["finishedAt"],
+                    )
+                    solution = Solution(
+                        variable=trial_data["solution"]["variable"],
+                        created_at=trial_data["solution"]["createdAt"],
+                    )
+                    trial = Trial(
+                        trialNo=trial_data["trialNo"],
+                        solution=solution,
+                        status=trial_data["status"],
+                        evaluation=evaluation,
+                        score=score,
+                    )
+                    trials.append(trial)
+                elif trial_data.get("status") == "evaluating":
+                    solution = Solution(
+                        variable=trial_data["solution"]["variable"],
+                        created_at=trial_data["solution"]["createdAt"],
+                    )
+                    trial = Trial(
+                        trialNo=trial_data["trialNo"],
+                        solution=solution,
+                        status=trial_data["status"],
+                        evaluation=None,
+                        score=None,
+                    )
+                    trials.append(trial) if not display_only_success else None
+                elif trial_data.get("status") == "scoring":
+                    evaluation = Evaluation(
+                        status=trial_data["evaluation"]["status"],
+                        objective=trial_data["evaluation"]["objective"],
+                        constraint=trial_data["evaluation"]["constraint"],
+                        info=trial_data["evaluation"]["info"],
+                        started_at=trial_data["evaluation"]["startedAt"],
+                        finished_at=trial_data["evaluation"]["finishedAt"],
+                    )
+                    solution = Solution(
+                        variable=trial_data["solution"]["variable"],
+                        created_at=trial_data["solution"]["createdAt"],
+                    )
+                    trial = Trial(
+                        trialNo=trial_data["trialNo"],
+                        solution=solution,
+                        status=trial_data["status"],
+                        evaluation=evaluation,
+                        score=None,
+                    )
+                    trials.append(trial) if not display_only_success else None
+                elif trial_data.get("status") == "scorer_failed":
+                    solution = Solution(
+                        variable=trial_data["solution"]["variable"],
+                        created_at=trial_data["solution"]["createdAt"],
+                    )
+                    evaluation = Evaluation(
+                        status=trial_data["evaluation"]["status"],
+                        objective=trial_data["evaluation"]["objective"],
+                        constraint=trial_data["evaluation"]["constraint"],
+                        info=trial_data["evaluation"]["info"],
+                        started_at=trial_data["evaluation"]["startedAt"],
+                        finished_at=trial_data["evaluation"]["finishedAt"],
+                    )
+                    trial = Trial(
+                        trialNo=trial_data["trialNo"],
+                        solution=solution,
+                        status=trial_data["status"],
+                        evaluation=evaluation,
+                        score=None,
+                    )
+                    trials.append(trial) if not display_only_success else None
+                elif trial_data.get("status") == "evaluator_failed":
+                    solution = Solution(
+                        variable=trial_data["solution"]["variable"],
+                        created_at=trial_data["solution"]["createdAt"],
+                    )
+                    trial = Trial(
+                        trialNo=trial_data["trialNo"],
+                        solution=solution,
+                        status=trial_data["status"],
+                        evaluation=None,
+                        score=None,
+                    )
+                    trials.append(trial) if not display_only_success else None
+                else:
+                    raise QueryError(resource="trial", detail="Unknown trial status")
+        return trials, is_first, is_last
+    except TransportQueryError as auth_error:
+        error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
+        raise GraphQLError(message=error_message) from auth_error
 
 
 def fetch_trials(
@@ -286,126 +293,130 @@ def fetch_trials(
                     }
                 }
             }}""")
-    result = client.execute(
-        query,
-        variable_values={
-            "match": {"id": match_id},
-            "order": "descending" if is_desc else "ascending",
-            "range": {
-                "startTrialNo": start,
-                "limit": limit,
+    try:
+        result = client.execute(
+            query,
+            variable_values={
+                "match": {"id": match_id},
+                "order": "descending" if is_desc else "ascending",
+                "range": {
+                    "startTrialNo": start,
+                    "limit": limit,
+                },
             },
-        },
-    )
-    if result is None:
-        return []
-    data = result.get("getMatchTrialsByParticipant")
-    trials = []
-    is_last = False
-    is_first = False
-    if data and isinstance(data, dict):
-        trials_data = data.get("trials", [])
-        is_last = data.get("isLast")
-        is_first = data.get("isFirst")
-        for trial_data in trials_data:
-            if trial_data.get("status") == "success":
-                evaluation = Evaluation(
-                    status=trial_data["evaluation"]["status"],
-                    objective=trial_data["evaluation"]["objective"],
-                    constraint=trial_data["evaluation"]["constraint"],
-                    info=trial_data["evaluation"]["info"],
-                    started_at=trial_data["evaluation"]["startedAt"],
-                    finished_at=trial_data["evaluation"]["finishedAt"],
-                )
-                score = Score(
-                    status=trial_data["score"]["status"],
-                    score=trial_data["score"]["value"],
-                    started_at=trial_data["score"]["startedAt"],
-                    finished_at=trial_data["score"]["finishedAt"],
-                )
-                solution = Solution(
-                    variable=trial_data["solution"]["variable"],
-                    created_at=trial_data["solution"]["createdAt"],
-                )
-                trial = Trial(
-                    trialNo=trial_data["trialNo"],
-                    solution=solution,
-                    status=trial_data["status"],
-                    evaluation=evaluation,
-                    score=score,
-                )
-                trials.append(trial)
-            elif trial_data.get("status") == "evaluating":
-                solution = Solution(
-                    variable=trial_data["solution"]["variable"],
-                    created_at=trial_data["solution"]["createdAt"],
-                )
-                trial = Trial(
-                    trialNo=trial_data["trialNo"],
-                    solution=solution,
-                    status=trial_data["status"],
-                    evaluation=None,
-                    score=None,
-                )
-                trials.append(trial) if not display_only_success else None
-            elif trial_data.get("status") == "scoring":
-                evaluation = Evaluation(
-                    status=trial_data["evaluation"]["status"],
-                    objective=trial_data["evaluation"]["objective"],
-                    constraint=trial_data["evaluation"]["constraint"],
-                    info=trial_data["evaluation"]["info"],
-                    started_at=trial_data["evaluation"]["startedAt"],
-                    finished_at=trial_data["evaluation"]["finishedAt"],
-                )
-                solution = Solution(
-                    variable=trial_data["solution"]["variable"],
-                    created_at=trial_data["solution"]["createdAt"],
-                )
-                trial = Trial(
-                    trialNo=trial_data["trialNo"],
-                    solution=solution,
-                    status=trial_data["status"],
-                    evaluation=evaluation,
-                    score=None,
-                )
-                trials.append(trial) if not display_only_success else None
-            elif trial_data.get("status") == "scorer_failed":
-                solution = Solution(
-                    variable=trial_data["solution"]["variable"],
-                    created_at=trial_data["solution"]["createdAt"],
-                )
-                evaluation = Evaluation(
-                    status=trial_data["evaluation"]["status"],
-                    objective=trial_data["evaluation"]["objective"],
-                    constraint=trial_data["evaluation"]["constraint"],
-                    info=trial_data["evaluation"]["info"],
-                    started_at=trial_data["evaluation"]["startedAt"],
-                    finished_at=trial_data["evaluation"]["finishedAt"],
-                )
-                trial = Trial(
-                    trialNo=trial_data["trialNo"],
-                    solution=solution,
-                    status=trial_data["status"],
-                    evaluation=evaluation,
-                    score=None,
-                )
-                trials.append(trial) if not display_only_success else None
-            elif trial_data.get("status") == "evaluator_failed":
-                solution = Solution(
-                    variable=trial_data["solution"]["variable"],
-                    created_at=trial_data["solution"]["createdAt"],
-                )
-                trial = Trial(
-                    trialNo=trial_data["trialNo"],
-                    solution=solution,
-                    status=trial_data["status"],
-                    evaluation=None,
-                    score=None,
-                )
-                trials.append(trial) if not display_only_success else None
-            else:
-                raise AssertionError("Unknown trial status")
-    return trials, is_first, is_last
+        )
+        if result is None:
+            return []
+        data = result.get("getMatchTrialsByParticipant")
+        trials = []
+        is_last = False
+        is_first = False
+        if data and isinstance(data, dict):
+            trials_data = data.get("trials", [])
+            is_last = data.get("isLast")
+            is_first = data.get("isFirst")
+            for trial_data in trials_data:
+                if trial_data.get("status") == "success":
+                    evaluation = Evaluation(
+                        status=trial_data["evaluation"]["status"],
+                        objective=trial_data["evaluation"]["objective"],
+                        constraint=trial_data["evaluation"]["constraint"],
+                        info=trial_data["evaluation"]["info"],
+                        started_at=trial_data["evaluation"]["startedAt"],
+                        finished_at=trial_data["evaluation"]["finishedAt"],
+                    )
+                    score = Score(
+                        status=trial_data["score"]["status"],
+                        score=trial_data["score"]["value"],
+                        started_at=trial_data["score"]["startedAt"],
+                        finished_at=trial_data["score"]["finishedAt"],
+                    )
+                    solution = Solution(
+                        variable=trial_data["solution"]["variable"],
+                        created_at=trial_data["solution"]["createdAt"],
+                    )
+                    trial = Trial(
+                        trialNo=trial_data["trialNo"],
+                        solution=solution,
+                        status=trial_data["status"],
+                        evaluation=evaluation,
+                        score=score,
+                    )
+                    trials.append(trial)
+                elif trial_data.get("status") == "evaluating":
+                    solution = Solution(
+                        variable=trial_data["solution"]["variable"],
+                        created_at=trial_data["solution"]["createdAt"],
+                    )
+                    trial = Trial(
+                        trialNo=trial_data["trialNo"],
+                        solution=solution,
+                        status=trial_data["status"],
+                        evaluation=None,
+                        score=None,
+                    )
+                    trials.append(trial) if not display_only_success else None
+                elif trial_data.get("status") == "scoring":
+                    evaluation = Evaluation(
+                        status=trial_data["evaluation"]["status"],
+                        objective=trial_data["evaluation"]["objective"],
+                        constraint=trial_data["evaluation"]["constraint"],
+                        info=trial_data["evaluation"]["info"],
+                        started_at=trial_data["evaluation"]["startedAt"],
+                        finished_at=trial_data["evaluation"]["finishedAt"],
+                    )
+                    solution = Solution(
+                        variable=trial_data["solution"]["variable"],
+                        created_at=trial_data["solution"]["createdAt"],
+                    )
+                    trial = Trial(
+                        trialNo=trial_data["trialNo"],
+                        solution=solution,
+                        status=trial_data["status"],
+                        evaluation=evaluation,
+                        score=None,
+                    )
+                    trials.append(trial) if not display_only_success else None
+                elif trial_data.get("status") == "scorer_failed":
+                    solution = Solution(
+                        variable=trial_data["solution"]["variable"],
+                        created_at=trial_data["solution"]["createdAt"],
+                    )
+                    evaluation = Evaluation(
+                        status=trial_data["evaluation"]["status"],
+                        objective=trial_data["evaluation"]["objective"],
+                        constraint=trial_data["evaluation"]["constraint"],
+                        info=trial_data["evaluation"]["info"],
+                        started_at=trial_data["evaluation"]["startedAt"],
+                        finished_at=trial_data["evaluation"]["finishedAt"],
+                    )
+                    trial = Trial(
+                        trialNo=trial_data["trialNo"],
+                        solution=solution,
+                        status=trial_data["status"],
+                        evaluation=evaluation,
+                        score=None,
+                    )
+                    trials.append(trial) if not display_only_success else None
+                elif trial_data.get("status") == "evaluator_failed":
+                    solution = Solution(
+                        variable=trial_data["solution"]["variable"],
+                        created_at=trial_data["solution"]["createdAt"],
+                    )
+                    trial = Trial(
+                        trialNo=trial_data["trialNo"],
+                        solution=solution,
+                        status=trial_data["status"],
+                        evaluation=None,
+                        score=None,
+                    )
+                    trials.append(trial) if not display_only_success else None
+                else:
+                    raise QueryError(resource="trial", detail="Unknown trial status")
+        return trials, is_first, is_last
+    except TransportQueryError as auth_error:
+        error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
+        raise GraphQLError(message=error_message) from auth_error
 
 
 def fetch_trial(match_id: str, trial_no: int) -> Trial:
@@ -451,104 +462,108 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial:
                     value
                 }
             }}""")
-    result = client.execute(
-        query,
-        variable_values={"match": {"id": match_id}, "trialNo": trial_no},
-    )
-    if result is None:
-        return None
-    trial_data = result.get("getMatchTrialByParticipant")
-    if trial_data and isinstance(trial_data, dict):
-        if trial_data.get("status") == "success":
-            evaluation = Evaluation(
-                status=trial_data["evaluation"]["status"],
-                objective=trial_data["evaluation"]["objective"],
-                constraint=trial_data["evaluation"]["constraint"],
-                info=trial_data["evaluation"]["info"],
-                started_at=trial_data["evaluation"]["startedAt"],
-                finished_at=trial_data["evaluation"]["finishedAt"],
-            )
-            score = Score(
-                status=trial_data["score"]["status"],
-                score=trial_data["score"]["value"],
-                started_at=trial_data["score"]["startedAt"],
-                finished_at=trial_data["score"]["finishedAt"],
-            )
-            solution = Solution(
-                variable=trial_data["solution"]["variable"],
-                created_at=trial_data["solution"]["createdAt"],
-            )
-            trial = Trial(
-                trialNo=trial_data["trialNo"],
-                solution=solution,
-                status=trial_data["status"],
-                evaluation=evaluation,
-                score=score,
-            )
-        elif trial_data.get("status") == "evaluating":
-            solution = Solution(
-                variable=trial_data["solution"]["variable"],
-                created_at=trial_data["solution"]["createdAt"],
-            )
-            trial = Trial(
-                trialNo=trial_data["trialNo"],
-                solution=solution,
-                status=trial_data["status"],
-                evaluation=None,
-                score=None,
-            )
-        elif trial_data.get("status") == "scoring":
-            evaluation = Evaluation(
-                status=trial_data["evaluation"]["status"],
-                objective=trial_data["evaluation"]["objective"],
-                constraint=trial_data["evaluation"]["constraint"],
-                info=trial_data["evaluation"]["info"],
-                started_at=trial_data["evaluation"]["startedAt"],
-                finished_at=trial_data["evaluation"]["finishedAt"],
-            )
-            solution = Solution(
-                variable=trial_data["solution"]["variable"],
-                created_at=trial_data["solution"]["createdAt"],
-            )
-            trial = Trial(
-                trialNo=trial_data["trialNo"],
-                solution=solution,
-                status=trial_data["status"],
-                evaluation=evaluation,
-                score=None,
-            )
-        elif trial_data.get("status") == "scorer_failed":
-            solution = Solution(
-                variable=trial_data["solution"]["variable"],
-                created_at=trial_data["solution"]["createdAt"],
-            )
-            evaluation = Evaluation(
-                status=trial_data["evaluation"]["status"],
-                objective=trial_data["evaluation"]["objective"],
-                constraint=trial_data["evaluation"]["constraint"],
-                info=trial_data["evaluation"]["info"],
-                started_at=trial_data["evaluation"]["startedAt"],
-                finished_at=trial_data["evaluation"]["finishedAt"],
-            )
-            trial = Trial(
-                trialNo=trial_data["trialNo"],
-                solution=solution,
-                status=trial_data["status"],
-                evaluation=evaluation,
-                score=None,
-            )
-        elif trial_data.get("status") == "evaluator_failed":
-            solution = Solution(
-                variable=trial_data["solution"]["variable"],
-                created_at=trial_data["solution"]["createdAt"],
-            )
-            trial = Trial(
-                trialNo=trial_data["trialNo"],
-                solution=solution,
-                status=trial_data["status"],
-                evaluation=None,
-                score=None,
-            )
-        else:
-            raise AssertionError("Unknown trial status")
-    return trial
+    try:
+        result = client.execute(
+            query,
+            variable_values={"match": {"id": match_id}, "trialNo": trial_no},
+        )
+        if result is None:
+            return None
+        trial_data = result.get("getMatchTrialByParticipant")
+        if trial_data and isinstance(trial_data, dict):
+            if trial_data.get("status") == "success":
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
+                score = Score(
+                    status=trial_data["score"]["status"],
+                    score=trial_data["score"]["value"],
+                    started_at=trial_data["score"]["startedAt"],
+                    finished_at=trial_data["score"]["finishedAt"],
+                )
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=score,
+                )
+            elif trial_data.get("status") == "evaluating":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=None,
+                    score=None,
+                )
+            elif trial_data.get("status") == "scoring":
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=None,
+                )
+            elif trial_data.get("status") == "scorer_failed":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                evaluation = Evaluation(
+                    status=trial_data["evaluation"]["status"],
+                    objective=trial_data["evaluation"]["objective"],
+                    constraint=trial_data["evaluation"]["constraint"],
+                    info=trial_data["evaluation"]["info"],
+                    started_at=trial_data["evaluation"]["startedAt"],
+                    finished_at=trial_data["evaluation"]["finishedAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=evaluation,
+                    score=None,
+                )
+            elif trial_data.get("status") == "evaluator_failed":
+                solution = Solution(
+                    variable=trial_data["solution"]["variable"],
+                    created_at=trial_data["solution"]["createdAt"],
+                )
+                trial = Trial(
+                    trialNo=trial_data["trialNo"],
+                    solution=solution,
+                    status=trial_data["status"],
+                    evaluation=None,
+                    score=None,
+                )
+            else:
+                raise QueryError(resource="trial", detail="Unknown trial status")
+        return trial
+    except TransportQueryError as auth_error:
+        error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
+        raise GraphQLError(message=error_message) from auth_error

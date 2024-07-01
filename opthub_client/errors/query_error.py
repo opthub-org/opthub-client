@@ -1,5 +1,9 @@
 """This module contains the QueryError class."""
 
+import sys
+
+import click
+
 
 class QueryError(Exception):
     """Exception raised for errors during query data processing."""
@@ -10,3 +14,8 @@ class QueryError(Exception):
         self.detail = detail
         self.message = f"QueryError: {resource} - {detail}"
         super().__init__(self.message)
+
+    def error_handler(self) -> None:
+        """Handle the query error."""
+        click.echo(str(self))
+        sys.exit(1)

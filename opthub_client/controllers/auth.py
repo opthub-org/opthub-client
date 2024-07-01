@@ -5,6 +5,8 @@ import click
 from opthub_client.context.credentials import Credentials
 from opthub_client.controllers.utils import check_current_version_status
 from opthub_client.errors.authentication_error import AuthenticationError
+from opthub_client.errors.cache_io_error import CacheIOError
+from opthub_client.errors.query_error import QueryError
 
 
 @click.command()
@@ -13,12 +15,12 @@ from opthub_client.errors.authentication_error import AuthenticationError
 @click.pass_context
 def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
-    check_current_version_status()
-    credentials = Credentials()
     try:
+        check_current_version_status()
+        credentials = Credentials()
         credentials.cognito_login(username, password)
         click.echo("Successfully signed in.")
-    except AuthenticationError as e:
-        click.echo(str(e))
+    except (CacheIOError, AuthenticationError, QueryError) as e:
+        e.error_handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")

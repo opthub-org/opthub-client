@@ -8,6 +8,11 @@ from InquirerPy.validator import PathValidator
 
 from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.controllers.utils import check_current_version_status
+from opthub_client.errors.authentication_error import AuthenticationError
+from opthub_client.errors.cache_io_error import CacheIOError
+from opthub_client.errors.graphql_error import GraphQLError
+from opthub_client.errors.mutation_error import MutationError
+from opthub_client.errors.user_input_error import UserInputError, UserInputErrorMessage
 from opthub_client.models.solution import create_solution
 from opthub_client.validators.solution import SolutionValidator
 
@@ -39,51 +44,70 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         competition (str | None): option for competition(-c or --competition)
         file (bool): option for file(-f or --file). if -f or --file is provided, it will be a file submission.
     """
-    check_current_version_status()
-    match_selection_context = MatchSelectionContext()
-    selected_competition, selected_match = match_selection_context.get_selection(match, competition)
-    if file:  # file submission
-        questions = [
-            {
-                "name": "file",
-                "type": "filepath",
-                "message": "Submit the solution file (must be a JSON file):",
-                "default": str(Path("~/")),
-                "validate": PathValidator(is_file=True, message="Input is not a file"),
-                "only_files": True,
-            },
-        ]
-        result = prompt(questions)
-        # read the file
-        if not isinstance(result, dict):
-            # result is not a dictionary, cannot proceed
-            return
-        file_path = result.get("file")
-        if not isinstance(file_path, str):
-            # file_path is not a string, indicate error to user
-            click.echo("The file path is incorrect. Please provide a valid file path.")
-            return
-        full_path = Path(file_path).expanduser()
-        raw_solution_value = full_path.read_text()
-    else:  # text submission
-        questions = [
-            {
-                "name": "solution",
-                "type": "input",
-                "message": "Write the solution:",
-            },
-        ]
-        result = prompt(questions)
-        if not isinstance(result, dict) or "solution" not in result:
-            # result is not a dict or "solution" is not in result
-            click.echo("The input is missing. Please provide the necessary information.")
-            return
-        raw_solution_value = str(result["solution"])
-    if not SolutionValidator.check_solution(raw_solution_value):
-        click.echo("The solution is not valid. Please provide a valid solution.")
-        return
-    click.echo(
-        f"Submitting to {selected_competition['alias']}/{selected_match['alias']}...",
-    )
-    create_solution(selected_match["id"], raw_solution_value)
-    click.echo("...Submitted.")
+    try:
+        check_current_version_status()
+        match_selection_context = MatchSelectionContext()
+        selected_competition, selected_match = match_selection_context.get_selection(match, competition)
+        raw_solution_value = get_file_submission() if file else get_text_submission()
+        if not SolutionValidator.check_solution(raw_solution_value):
+            raise UserInputError(UserInputErrorMessage.INPUT_SOLUTION_ERROR)
+        click.echo(
+            f"Submitting to {selected_competition['alias']}/{selected_match['alias']}...",
+        )
+        create_solution(selected_match["id"], raw_solution_value)
+        click.echo("...Submitted.")
+    except (AuthenticationError, GraphQLError, MutationError, CacheIOError, UserInputError) as error:
+        error.error_handler()
+    except Exception:
+        click.echo("Unexpected error occurred. Please try again later.")
+
+
+def get_file_submission() -> str:
+    """Get solution from the file submission.
+
+    Raises:
+        UserInputError: If the solution is not provided.
+
+    Returns:
+        str: solution text
+    """
+    questions = [
+        {
+            "name": "file",
+            "type": "filepath",
+            "message": "Submit the solution file (must be a JSON file):",
+            "default": str(Path("~/")),
+            "validate": PathValidator(is_file=True, message="Input is not a file"),
+            "only_files": True,
+        },
+    ]
+    result = prompt(questions)
+    if not isinstance(result, dict):
+        raise UserInputError(UserInputErrorMessage.INPUT_FILE_ERROR)
+    file_path = result.get("file")
+    if not isinstance(file_path, str):
+        raise UserInputError(UserInputErrorMessage.INPUT_FILE_PATH_ERROR)
+    full_path = Path(file_path).expanduser()
+    return full_path.read_text()
+
+
+def get_text_submission() -> str:
+    """Get solution from the text submission.
+
+    Raises:
+        UserInputError: If the solution is not provided.
+
+    Returns:
+        str: solution text
+    """
+    questions = [
+        {
+            "name": "solution",
+            "type": "input",
+            "message": "Write the solution:",
+        },
+    ]
+    result = prompt(questions)
+    if not isinstance(result, dict) or "solution" not in result:
+        raise UserInputError(UserInputErrorMessage.INPUT_SOLUTION_ERROR)
+    return str(result["solution"])

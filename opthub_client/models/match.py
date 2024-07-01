@@ -3,7 +3,10 @@
 from typing import TypedDict
 
 from gql import gql
+from gql.transport.exceptions import TransportQueryError
 
+from opthub_client.errors.graphql_error import GraphQLError
+from opthub_client.errors.query_error import QueryError
 from opthub_client.graphql.client import get_gql_client
 
 
@@ -71,9 +74,12 @@ def fetch_matches_by_competition(comp_id: str, comp_alias: str) -> list[Match]:
             closeAt
         }
         }""")
-    result = client.execute(query, variable_values={"id": comp_id, "alias": comp_alias})
-    data = result.get("getMatchesByCompetition")
-    if data and isinstance(data, list):
-        return [Match(id=match["id"], alias=match["alias"]) for match in data]
-    error_message = "Failed to fetch participating matches."
-    raise ValueError(error_message)
+    try:
+        result = client.execute(query, variable_values={"id": comp_id, "alias": comp_alias})
+        data = result.get("getMatchesByCompetition")
+        if data and isinstance(data, list):
+            return [Match(id=match["id"], alias=match["alias"]) for match in data]
+        raise QueryError(resource="matches", detail="No data returned.")
+    except TransportQueryError as auth_error:
+        error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
+        raise GraphQLError(message=error_message) from auth_error

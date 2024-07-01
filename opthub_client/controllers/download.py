@@ -7,6 +7,11 @@ import click
 
 from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.controllers.utils import check_current_version_status
+from opthub_client.errors.authentication_error import AuthenticationError
+from opthub_client.errors.cache_io_error import CacheIOError
+from opthub_client.errors.graphql_error import GraphQLError
+from opthub_client.errors.query_error import QueryError
+from opthub_client.errors.user_input_error import UserInputError
 from opthub_client.models.trial import fetch_trials
 
 SIZE_FETCH_TRIALS = 50
@@ -42,32 +47,37 @@ def download(
     success: bool,
 ) -> None:
     """Download trials to a file."""
-    check_current_version_status()
-    match_selection_context = MatchSelectionContext()
-    selected_match = match_selection_context.get_match(match, competition)
-    output_file = Path(f"trials_{selected_match['alias']}_trials.json")
-    total_trials = end - start + 1
+    try:
+        check_current_version_status()
+        match_selection_context = MatchSelectionContext()
+        selected_match = match_selection_context.get_match(match, competition)
+        output_file = Path(f"trials_{selected_match['alias']}_trials.json")
+        total_trials = end - start + 1
 
-    with open(output_file, "w") as f:
-        all_trials = []
-        with click.progressbar(
-            length=total_trials,
-            label="Downloading trials",
-        ) as bar:
-            for batch_start in range(start, end + 1, SIZE_FETCH_TRIALS):
-                limit = min(SIZE_FETCH_TRIALS, end - batch_start + 1)
-                trials, is_first, is_last = fetch_trials(
-                    selected_match["id"],
-                    start=batch_start,
-                    limit=limit,
-                    is_desc=descending,
-                    display_only_success=success,
-                )
-                all_trials.extend(trials)
-                if (is_first and descending) or (is_last and not descending):
-                    bar.update(total_trials)
-                    break
-                bar.update(limit)
-        json.dump(all_trials, f, indent=4)
+        with output_file.open("w") as f:
+            all_trials = []
+            with click.progressbar(
+                length=total_trials,
+                label="Downloading trials",
+            ) as bar:
+                for batch_start in range(start, end + 1, SIZE_FETCH_TRIALS):
+                    limit = min(SIZE_FETCH_TRIALS, end - batch_start + 1)
+                    trials, is_first, is_last = fetch_trials(
+                        selected_match["id"],
+                        start=batch_start,
+                        limit=limit,
+                        is_desc=descending,
+                        display_only_success=success,
+                    )
+                    all_trials.extend(trials)
+                    if (is_first and descending) or (is_last and not descending):
+                        bar.update(total_trials)
+                        break
+                    bar.update(limit)
+            json.dump(all_trials, f, indent=4)
 
-    click.echo(f"Trials have been written to {output_file}")
+        click.echo(f"Trials have been written to {output_file}")
+    except (AuthenticationError, GraphQLError, QueryError, CacheIOError, UserInputError) as error:
+        error.error_handler()
+    except Exception:
+        click.echo("Unexpected error occurred. Please try again later.")

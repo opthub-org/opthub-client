@@ -2,6 +2,7 @@
 
 from gql import gql
 
+from opthub_client.errors.mutation_error import Method, MutationError
 from opthub_client.graphql.client import get_gql_client
 
 
@@ -32,4 +33,7 @@ def create_solution(match_id: str, variable: str) -> None:
         "matchId": match_id,
         "variable": variable,
     }
-    client.execute(mutation, solution_input)
+    try:
+        client.execute(mutation, solution_input)
+    except Exception as e:
+        raise MutationError(method=Method.CREATE, resource="solution", detail="Failed to submit solutions") from e
