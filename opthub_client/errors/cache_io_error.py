@@ -12,6 +12,7 @@ class CacheIOErrorMessage(Enum):
     VERSION_FILE_READ_FAILED = "Failed to read version cache file. Please try again later."
     MATCH_SELECTION_FILE_READ_FAILED = "Failed to read match selection cache file. Please try again later."
     WRITE_FAILED = "Failed to write cache file. Please try again later."
+    MATCH_NOT_SELECTED = "Please select a match first."
 
 
 class CacheIOError(Exception):

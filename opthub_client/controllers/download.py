@@ -14,6 +14,7 @@ from opthub_client.errors.query_error import QueryError
 from opthub_client.errors.user_input_error import UserInputError
 from opthub_client.models.trial import fetch_trials
 
+# Number of trials to fetch in one request
 SIZE_FETCH_TRIALS = 50
 
 

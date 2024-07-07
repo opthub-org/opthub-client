@@ -1,12 +1,10 @@
 """This module contains the class related to match selection context."""
 
 import shelve
-import sys
 from pathlib import Path
 
-import click
-
 from opthub_client.errors.cache_io_error import CacheIOError, CacheIOErrorMessage
+from opthub_client.errors.user_input_error import UserInputError, UserInputErrorMessage
 from opthub_client.models.competition import Competition, fetch_participating_competitions
 from opthub_client.models.match import Match, fetch_matches_by_competition
 
@@ -73,13 +71,13 @@ class MatchSelectionContext:
         competitions = fetch_participating_competitions()
         selected_competition = next((c for c in competitions if c["alias"] == competition), None)
         if selected_competition is None:
-            raise CacheIOError(CacheIOErrorMessage.MATCH_SELECTION_FILE_READ_FAILED)
+            raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
         matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
         selected_match = next((m for m in matches if m["alias"] == match), None)
         if selected_competition is None:
-            raise CacheIOError(CacheIOErrorMessage.MATCH_SELECTION_FILE_READ_FAILED)
+            raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
         if selected_match is None:
-            raise CacheIOError(CacheIOErrorMessage.MATCH_SELECTION_FILE_READ_FAILED)
+            raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
         return selected_competition, selected_match
 
     def get_match(self, match: str | None, competition: str | None) -> Match:
@@ -104,19 +102,15 @@ class MatchSelectionContext:
         if competition is None:
             competition = match_selection_context.competition_alias
         if competition is None or match is None:
-            msg = "Please select a competition and match first."
-            raise AssertionError(msg)
+            raise CacheIOError(CacheIOErrorMessage.MATCH_NOT_SELECTED)
         competitions = fetch_participating_competitions()
         selected_competition = next((c for c in competitions if c["alias"] == competition), None)
         if selected_competition is None:
-            click.echo("Competition is not found.")
-            sys.exit(1)
+            raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
         matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
         selected_match = next((m for m in matches if m["alias"] == match), None)
         if selected_competition is None:
-            msg = "Competition is not found."
-            raise AssertionError(msg)
+            raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
         if selected_match is None:
-            msg = "Match is not found."
-            raise AssertionError(msg)
+            raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
         return selected_match
