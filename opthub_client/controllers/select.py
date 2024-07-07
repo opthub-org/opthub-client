@@ -4,6 +4,7 @@ import click
 from InquirerPy import prompt  # type: ignore[attr-defined]
 
 from opthub_client.context.match_selection import MatchSelectionContext
+from opthub_client.controllers.utils import check_current_version_status
 from opthub_client.errors.authentication_error import AuthenticationError
 from opthub_client.errors.cache_io_error import CacheIOError
 from opthub_client.errors.graphql_error import GraphQLError
@@ -38,7 +39,7 @@ def select(
         match (str | None): option for match(-m or --match)
     """
     try:
-        # check_current_version_status()
+        check_current_version_status()
         match_selection_context = MatchSelectionContext()
         # competitions aliases for choices
         competitions = fetch_participating_competitions()
