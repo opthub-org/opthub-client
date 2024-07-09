@@ -36,32 +36,32 @@ class Credentials:
     def load(self) -> None:
         """Load the credentials from the shelve file."""
         cipher_suite = CipherSuite()
-        with shelve.open(str(self.file_path)) as db:
+        with shelve.open(str(self.file_path)) as key_store:
             # decrypt the credentials
-            self.access_token = cipher_suite.decrypt(db.get("access_token", b""))
-            self.refresh_token = cipher_suite.decrypt(db.get("refresh_token", b""))
-            self.expire_at = cipher_suite.decrypt(db.get("expire_at", b""))
-            self.uid = cipher_suite.decrypt(db.get("uid", b""))
-            self.username = cipher_suite.decrypt(db.get("username", b""))
+            self.access_token = cipher_suite.decrypt(key_store.get("access_token", b""))
+            self.refresh_token = cipher_suite.decrypt(key_store.get("refresh_token", b""))
+            self.expire_at = cipher_suite.decrypt(key_store.get("expire_at", b""))
+            self.uid = cipher_suite.decrypt(key_store.get("uid", b""))
+            self.username = cipher_suite.decrypt(key_store.get("username", b""))
             # refresh the access token if it is expired
             if self.is_expired():
                 self.refresh_access_token()
-            db.close()
+            key_store.close()
 
     def update(self, access_token: str, refresh_token: str) -> None:
         """Update the credentials in the shelve file."""
         cipher_suite = CipherSuite()
-        with shelve.open(str(self.file_path)) as db:
+        with shelve.open(str(self.file_path)) as key_store:
             # encrypt the credentials
-            db["access_token"] = cipher_suite.encrypt(access_token)
-            db["refresh_token"] = cipher_suite.encrypt(refresh_token)
+            key_store["access_token"] = cipher_suite.encrypt(access_token)
+            key_store["refresh_token"] = cipher_suite.encrypt(refresh_token)
             # decode the access token to get the expire time, user id and user name
             public_key = self.get_jwks_public_key(access_token)
             token = jwt.decode(access_token, public_key, algorithms=["RS256"], options={"verify_signature": True})
-            db["expire_at"] = cipher_suite.encrypt(str(token.get("exp")))
-            db["uid"] = cipher_suite.encrypt(token.get("sub"))
-            db["username"] = cipher_suite.encrypt(token.get("username"))
-            db.sync()
+            key_store["expire_at"] = cipher_suite.encrypt(str(token.get("exp")))
+            key_store["uid"] = cipher_suite.encrypt(token.get("sub"))
+            key_store["username"] = cipher_suite.encrypt(token.get("username"))
+            key_store.sync()
         self.access_token = access_token
         self.refresh_token = refresh_token
 
@@ -126,9 +126,9 @@ class Credentials:
 
     def clear_credentials(self) -> None:
         """Clear the credentials in the shelve file."""
-        with shelve.open(str(self.file_path)) as db:
-            db.clear()
-            db.sync()
+        with shelve.open(str(self.file_path)) as key_store:
+            key_store.clear()
+            key_store.sync()
         self.access_token = None
         self.refresh_token = None
         self.expire_at = None

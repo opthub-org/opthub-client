@@ -22,12 +22,12 @@ class MatchSelectionContext:
 
     def load(self) -> None:
         """Load the match selection from the shelve file."""
-        with shelve.open(str(self.file_path)) as db:
-            self.competition_id = db.get("competition_id")
-            self.match_id = db.get("match_id")
-            self.match_alias = db.get("match_alias")
-            self.competition_alias = db.get("competition_alias")
-            db.close()
+        with shelve.open(str(self.file_path)) as key_store:
+            self.competition_id = key_store.get("competition_id")
+            self.match_id = key_store.get("match_id")
+            self.match_alias = key_store.get("match_alias")
+            self.competition_alias = key_store.get("competition_alias")
+            key_store.close()
 
     def update(self, competition: Competition, match: Match) -> None:
         """Update the match selection in the shelve file.

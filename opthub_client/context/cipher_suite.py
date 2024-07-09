@@ -26,12 +26,12 @@ class CipherSuite:
         Returns:
             bytes: encryption key
         """
-        with shelve.open(str(KEY_FILE_PATH)) as db:
-            key = db.get("encryption_key")
+        with shelve.open(str(KEY_FILE_PATH)) as key_store:
+            key = key_store.get("encryption_key")
             if key is None:
                 key = Fernet.generate_key()
-                db["encryption_key"] = key
-                db.sync()
+                key_store["encryption_key"] = key
+                key_store.sync()
             return key
 
     def encrypt(self, data: str) -> bytes:
