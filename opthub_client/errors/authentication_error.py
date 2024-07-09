@@ -11,7 +11,6 @@ class AuthenticationErrorMessage(Enum):
 
     LOGIN_FAILED = "Login failed. Please check your Username or Password."
     GET_JWKS_PUBLIC_KEY_FAILED = "Failed to get public key. Please try again later."
-    GET_GRAPHQL_CLIENT_FAILED = "Failed to get GraphQL client. Please try again later."
 
 
 class AuthenticationError(Exception):
