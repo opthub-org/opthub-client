@@ -11,8 +11,10 @@ import requests
 from jwcrypto import jwk  # type: ignore[import]
 
 from opthub_client.context.cipher_suite import CipherSuite
+from opthub_client.context.utils import get_opthub_client_dir
 from opthub_client.errors.authentication_error import AuthenticationError, AuthenticationErrorMessage
 
+CREDENTIALS_FILE_NAME = "credentials"
 CLIENT_ID = "24nvfsrgbuvu75h4o8oj2c2oek"
 JWKS_URL = "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_1Y69fktA0/.well-known/jwks.json"
 
@@ -29,9 +31,7 @@ class Credentials:
 
     def __init__(self) -> None:
         """Initialize the credentials context with a persistent temporary file."""
-        opthub_dir = Path.home() / ".opthub_client"
-        opthub_dir.mkdir(exist_ok=True)  # Create the directory if it doesn't exist
-        self.file_path = opthub_dir / "credentials"
+        self.file_path = get_opthub_client_dir() / CREDENTIALS_FILE_NAME
 
     def load(self) -> None:
         """Load the credentials from the shelve file."""
