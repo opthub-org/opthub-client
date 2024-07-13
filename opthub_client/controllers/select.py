@@ -43,6 +43,9 @@ def select(
         match_selection_context = MatchSelectionContext()
         # competitions aliases for choices
         competitions = fetch_participating_competitions()
+        if not competitions:
+            click.echo("No competitions found that you are participating in.")
+            return
         selected_competition = select_competition(competitions, competition)
         matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
         selected_match = select_match(matches, match)
