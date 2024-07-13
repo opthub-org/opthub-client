@@ -6,7 +6,7 @@ from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.controllers.utils import check_current_version_status
 from opthub_client.errors.authentication_error import AuthenticationError
 from opthub_client.errors.cache_io_error import CacheIOError
-from opthub_client.errors.graphql_error import GraphQLError
+from opthub_client.errors.fetch_error import FetchError
 from opthub_client.errors.query_error import QueryError
 from opthub_client.errors.user_input_error import UserInputError
 from opthub_client.models.trial import fetch_trial
@@ -28,7 +28,7 @@ def show_trial(ctx: click.Context, competition: str | None, match: str | None, d
         # display batch of solutions.
         trial = fetch_trial(selected_match["id"], trial_no=trial_no)
         display_trial(trial, detail)
-    except (AuthenticationError, GraphQLError, QueryError, CacheIOError, UserInputError) as error:
+    except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
         error.error_handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")

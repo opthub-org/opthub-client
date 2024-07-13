@@ -6,7 +6,7 @@ from opthub_client.context.credentials import Credentials
 from opthub_client.controllers.utils import check_current_version_status
 from opthub_client.errors.authentication_error import AuthenticationError
 from opthub_client.errors.cache_io_error import CacheIOError
-from opthub_client.errors.graphql_error import GraphQLError
+from opthub_client.errors.fetch_error import FetchError
 from opthub_client.errors.query_error import QueryError
 
 
@@ -21,7 +21,7 @@ def auth(ctx: click.Context, username: str, password: str) -> None:
         credentials = Credentials()
         credentials.cognito_login(username, password)
         click.echo("Successfully signed in.")
-    except (CacheIOError, AuthenticationError, QueryError, GraphQLError) as e:
+    except (CacheIOError, AuthenticationError, QueryError, FetchError) as e:
         e.error_handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")

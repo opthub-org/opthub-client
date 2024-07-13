@@ -10,7 +10,6 @@ from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.controllers.utils import check_current_version_status
 from opthub_client.errors.authentication_error import AuthenticationError
 from opthub_client.errors.cache_io_error import CacheIOError
-from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.mutation_error import MutationError
 from opthub_client.errors.user_input_error import UserInputError, UserInputErrorMessage
 from opthub_client.models.solution import create_solution
@@ -56,7 +55,7 @@ def submit(match: str | None, competition: str | None, file: bool) -> None:
         )
         create_solution(selected_match["id"], raw_solution_value)
         click.echo("...Submitted.")
-    except (AuthenticationError, GraphQLError, MutationError, CacheIOError, UserInputError) as error:
+    except (AuthenticationError, MutationError, CacheIOError, UserInputError) as error:
         error.error_handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")

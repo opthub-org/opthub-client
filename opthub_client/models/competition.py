@@ -5,11 +5,10 @@ from typing import TypedDict
 
 import click
 from gql import gql
-from gql.transport.exceptions import TransportQueryError
 
 from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
-from opthub_client.graphql.client import get_gql_client
+from opthub_client.graphql.client import execute_query, get_gql_client
 
 
 class Competition(TypedDict):
@@ -48,7 +47,7 @@ def fetch_participating_competitions() -> list[Competition]:
         }
         """)
     try:
-        result = client.execute(query)
+        result = execute_query(client, query)
         data = result.get("getCompetitionsByParticipantUser")
         if data:
             participating_competitions = data.get("participating")
@@ -58,6 +57,5 @@ def fetch_participating_competitions() -> list[Competition]:
             click.echo("No competitions found that you are participating in.")
             sys.exit(1)
         raise QueryError(resource="competitions", detail="No data returned.")
-    except TransportQueryError as auth_error:
-        error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
-        raise GraphQLError(message=error_message) from auth_error
+    except GraphQLError as e:
+        raise QueryError(resource="competitions", detail=str(e.message)) from e

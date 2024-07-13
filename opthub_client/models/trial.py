@@ -3,11 +3,10 @@
 from typing import Literal, TypedDict
 
 from gql import gql
-from gql.transport.exceptions import TransportQueryError
 
 from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
-from opthub_client.graphql.client import get_gql_client
+from opthub_client.graphql.client import execute_query, execute_query_async, get_gql_client
 
 
 class Solution(TypedDict):
@@ -110,9 +109,10 @@ async def fetch_trials_async(
                 }
             }}""")
     try:
-        result = await client.execute_async(
+        result = await execute_query_async(
+            client,
             query,
-            variable_values={
+            variables={
                 "match": {"id": match_id},
                 "range": {"startTrialNo": trial_from + 1 + page * limit, "limit": limit}
                 if is_asc
@@ -228,10 +228,10 @@ async def fetch_trials_async(
                     trials.append(trial) if not display_only_success else None
                 else:
                     raise QueryError(resource="trial", detail="Unknown trial status")
+    except GraphQLError as e:
+        raise QueryError(resource="trial", detail=str(e.message)) from e
+    else:
         return trials, is_first, is_last
-    except TransportQueryError as auth_error:
-        error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
-        raise GraphQLError(message=error_message) from auth_error
 
 
 def fetch_trials(
@@ -294,9 +294,10 @@ def fetch_trials(
                 }
             }}""")
     try:
-        result = client.execute(
+        result = execute_query(
+            client,
             query,
-            variable_values={
+            variables={
                 "match": {"id": match_id},
                 "order": "descending" if is_desc else "ascending",
                 "range": {
@@ -413,10 +414,10 @@ def fetch_trials(
                     trials.append(trial) if not display_only_success else None
                 else:
                     raise QueryError(resource="trial", detail="Unknown trial status")
+    except GraphQLError as e:
+        raise QueryError(resource="trial", detail=str(e.message)) from e
+    else:
         return trials, is_first, is_last
-    except TransportQueryError as auth_error:
-        error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
-        raise GraphQLError(message=error_message) from auth_error
 
 
 def fetch_trial(match_id: str, trial_no: int) -> Trial:
@@ -463,10 +464,7 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial:
                 }
             }}""")
     try:
-        result = client.execute(
-            query,
-            variable_values={"match": {"id": match_id}, "trialNo": trial_no},
-        )
+        result = execute_query(client, query, variables={"match": {"id": match_id}, "trialNo": trial_no})
         if result is None:
             return None
         trial_data = result.get("getMatchTrialByParticipant")
@@ -563,7 +561,7 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial:
                 )
             else:
                 raise QueryError(resource="trial", detail="Unknown trial status")
+    except GraphQLError as e:
+        raise QueryError(resource="trial", detail=str(e.message)) from e
+    else:
         return trial
-    except TransportQueryError as auth_error:
-        error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
-        raise GraphQLError(message=error_message) from auth_error

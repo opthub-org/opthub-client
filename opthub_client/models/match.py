@@ -3,11 +3,10 @@
 from typing import TypedDict
 
 from gql import gql
-from gql.transport.exceptions import TransportQueryError
 
 from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
-from opthub_client.graphql.client import get_gql_client
+from opthub_client.graphql.client import execute_query, get_gql_client
 
 
 class Match(TypedDict):
@@ -75,11 +74,10 @@ def fetch_matches_by_competition(comp_id: str, comp_alias: str) -> list[Match]:
         }
         }""")
     try:
-        result = client.execute(query, variable_values={"id": comp_id, "alias": comp_alias})
+        result = execute_query(client, query, variables={"id": comp_id, "alias": comp_alias})
         data = result.get("getMatchesByCompetition")
         if data and isinstance(data, list):
             return [Match(id=match["id"], alias=match["alias"]) for match in data]
         raise QueryError(resource="matches", detail="No data returned.")
-    except TransportQueryError as auth_error:
-        error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
-        raise GraphQLError(message=error_message) from auth_error
+    except GraphQLError as e:
+        raise QueryError(resource="matches", detail=str(e.message)) from e

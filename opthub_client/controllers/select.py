@@ -7,7 +7,7 @@ from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.controllers.utils import check_current_version_status
 from opthub_client.errors.authentication_error import AuthenticationError
 from opthub_client.errors.cache_io_error import CacheIOError
-from opthub_client.errors.graphql_error import GraphQLError
+from opthub_client.errors.fetch_error import FetchError
 from opthub_client.errors.query_error import QueryError
 from opthub_client.errors.user_input_error import UserInputError, UserInputErrorMessage
 from opthub_client.models.competition import Competition, fetch_participating_competitions
@@ -49,7 +49,7 @@ def select(
         match_selection_context.update(selected_competition, selected_match)
         # show selected competition and match
         click.echo(f"You have selected {selected_competition['alias']} - {selected_match['alias']}")
-    except (AuthenticationError, GraphQLError, QueryError, CacheIOError, UserInputError) as error:
+    except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
         error.error_handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")
