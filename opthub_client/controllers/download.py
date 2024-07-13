@@ -80,5 +80,5 @@ def download(
         click.echo(f"Trials have been written to {output_file}")
     except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
         error.error_handler()
-    except Exception:
-        click.echo("Unexpected error occurred. Please try again later.")
+    # except Exception:
+    #     click.echo("Unexpected error occurred. Please try again later.")

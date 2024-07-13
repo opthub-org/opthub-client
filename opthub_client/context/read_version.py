@@ -18,7 +18,7 @@ def get_version_from_file() -> str:
     path = Path("pyproject.toml")
     with path.open("rb") as file:
         data = tomllib.load(file)
-    version = data["tool"]["project"]["version"]
+    version = data["project"]["version"]
     if not isinstance(version, str):
         raise CacheIOError(CacheIOErrorMessage.VERSION_FILE_READ_FAILED)
     return version

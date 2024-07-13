@@ -1,9 +1,7 @@
 """This module contains the functions related to competitions."""
 
-import sys
 from typing import TypedDict
 
-import click
 from gql import gql
 
 from opthub_client.errors.graphql_error import GraphQLError
@@ -48,14 +46,14 @@ def fetch_participating_competitions() -> list[Competition]:
         """)
     try:
         result = execute_query(client, query)
-        data = result.get("getCompetitionsByParticipantUser")
-        if data:
-            participating_competitions = data.get("participating")
-            if participating_competitions and isinstance(participating_competitions, list):
-                return [Competition(id=comp["id"], alias=comp["alias"]) for comp in participating_competitions]
-            # if no competitions found
-            click.echo("No competitions found that you are participating in.")
-            sys.exit(1)
-        raise QueryError(resource="competitions", detail="No data returned.")
     except GraphQLError as e:
-        raise QueryError(resource="competitions", detail=str(e.message)) from e
+        raise QueryError(resource="competitions", detail=str(e)) from e
+    data = result.get("getCompetitionsByParticipantUser")
+    if not data:
+        raise QueryError(resource="competitions", detail="No data returned.")
+    participating_competitions = data.get("participating")
+    if not participating_competitions:
+        raise QueryError(resource="competitions", detail="No competitions found.")
+    if not isinstance(participating_competitions, list):
+        raise QueryError(resource="competitions", detail="Invalid data returned.")
+    return [Competition(id=comp["id"], alias=comp["alias"]) for comp in participating_competitions]

@@ -6,7 +6,7 @@ from prompt_toolkit.styles import Style
 from opthub_client.models.trial import Trial
 
 
-def display_trial(trial: Trial, is_detail: bool) -> None:
+def display_trial(trial: Trial | None, is_detail: bool) -> None:
     """Display the trial."""
     if trial is None:
         click.echo("No more solutions to display.")
