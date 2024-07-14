@@ -36,7 +36,7 @@ class Credentials:
     def load(self) -> None:
         """Load the credentials from the shelve file."""
         cipher_suite = CipherSuite()
-        with shelve.open(str(self.file_path)) as key_store:
+        with shelve.open(str(self.file_path)) as key_store:  # noqa: S301 opthub-client#95
             # decrypt the credentials
             self.access_token = cipher_suite.decrypt(key_store.get("access_token", b""))
             self.refresh_token = cipher_suite.decrypt(key_store.get("refresh_token", b""))
@@ -51,7 +51,7 @@ class Credentials:
     def update(self, access_token: str, refresh_token: str) -> None:
         """Update the credentials in the shelve file."""
         cipher_suite = CipherSuite()
-        with shelve.open(str(self.file_path)) as key_store:
+        with shelve.open(str(self.file_path)) as key_store:  # noqa: S301 opthub-client#95
             # encrypt the credentials
             key_store["access_token"] = cipher_suite.encrypt(access_token)
             key_store["refresh_token"] = cipher_suite.encrypt(refresh_token)
@@ -101,7 +101,7 @@ class Credentials:
                 algorithms=["RS256"],
                 options={"verify_signature": True},
             )["exp"]
-        except:
+        except Exception:
             self.clear_credentials()
 
     def cognito_login(self, username: str, password: str) -> None:
@@ -126,7 +126,7 @@ class Credentials:
 
     def clear_credentials(self) -> None:
         """Clear the credentials in the shelve file."""
-        with shelve.open(str(self.file_path)) as key_store:
+        with shelve.open(str(self.file_path)) as key_store:  # noqa: S301 opthub-client#95
             key_store.clear()
             key_store.sync()
         self.access_token = None
