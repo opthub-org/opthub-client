@@ -52,8 +52,6 @@ def fetch_participating_competitions() -> list[Competition]:
     if not data:
         raise QueryError(resource="competitions", detail="No data returned.")
     participating_competitions = data.get("participating")
-    if not participating_competitions:
-        return []
     if not isinstance(participating_competitions, list):
         raise QueryError(resource="competitions", detail="Invalid data returned.")
     return [Competition(id=comp["id"], alias=comp["alias"]) for comp in participating_competitions]
