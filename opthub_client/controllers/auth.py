@@ -1,10 +1,13 @@
 """This module contains the functions related to auth command."""
 
-import botocore
 import click
 
 from opthub_client.context.credentials import Credentials
 from opthub_client.controllers.utils import check_current_version_status
+from opthub_client.errors.authentication_error import AuthenticationError
+from opthub_client.errors.cache_io_error import CacheIOError
+from opthub_client.errors.fetch_error import FetchError
+from opthub_client.errors.query_error import QueryError
 
 
 @click.command()
@@ -13,20 +16,12 @@ from opthub_client.controllers.utils import check_current_version_status
 @click.pass_context
 def auth(ctx: click.Context, username: str, password: str) -> None:
     """Sign in."""
-    check_current_version_status()
-    credentials = Credentials()
     try:
+        check_current_version_status()
+        credentials = Credentials()
         credentials.cognito_login(username, password)
         click.echo("Successfully signed in.")
-    except botocore.exceptions.ClientError as error:
-        error_code = error.response["Error"]["Code"]
-        if error_code == "NotAuthorizedException":
-            # user not exist or incorrect password
-            click.echo("Authentication failed. Please verify that your username and password are correct.")
-        elif error_code == "TooManyRequestsException":
-            click.echo("Too many requests. Please try again later.")
-        else:
-            click.echo(f"An error occurred: {error_code}")
-    except Exception as e:
-        # another exception
-        click.echo(f"An unexpected error occurred: {e}")
+    except (CacheIOError, AuthenticationError, QueryError, FetchError) as e:
+        e.error_handler()
+    except Exception:
+        click.echo("Unexpected error occurred. Please try again later.")

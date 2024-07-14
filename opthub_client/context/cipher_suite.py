@@ -1,16 +1,20 @@
 """Cipher Suite Class for encrypting and decrypting data."""
 
 import shelve
-from pathlib import Path
 
 from cryptography.fernet import Fernet
 
-OPTHUB_CLIENT_DIR = Path.home() / ".opthub_client"
-KEY_FILE_PATH = OPTHUB_CLIENT_DIR / "encryption_key"
+from opthub_client.context.utils import get_opthub_client_dir
+
+FILE_NAME = "encryption_key"
 
 
 class CipherSuite:
     """Cipher suite class for encrypt."""
+
+    def __init__(self) -> None:
+        """Initialize the credentials context with a persistent temporary file."""
+        self.file_path = get_opthub_client_dir() / FILE_NAME
 
     def get(self) -> Fernet:
         """Get the Fernet cipher suite using the encryption key.
@@ -27,12 +31,12 @@ class CipherSuite:
         Returns:
             bytes: encryption key
         """
-        with shelve.open(str(KEY_FILE_PATH)) as db:
-            key = db.get("encryption_key")
+        with shelve.open(str(self.file_path)) as key_store:
+            key = key_store.get("encryption_key")
             if key is None:
                 key = Fernet.generate_key()
-                db["encryption_key"] = key
-                db.sync()
+                key_store["encryption_key"] = key
+                key_store.sync()
             return key
 
     def encrypt(self, data: str) -> bytes:

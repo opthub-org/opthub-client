@@ -2,7 +2,9 @@
 
 from gql import gql
 
-from opthub_client.graphql.client import get_gql_client
+from opthub_client.errors.graphql_error import GraphQLError
+from opthub_client.errors.query_error import QueryError
+from opthub_client.graphql.client import execute_query, get_gql_client
 
 
 class VersionCLIMessage:
@@ -13,7 +15,15 @@ class VersionCLIMessage:
     message: str
     message_color: str
 
-    def __init__(self, label: str, labelColor: str, message: str, messageColor: str):
+    def __init__(self, label: str, labelColor: str, message: str, messageColor: str) -> None:
+        """Initialize the VersionCLIMessage class.
+
+        Args:
+            label (str): label
+            labelColor (str): color of the label
+            message (str): message
+            messageColor (str): color of the message
+        """
         self.label = label
         self.label_color = labelColor
         self.message = message
@@ -37,10 +47,13 @@ def get_version_status_messages(version: str) -> list[VersionCLIMessage]:
     }
     }
     """)
-
-    result = client.execute(query, variable_values={"version": version})
-    data = result.get("getCLIVersionStatus")
-    if isinstance(data, list) and data:
-        messages = [VersionCLIMessage(**item) for item in data]
-        return messages
-    raise ValueError("No CLI messages found for version")
+    try:
+        result = execute_query(client, query, variables={"version": version})
+        data = result.get("getCLIVersionStatus")
+        if not data:
+            raise QueryError(resource="version status", detail="No data returned.")
+        if not isinstance(data, list):
+            raise QueryError(resource="version status", detail="Invalid data returned.")
+        return [VersionCLIMessage(**item) for item in data]
+    except GraphQLError as e:
+        raise QueryError(resource="version status", detail=str(e.message)) from e

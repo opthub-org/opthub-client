@@ -5,8 +5,13 @@ from InquirerPy import prompt  # type: ignore[attr-defined]
 
 from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.controllers.utils import check_current_version_status
-from opthub_client.models.competition import fetch_participating_competitions
-from opthub_client.models.match import fetch_matches_by_competition
+from opthub_client.errors.authentication_error import AuthenticationError
+from opthub_client.errors.cache_io_error import CacheIOError
+from opthub_client.errors.fetch_error import FetchError
+from opthub_client.errors.query_error import QueryError
+from opthub_client.errors.user_input_error import UserInputError, UserInputErrorMessage
+from opthub_client.models.competition import Competition, fetch_participating_competitions
+from opthub_client.models.match import Match, fetch_matches_by_competition
 
 custom_style = {
     "question": "fg:#ffff00 bold",  # question text style
@@ -33,15 +38,42 @@ def select(
         competition (str | None): option for competition(-c or --competition)
         match (str | None): option for match(-m or --match)
     """
-    check_current_version_status()
-    match_selection_context = MatchSelectionContext()
+    try:
+        check_current_version_status()
+        match_selection_context = MatchSelectionContext()
+        # competitions aliases for choices
+        competitions = fetch_participating_competitions()
+        if not competitions:
+            click.echo("No competitions found that you are participating in.")
+            return
+        selected_competition = select_competition(competitions, competition)
+        matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
+        selected_match = select_match(matches, match)
+        match_selection_context.update(selected_competition, selected_match)
+        # show selected competition and match
+        click.echo(f"You have selected {selected_competition['alias']} - {selected_match['alias']}")
+    except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
+        error.error_handler()
+    except Exception:
+        click.echo("Unexpected error occurred. Please try again later.")
 
-    # competitions aliases for choices
-    competitions = fetch_participating_competitions()
+
+def select_competition(competitions: list[Competition], competition_option: str | None) -> Competition:
+    """Select a competition.
+
+    Args:
+        competitions (list[Competition]): fetch participating competitions
+        competition_option (str | None): option for competition(-c or --competition)
+
+    Raises:
+        UserInputError: competition error
+
+    Returns:
+        Competition: competition
+    """
     competition_aliases = [competition["alias"] for competition in competitions]
-
     # if not set -c commands option
-    if competition is None:
+    if competition_option is None:
         competition_questions = [
             {
                 "type": "list",
@@ -52,22 +84,33 @@ def select(
         ]
         result_competition = prompt(questions=competition_questions, style=custom_style)
         if isinstance(result_competition["competition"], str):
-            competition = result_competition["competition"]
+            competition_option = result_competition["competition"]
         else:
-            click.echo("Input type is not valid.")
-            return
-    if competition not in competition_aliases:
-        click.echo("Competition is not found.")
-        return
-    selected_competition = next((c for c in competitions if c["alias"] == competition), None)
+            raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+    if competition_option not in competition_aliases:
+        raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+    selected_competition = next((c for c in competitions if c["alias"] == competition_option), None)
     if selected_competition is None:
-        click.echo("Competition is not found.")
-        return
-    matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
-    match_aliases = [match["alias"] for match in matches]
+        raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+    return selected_competition
 
+
+def select_match(matches: list[Match], match_option: str | None) -> Match:
+    """Select a match.
+
+    Args:
+        matches (list[Match]): fetch matches
+        match_option (str | None): option for match(-m or --match)
+
+    Raises:
+        UserInputError: match error
+
+    Returns:
+        Match: Match
+    """
+    match_aliases = [match["alias"] for match in matches]
     # if not set -m commands option
-    if match is None:
+    if match_option is None:
         match_questions = [
             {
                 "type": "list",
@@ -80,16 +123,10 @@ def select(
         if isinstance(result_match["match"], str):
             match = result_match["match"]
         else:
-            click.echo("Input type is not valid.")
-            return
+            raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
     if match not in match_aliases:
-        click.echo("Match is not found.")
-        return
+        raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
     selected_match = next((m for m in matches if m["alias"] == match), None)
     if selected_match is None:
-        click.echo("Match is not found.")
-        return
-    match_selection_context.update(selected_competition, selected_match)
-
-    # show selected competition and match
-    click.echo(f"You have selected {competition} - {match}")
+        raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
+    return selected_match

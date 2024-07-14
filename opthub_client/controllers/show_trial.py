@@ -4,6 +4,11 @@ import click
 
 from opthub_client.context.match_selection import MatchSelectionContext
 from opthub_client.controllers.utils import check_current_version_status
+from opthub_client.errors.authentication_error import AuthenticationError
+from opthub_client.errors.cache_io_error import CacheIOError
+from opthub_client.errors.fetch_error import FetchError
+from opthub_client.errors.query_error import QueryError
+from opthub_client.errors.user_input_error import UserInputError
 from opthub_client.models.trial import fetch_trial
 from opthub_client.view.display_trials import display_trial
 
@@ -16,10 +21,14 @@ from opthub_client.view.display_trials import display_trial
 @click.pass_context
 def show_trial(ctx: click.Context, competition: str | None, match: str | None, detail: bool, trial_no: int) -> None:
     """Check submitted solutions."""
-    check_current_version_status()
-    match_selection_context = MatchSelectionContext()
-    selected_match = match_selection_context.get_match(match, competition)
-
-    # display batch of solutions.
-    trial = fetch_trial(selected_match["id"], trial_no=trial_no)
-    display_trial(trial, detail)
+    try:
+        check_current_version_status()
+        match_selection_context = MatchSelectionContext()
+        selected_match = match_selection_context.get_match(match, competition)
+        # display batch of solutions.
+        trial = fetch_trial(selected_match["id"], trial_no=trial_no)
+        display_trial(trial, detail)
+    except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
+        error.error_handler()
+    except Exception:
+        click.echo("Unexpected error occurred. Please try again later.")
