@@ -18,37 +18,6 @@ from opthub_client.models.trial import fetch_trials_async
 from opthub_client.view.display_trials import display_trials, user_interaction_message, user_interaction_message_style
 
 
-async def fetch_and_display_trials(
-    selected_match_id: str,
-    page: int,
-    size: int,
-    trial_from: int,
-    detail: bool,
-    asc: bool,
-    success: bool,
-) -> bool:
-    """Fetch and display the trials. Returns True if more trials are available, False if no more trials.
-
-    Args:
-        selected_match_id (str): selected match id
-        page (int): Page number
-        size (int): Number of trials to display
-        trial_from (int): Trial number to start from
-        detail (bool): True for detailed information, false for general information
-        asc (bool): True for show trials in ascending order, false for descending order
-        success (bool): True for show only successful trials, false for all trials
-
-    Returns:
-        bool: True if more trials are available, False if no more trials
-    """
-    trials, is_first, is_last = await fetch_trials_async(selected_match_id, page, size, trial_from, asc, success)
-    run_in_terminal(lambda: display_trials(trials, detail), render_cli_done=False)
-    if (asc and is_last) or (not asc and is_first):
-        run_in_terminal(lambda: click.echo("No more trials."), render_cli_done=False)
-        return False
-    return True
-
-
 @click.command(name="trials")
 @click.option("-c", "--competition", type=str, help="Competition ID.")
 @click.option("-m", "--match", type=str, help="Match ID.")
@@ -153,3 +122,34 @@ def show_trials(
         error.handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")
+
+
+async def fetch_and_display_trials(
+    selected_match_id: str,
+    page: int,
+    size: int,
+    trial_from: int,
+    detail: bool,
+    asc: bool,
+    success: bool,
+) -> bool:
+    """Fetch and display the trials. Returns True if more trials are available, False if no more trials.
+
+    Args:
+        selected_match_id (str): selected match id
+        page (int): Page number
+        size (int): Number of trials to display
+        trial_from (int): Trial number to start from
+        detail (bool): True for detailed information, false for general information
+        asc (bool): True for show trials in ascending order, false for descending order
+        success (bool): True for show only successful trials, false for all trials
+
+    Returns:
+        bool: True if more trials are available, False if no more trials
+    """
+    trials, is_first, is_last = await fetch_trials_async(selected_match_id, page, size, trial_from, asc, success)
+    run_in_terminal(lambda: display_trials(trials, detail), render_cli_done=False)
+    if (asc and is_last) or (not asc and is_first):
+        run_in_terminal(lambda: click.echo("No more trials."), render_cli_done=False)
+        return False
+    return True

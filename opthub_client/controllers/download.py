@@ -61,13 +61,14 @@ def download(
                 length=total_trials,
                 label="Downloading trials",
             ) as bar:
-                for batch_start in range(start, end + 1, SIZE_FETCH_TRIALS):
+                for index, batch_start in enumerate(range(start, end + 1, SIZE_FETCH_TRIALS)):
                     limit = min(SIZE_FETCH_TRIALS, end - batch_start + 1)
                     trials, is_first, is_last = fetch_trials(
                         selected_match["id"],
-                        start=batch_start,
+                        page=index + 1,
+                        trial_from=batch_start,
                         limit=limit,
-                        is_desc=descending,
+                        is_asc=not descending,
                         display_only_success=success,
                     )
                     all_trials.extend(trials)

@@ -77,8 +77,6 @@ def fetch_matches_by_competition(comp_id: str, comp_alias: str) -> list[Match]:
     except GraphQLError as e:
         raise QueryError(resource="matches", detail=str(e.message)) from e
     data = result.get("getMatchesByCompetition")
-    if not data:
-        raise QueryError(resource="matches", detail="No data returned.")
     if not isinstance(data, list):
         raise QueryError(resource="matches", detail="Invalid data returned.")
     return [Match(id=match["id"], alias=match["alias"]) for match in data]

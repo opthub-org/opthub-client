@@ -48,19 +48,19 @@ def get_version_status_messages(version: str) -> list[RemoteMessage]:
     """)
     try:
         result = execute_query(query, variables={"version": version})
-        data = result.get("getCLIVersionStatus")
-        if not data:
-            raise QueryError(resource="version status", detail="No data returned.")
-        if not isinstance(data, list):
-            raise QueryError(resource="version status", detail="Invalid data returned.")
-        return [
-            RemoteMessage(
-                label=item["label"],
-                label_color=item["labelColor"],
-                message=item["message"],
-                message_color=item["messageColor"],
-            )
-            for item in data
-        ]
     except GraphQLError as e:
         raise QueryError(resource="version status", detail=str(e.message)) from e
+    data = result.get("getCLIVersionStatus")
+    if not data:
+        raise QueryError(resource="version status", detail="No data returned.")
+    if not isinstance(data, list):
+        raise QueryError(resource="version status", detail="Invalid data returned.")
+    return [
+        RemoteMessage(
+            label=item["label"],
+            label_color=item["labelColor"],
+            message=item["message"],
+            message_color=item["messageColor"],
+        )
+        for item in data
+    ]
