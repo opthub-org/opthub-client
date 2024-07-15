@@ -9,11 +9,11 @@ import click
 class UserInputErrorMessage(Enum):
     """Enum class for user input error types."""
 
-    INPUT_FILE_ERROR = "File input error. Please check the file."
-    INPUT_FILE_PATH_ERROR = "File path error. Please check the file path."
-    INPUT_SOLUTION_ERROR = "Solution input error. Please check the solution."
-    INPUT_MATCH_ERROR = "Match input error. Please check the match."
-    INPUT_COMPETITION_ERROR = "Competition input error. Please check the competition."
+    FILE_ERROR = "File input error. Please check the file."
+    FILE_PATH_ERROR = "File path error. Please check the file path."
+    SOLUTION_ERROR = "Solution input error. Please check the solution."
+    MATCH_ERROR = "Match input error. Please check the match."
+    COMPETITION_ERROR = "Competition input error. Please check the competition."
 
 
 class UserInputError(Exception):

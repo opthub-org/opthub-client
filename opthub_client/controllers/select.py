@@ -86,12 +86,12 @@ def select_competition(competitions: list[Competition], competition_option: str 
         if isinstance(result_competition["competition"], str):
             competition_option = result_competition["competition"]
         else:
-            raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+            raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)
     if competition_option not in competition_aliases:
-        raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+        raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)
     selected_competition = next((c for c in competitions if c["alias"] == competition_option), None)
     if selected_competition is None:
-        raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+        raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)
     return selected_competition
 
 
@@ -123,10 +123,10 @@ def select_match(matches: list[Match], match_option: str | None) -> Match:
         if isinstance(result_match["match"], str):
             match = result_match["match"]
         else:
-            raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
+            raise UserInputError(UserInputErrorMessage.MATCH_ERROR)
     if match not in match_aliases:
-        raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
+        raise UserInputError(UserInputErrorMessage.MATCH_ERROR)
     selected_match = next((m for m in matches if m["alias"] == match), None)
     if selected_match is None:
-        raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
+        raise UserInputError(UserInputErrorMessage.MATCH_ERROR)
     return selected_match

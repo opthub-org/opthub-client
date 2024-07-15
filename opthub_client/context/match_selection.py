@@ -70,13 +70,13 @@ class MatchSelectionContext:
         competitions = fetch_participating_competitions()
         selected_competition = next((c for c in competitions if c["alias"] == competition), None)
         if selected_competition is None:
-            raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+            raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)
         matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
         selected_match = next((m for m in matches if m["alias"] == match), None)
         if selected_competition is None:
-            raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+            raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)
         if selected_match is None:
-            raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
+            raise UserInputError(UserInputErrorMessage.MATCH_ERROR)
         return selected_competition, selected_match
 
     def get_match(self, match: str | None, competition: str | None) -> Match:
@@ -105,11 +105,11 @@ class MatchSelectionContext:
         competitions = fetch_participating_competitions()
         selected_competition = next((c for c in competitions if c["alias"] == competition), None)
         if selected_competition is None:
-            raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+            raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)
         matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
         selected_match = next((m for m in matches if m["alias"] == match), None)
         if selected_competition is None:
-            raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+            raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)
         if selected_match is None:
-            raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
+            raise UserInputError(UserInputErrorMessage.MATCH_ERROR)
         return selected_match
