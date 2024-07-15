@@ -66,7 +66,7 @@ def download(
                     trials, is_first, is_last = fetch_trials(
                         selected_match["id"],
                         page=index + 1,
-                        trial_from=batch_start,
+                        offset=batch_start,
                         limit=limit,
                         is_asc=not descending,
                         display_only_success=success,

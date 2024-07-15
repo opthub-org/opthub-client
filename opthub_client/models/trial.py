@@ -1,9 +1,9 @@
 """This module contains the types and functions related to participant trials."""
 
-import asyncio
 from typing import Any, Literal, TypedDict
 
 from gql import gql
+from graphql import DocumentNode
 
 from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
@@ -45,6 +45,47 @@ class Trial(TypedDict):
     status: Literal["evaluating", "success", "scoring", "evaluator_failed", "scorer_failed"]
     evaluation: Evaluation | None
     score: Score | None
+
+
+def create_trial(trial_data: dict[str, Any]) -> Trial:
+    """Create a Trial object from trial data.
+
+    Args:
+        trial_data (dict[str, Any]): trail data from the server
+
+    Returns:
+        Trial: the trial object
+    """
+    status = trial_data.get("status", "evaluating")
+    solution = Solution(
+        variable=trial_data["solution"]["variable"],
+        created_at=trial_data["solution"]["createdAt"],
+    )
+    evaluation = None
+    if status in ("success", "scoring", "scorer_failed") and "evaluation" in trial_data:
+        evaluation = Evaluation(
+            status=trial_data["evaluation"]["status"],
+            objective=trial_data["evaluation"]["objective"],
+            constraint=trial_data["evaluation"]["constraint"],
+            info=trial_data["evaluation"]["info"],
+            started_at=trial_data["evaluation"]["startedAt"],
+            finished_at=trial_data["evaluation"]["finishedAt"],
+        )
+    score = None
+    if status in ("success") and "score" in trial_data:
+        score = Score(
+            status=trial_data["score"]["status"],
+            score=trial_data["score"]["value"],
+            started_at=trial_data["score"]["startedAt"],
+            finished_at=trial_data["score"]["finishedAt"],
+        )
+    return Trial(
+        trialNo=trial_data["trialNo"],
+        solution=solution,
+        status=status,
+        evaluation=evaluation,
+        score=score,
+    )
 
 
 def fetch_trial(match_id: str, trial_no: int) -> Trial | None:
@@ -95,12 +136,12 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial | None:
         raise QueryError(resource="trial", detail=str(e.message)) from e
     if result is None:
         return None
-    trial_data = result.get("getMatchTrialByParticipant")
-    if not trial_data:
+    raw_trial = result.get("getMatchTrialByParticipant")
+    if not raw_trial:
         return None
-    if not isinstance(trial_data, dict):
+    if not isinstance(raw_trial, dict):
         raise QueryError(resource="trial", detail="Invalid data returned.")
-    trial = create_trial(trial_data)
+    trial = create_trial(raw_trial)
     return trial
 
 
@@ -128,99 +169,14 @@ def parse_fetched_trials(result: dict[str, Any], display_only_success: bool) -> 
     return trials, is_first, is_last
 
 
-async def fetch_trials_async(
-    match_id: str,
-    page: int,
-    limit: int,
-    trial_from: int,
-    is_asc: bool,
-    display_only_success: bool,
-) -> tuple[list[Trial], bool, bool]:
-    """Fetch the history of the user's submitted solutions and their evaluations and scores.
-
-    Args:
-        match_id (str): Match ID in the competition
-        page (int): Page number
-        limit (int): Size of the page
-        trial_from (int): Trial number to start fetching
-        is_asc (bool): True for show trials in ascending order, False for descending order
-        display_only_success (bool): True to display only successful trials
+def make_fetch_trials_query_document() -> DocumentNode:
+    """Make the graphql document node to fetch the trials.
 
     Returns:
-        list[Trial]:
-            The the history of the user's submitted solutions and their evaluations and scores.
+        DocumentNode:
+            The graphql document node to fetch the trials.
     """
-    return await fetch_trials_common(
-        match_id,
-        page,
-        limit,
-        trial_from,
-        is_asc,
-        display_only_success,
-        is_async=True,
-    )
-
-
-def fetch_trials(
-    match_id: str,
-    page: int,
-    limit: int,
-    trial_from: int,
-    is_asc: bool,
-    display_only_success: bool,
-) -> tuple[list[Trial], bool, bool]:
-    """Fetch the history of the user's submitted solutions and their evaluations and scores.
-
-    Args:
-        match_id (str): Match ID in the competition
-        page (int): Page number
-        limit (int): Size of the page
-        trial_from (int): Trial number to start fetching
-        is_asc (bool): True for show trials in ascending order, False for descending order
-        display_only_success (bool): True to display only successful trials
-
-    Returns:
-        list[Trial]:
-            The the history of the user's submitted solutions and their evaluations and scores.
-    """
-    return asyncio.run(
-        fetch_trials_common(
-            match_id,
-            page,
-            limit,
-            trial_from,
-            is_asc,
-            display_only_success,
-            is_async=False,
-        ),
-    )
-
-
-async def fetch_trials_common(
-    match_id: str,
-    page: int,
-    limit: int,
-    trial_from: int,
-    is_asc: bool,
-    display_only_success: bool,
-    is_async: bool,
-) -> tuple[list[Trial], bool, bool]:
-    """Common function to fetch the history of the user's submitted solutions and their evaluations and scores.
-
-    Args:
-        match_id (str): Match ID in the competition
-        page (int): Page number
-        limit (int): Size of the page
-        trial_from (int): Trial number to start fetching
-        is_asc (bool): True for show trials in ascending order, False for descending order
-        display_only_success (bool): True to display only successful trials
-        is_async (bool): True if calling asynchronously
-
-    Returns:
-        list[Trial]:
-            The the history of the user's submitted solutions and their evaluations and scores.
-    """
-    query = gql("""
+    return gql("""
             query getMatchTrialsByParticipant(
             $match: MatchIdentifierInput!,
             $participant: ParticipantInput,
@@ -261,38 +217,63 @@ async def fetch_trials_common(
                     }
                 }
             }}""")
+
+
+def make_fetch_trials_query_variables(
+    match_id: str,
+    page: int,
+    limit: int,
+    offset: int,
+    is_asc: bool,
+) -> dict[str, Any]:
+    """Make the variables for the fetch trials query.
+
+    Args:
+        match_id (str): Match ID in the competition
+        page (int): Page number
+        limit (int): Size of the page
+        offset (int): Trial number to start fetching
+        is_asc (bool): True for show trials in ascending order, False for descending order
+
+    Returns:
+         dict[str, Any]:
+            The variables for the fetch trials query.
+    """
+    return {
+        "match": {"id": match_id},
+        "range": {"startTrialNo": offset + page * limit, "limit": limit}
+        if is_asc
+        else {"endTrialNo": offset - page * limit, "limit": limit},
+        "order": "ascending" if is_asc else "descending",
+    }
+
+
+async def fetch_trials_async(
+    match_id: str,
+    page: int,
+    limit: int,
+    offset: int,
+    is_asc: bool,
+    display_only_success: bool,
+) -> tuple[list[Trial], bool, bool]:
+    """Fetch the history of the user's submitted solutions and their evaluations and scores.
+
+    Args:
+        match_id (str): Match ID in the competition
+        page (int): Page number
+        limit (int): Size of the page
+        offset (int): Trial number to start fetching
+        is_asc (bool): True for show trials in ascending order, False for descending order
+        display_only_success (bool): True to display only successful trials
+
+    Returns:
+        list[Trial]:
+            The history of the user's submitted solutions and their evaluations and scores.
+    """
+    query = make_fetch_trials_query_document()
+    variables = make_fetch_trials_query_variables(match_id, page, limit, offset, is_asc)
     try:
-        if is_async:
-            result = await execute_query_async(
-                query,
-                variables={
-                    "match": {"id": match_id},
-                    "range": {"startTrialNo": trial_from + 1 + page * limit, "limit": limit}
-                    if is_asc
-                    else {"endTrialNo": trial_from + -page * limit, "limit": limit},
-                    "order": "ascending" if is_asc else "descending",
-                },
-            )
-        else:
-            loop = asyncio.get_event_loop()
-            variables = {
-                "match": {"id": match_id},
-                "order": "ascending" if is_asc else "descending",
-                "range": {
-                    "startTrialNo": trial_from,
-                    "limit": limit,
-                },
-            }
-            if loop.is_running():
-                result = await execute_query_async(
-                    query,
-                    variables=variables,
-                )
-            else:
-                result = execute_query(
-                    query,
-                    variables=variables,
-                )
+        result = await execute_query_async(query, variables)
     except GraphQLError as e:
         raise QueryError(resource="trial", detail=str(e.message)) from e
     return parse_fetched_trials(
@@ -301,42 +282,35 @@ async def fetch_trials_common(
     )
 
 
-def create_trial(trial_data: dict[str, Any]) -> Trial:
-    """Create a Trial object from trial data.
+def fetch_trials(
+    match_id: str,
+    page: int,
+    limit: int,
+    offset: int,
+    is_asc: bool,
+    display_only_success: bool,
+) -> tuple[list[Trial], bool, bool]:
+    """Fetch the history of the user's submitted solutions and their evaluations and scores.
 
     Args:
-        trial_data (dict[str, Any]): trail data from the server
+        match_id (str): Match ID in the competition
+        page (int): Page number
+        limit (int): Size of the page
+        offset (int): Trial number to start fetching
+        is_asc (bool): True for show trials in ascending order, False for descending order
+        display_only_success (bool): True to display only successful trials
 
     Returns:
-        Trial: the trial object
+        list[Trial]:
+            The the history of the user's submitted solutions and their evaluations and scores.
     """
-    status = trial_data.get("status", "evaluating")
-    solution = Solution(
-        variable=trial_data["solution"]["variable"],
-        created_at=trial_data["solution"]["createdAt"],
-    )
-    evaluation = None
-    if status in ("success", "scoring", "scorer_failed") and "evaluation" in trial_data:
-        evaluation = Evaluation(
-            status=trial_data["evaluation"]["status"],
-            objective=trial_data["evaluation"]["objective"],
-            constraint=trial_data["evaluation"]["constraint"],
-            info=trial_data["evaluation"]["info"],
-            started_at=trial_data["evaluation"]["startedAt"],
-            finished_at=trial_data["evaluation"]["finishedAt"],
-        )
-    score = None
-    if status in ("success") and "score" in trial_data:
-        score = Score(
-            status=trial_data["score"]["status"],
-            score=trial_data["score"]["value"],
-            started_at=trial_data["score"]["startedAt"],
-            finished_at=trial_data["score"]["finishedAt"],
-        )
-    return Trial(
-        trialNo=trial_data["trialNo"],
-        solution=solution,
-        status=status,
-        evaluation=evaluation,
-        score=score,
+    query = make_fetch_trials_query_document()
+    variables = make_fetch_trials_query_variables(match_id, page, limit, offset, is_asc)
+    try:
+        result = execute_query(query, variables)
+    except GraphQLError as e:
+        raise QueryError(resource="trial", detail=str(e.message)) from e
+    return parse_fetched_trials(
+        result=result,
+        display_only_success=display_only_success,
     )

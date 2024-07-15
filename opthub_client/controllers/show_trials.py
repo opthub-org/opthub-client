@@ -56,8 +56,6 @@ def show_trials(
         match_selection_context = MatchSelectionContext()
         selected_match = match_selection_context.get_match(match, competition)
         bindings = KeyBindings()
-        # trial_from is decremented by 1 if it is greater than 0 and ascending is True
-        trial_from = trial_from - 1 if trial_from > 0 and ascending else trial_from
         page = 0
         has_all_trials_displayed = False
         tasks = []
@@ -120,8 +118,6 @@ def show_trials(
         )
     except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
         error.handler()
-    except Exception:
-        click.echo("Unexpected error occurred. Please try again later.")
 
 
 async def fetch_and_display_trials(
