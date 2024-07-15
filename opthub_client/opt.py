@@ -2,9 +2,10 @@
 
 import click
 
-from opthub_client.controllers.auth import auth
 from opthub_client.controllers.download import download
 from opthub_client.controllers.help import help
+from opthub_client.controllers.login import login
+from opthub_client.controllers.logout import logout
 from opthub_client.controllers.select import select
 from opthub_client.controllers.show import show
 from opthub_client.controllers.submit import submit
@@ -32,5 +33,6 @@ opt.add_command(show)
 opt.add_command(select)
 opt.add_command(submit)
 opt.add_command(help)
-opt.add_command(auth)
+opt.add_command(login)
+opt.add_command(logout)
 opt.add_command(download)

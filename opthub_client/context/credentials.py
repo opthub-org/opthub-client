@@ -8,7 +8,7 @@ from typing import Any
 import boto3
 import jwt
 import requests
-from jwcrypto import jwk  # type: ignore[import]
+from jwcrypto import jwk  # type: ignore[import-untyped]
 
 from opthub_client.context.cipher_suite import CipherSuite
 from opthub_client.context.utils import get_opthub_client_dir
@@ -35,18 +35,22 @@ class Credentials:
 
     def load(self) -> None:
         """Load the credentials from the shelve file."""
-        cipher_suite = CipherSuite()
-        with shelve.open(str(self.file_path)) as key_store:  # noqa: S301 opthub-client#95
-            # decrypt the credentials
-            self.access_token = cipher_suite.decrypt(key_store.get("access_token", b""))
-            self.refresh_token = cipher_suite.decrypt(key_store.get("refresh_token", b""))
-            self.expire_at = cipher_suite.decrypt(key_store.get("expire_at", b""))
-            self.uid = cipher_suite.decrypt(key_store.get("uid", b""))
-            self.username = cipher_suite.decrypt(key_store.get("username", b""))
-            # refresh the access token if it is expired
-            if self.is_expired():
-                self.refresh_access_token()
-            key_store.close()
+        try:
+            cipher_suite = CipherSuite()
+            with shelve.open(str(self.file_path)) as key_store:  # noqa: S301 opthub-client#95
+                # decrypt the credentials
+                self.access_token = cipher_suite.decrypt(key_store.get("access_token", b""))
+                self.refresh_token = cipher_suite.decrypt(key_store.get("refresh_token", b""))
+                self.expire_at = cipher_suite.decrypt(key_store.get("expire_at", b""))
+                self.uid = cipher_suite.decrypt(key_store.get("uid", b""))
+                self.username = cipher_suite.decrypt(key_store.get("username", b""))
+                # refresh the access token if it is expired
+                if self.is_expired():
+                    self.refresh_access_token()
+                key_store.close()
+        except Exception as e:
+            self.clear_credentials()
+            raise AuthenticationError(AuthenticationErrorMessage.LOAD_CREDENTIALS_FAILED) from e
 
     def update(self, access_token: str, refresh_token: str) -> None:
         """Update the credentials in the shelve file."""
@@ -83,26 +87,23 @@ class Credentials:
         Returns:
             bool: true if the access token is refreshed successfully, otherwise false.
         """
-        try:
-            client = boto3.client("cognito-idp", region_name="ap-northeast-1")
-            response = client.initiate_auth(
-                AuthFlow="REFRESH_TOKEN_AUTH",
-                AuthParameters={"REFRESH_TOKEN": self.refresh_token},
-                ClientId=CLIENT_ID,
-            )
-            self.access_token = response["AuthenticationResult"]["AccessToken"]
-            if self.access_token is None:
-                self.clear_credentials()
-                return
-            public_key = self.get_jwks_public_key(self.access_token)
-            self.expire_at = jwt.decode(
-                self.access_token,
-                public_key,
-                algorithms=["RS256"],
-                options={"verify_signature": True},
-            )["exp"]
-        except Exception:
+        client = boto3.client("cognito-idp", region_name="ap-northeast-1")
+        response = client.initiate_auth(
+            AuthFlow="REFRESH_TOKEN_AUTH",
+            AuthParameters={"REFRESH_TOKEN": self.refresh_token},
+            ClientId=CLIENT_ID,
+        )
+        self.access_token = response["AuthenticationResult"]["AccessToken"]
+        if self.access_token is None:
             self.clear_credentials()
+            return
+        public_key = self.get_jwks_public_key(self.access_token)
+        self.expire_at = jwt.decode(
+            self.access_token,
+            public_key,
+            algorithms=["RS256"],
+            options={"verify_signature": True},
+        )["exp"]
 
     def cognito_login(self, username: str, password: str) -> None:
         """Login to cognito user pool. And update the credentials.

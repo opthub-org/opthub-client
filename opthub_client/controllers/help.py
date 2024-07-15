@@ -2,7 +2,8 @@
 
 import click
 
-from opthub_client.controllers.auth import auth
+from opthub_client.controllers.login import login
+from opthub_client.controllers.logout import logout
 from opthub_client.controllers.select import select
 from opthub_client.controllers.show import show
 from opthub_client.controllers.show_trials import show_trials
@@ -18,5 +19,6 @@ def help(ctx: click.Context) -> None:  # noqa: A001, ARG001
 help.add_command(show_trials)
 help.add_command(select)
 help.add_command(submit)
-help.add_command(auth)
+help.add_command(login)
+help.add_command(logout)
 help.add_command(show)

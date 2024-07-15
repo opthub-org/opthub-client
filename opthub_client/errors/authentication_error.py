@@ -11,6 +11,7 @@ class AuthenticationErrorMessage(Enum):
 
     LOGIN_FAILED = "Login failed. Please check your Username or Password."
     GET_JWKS_PUBLIC_KEY_FAILED = "Failed to get public key. Please try again later."
+    LOAD_CREDENTIALS_FAILED = "Not found credentials. Please login with `opt login` command."
 
 
 class AuthenticationError(Exception):
