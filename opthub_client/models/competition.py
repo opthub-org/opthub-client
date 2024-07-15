@@ -6,7 +6,7 @@ from gql import gql
 
 from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
-from opthub_client.graphql.client import execute_query, get_gql_client
+from opthub_client.graphql.client import execute_query
 
 
 class Competition(TypedDict):
@@ -27,7 +27,6 @@ def fetch_participating_competitions() -> list[Competition]:
     Raises:
         ValueError: If no competitions are found for the user or the fetch fails.
     """
-    client = get_gql_client()
     query = gql("""
         query getCompetitionsByParticipantUser(
         $id: String,
@@ -45,7 +44,7 @@ def fetch_participating_competitions() -> list[Competition]:
         }
         """)
     try:
-        result = execute_query(client, query)
+        result = execute_query(query)
     except GraphQLError as e:
         raise QueryError(resource="competitions", detail=str(e)) from e
     data = result.get("getCompetitionsByParticipantUser")

@@ -21,7 +21,7 @@ class MatchSelectionContext:
 
     def load(self) -> None:
         """Load the match selection from the shelve file."""
-        with shelve.open(str(self.file_path)) as key_store:
+        with shelve.open(str(self.file_path)) as key_store:  # noqa: S301 opthub-client#95
             self.competition_id = key_store.get("competition_id")
             self.match_id = key_store.get("match_id")
             self.match_alias = key_store.get("match_alias")
@@ -35,7 +35,7 @@ class MatchSelectionContext:
             competition (Competition): Competition instance
             match (Match): Match instance
         """
-        with shelve.open(str(self.file_path)) as db:
+        with shelve.open(str(self.file_path)) as db:  # noqa: S301 opthub-client#95
             db["competition_id"] = competition["id"]
             db["match_id"] = match["id"]
             db["match_alias"] = match["alias"]

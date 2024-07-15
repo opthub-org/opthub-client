@@ -13,23 +13,7 @@ from opthub_client.errors.graphql_error import GraphQLError
 URL = "https://jciqso7l7rhajfkt5s3dhybpcu.appsync-api.ap-northeast-1.amazonaws.com/graphql"
 
 
-def get_gql_client() -> Client:
-    """Get the GraphQL client.
-
-    Returns:
-        Client: The GraphQL client
-
-    Raises:
-        AuthenticationError: If authentication fails
-    """
-    credentials = Credentials()
-    credentials.load()
-    headers = {"Authorization": f"Bearer {credentials.access_token}"}
-    transport = AIOHTTPTransport(url=URL, headers=headers)
-    return Client(transport=transport, fetch_schema_from_transport=True)
-
-
-def execute_query(client: Client, query: DocumentNode, variables: dict[str, Any] | None = None) -> dict[str, Any]:
+def execute_query(query: DocumentNode, variables: dict[str, Any] | None = None) -> dict[str, Any]:
     """Execute a query.
 
     Args:
@@ -43,6 +27,11 @@ def execute_query(client: Client, query: DocumentNode, variables: dict[str, Any]
     Returns:
         dict[str, Any]: result
     """
+    credentials = Credentials()
+    credentials.load()
+    headers = {"Authorization": f"Bearer {credentials.access_token}"}
+    transport = AIOHTTPTransport(url=URL, headers=headers)
+    client = Client(transport=transport, fetch_schema_from_transport=True)
     try:
         return client.execute(query, variable_values=variables)
     except TransportQueryError as auth_error:
@@ -51,7 +40,6 @@ def execute_query(client: Client, query: DocumentNode, variables: dict[str, Any]
 
 
 async def execute_query_async(
-    client: Client,
     query: DocumentNode,
     variables: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -68,6 +56,11 @@ async def execute_query_async(
     Returns:
         dict[str, Any]: result
     """
+    credentials = Credentials()
+    credentials.load()
+    headers = {"Authorization": f"Bearer {credentials.access_token}"}
+    transport = AIOHTTPTransport(url=URL, headers=headers)
+    client = Client(transport=transport, fetch_schema_from_transport=True)
     try:
         return await client.execute_async(query, variable_values=variables)
     except TransportQueryError as auth_error:
@@ -76,7 +69,6 @@ async def execute_query_async(
 
 
 def execute_mutation(
-    client: Client,
     mutation: DocumentNode,
     variables: dict[str, Any] | None = None,
 ) -> None:
@@ -90,6 +82,11 @@ def execute_mutation(
     Raises:
         GraphQLError: graphql error
     """
+    credentials = Credentials()
+    credentials.load()
+    headers = {"Authorization": f"Bearer {credentials.access_token}"}
+    transport = AIOHTTPTransport(url=URL, headers=headers)
+    client = Client(transport=transport, fetch_schema_from_transport=True)
     try:
         client.execute(mutation, variables)
     except TransportQueryError as auth_error:

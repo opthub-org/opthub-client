@@ -35,14 +35,9 @@ from opthub_client.validators.solution import SolutionValidator
     is_flag=True,
     help="Flag to indicate file submission.",
 )
-def submit(match: str | None, competition: str | None, file: bool) -> None:
-    """Submit a solution.
-
-    Args:
-        match (str | None): option for match(-m or --match)
-        competition (str | None): option for competition(-c or --competition)
-        file (bool): option for file(-f or --file). if -f or --file is provided, it will be a file submission.
-    """
+@click.pass_context
+def submit(ctx: click.Context, match: str | None, competition: str | None, file: bool) -> None:  # noqa: ARG001
+    """Submit a solution."""
     try:
         check_current_version_status()
         match_selection_context = MatchSelectionContext()

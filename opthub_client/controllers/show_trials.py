@@ -33,8 +33,10 @@ async def fetch_and_display_trials(
         selected_match_id (str): selected match id
         page (int): Page number
         size (int): Number of trials to display
+        trial_from (int): Trial number to start from
         detail (bool): True for detailed information, false for general information
         asc (bool): True for show trials in ascending order, false for descending order
+        success (bool): True for show only successful trials, false for all trials
 
     Returns:
         bool: True if more trials are available, False if no more trials
@@ -70,7 +72,7 @@ async def fetch_and_display_trials(
 @click.option("-suc", "--success", is_flag=True, help="Show only successful trials")
 @click.pass_context
 def show_trials(
-    ctx: click.Context,
+    ctx: click.Context,  # noqa: ARG001
     competition: str | None,
     match: str | None,
     size: int,
@@ -109,7 +111,7 @@ def show_trials(
 
         # n key is to display next batch of solutions
         @bindings.add("n")
-        def add_trials(event: KeyPressEvent) -> None:
+        def add_trials(event: KeyPressEvent) -> None:  # noqa: ARG001
             """Display next batch of solutions."""
             if not has_all_trials_displayed:
                 task = asyncio.create_task(next_trials())
@@ -120,7 +122,7 @@ def show_trials(
         @bindings.add("e")  # e for exit
         @bindings.add("q")  # q for exit
         @bindings.add("c-c")  # Ctrl-C for exit
-        def exit_trials_view(event: KeyPressEvent) -> None:
+        def exit_trials_view(event: KeyPressEvent) -> None:  # noqa: ARG001
             """Exit the application."""
             session.app.exit()
 

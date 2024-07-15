@@ -5,7 +5,7 @@ import sys
 import click
 
 from opthub_client.context.read_version import get_version_from_file
-from opthub_client.graphql.version_cli import get_version_status_messages
+from opthub_client.models.remote_message import get_version_status_messages
 
 
 def check_current_version_status() -> None:

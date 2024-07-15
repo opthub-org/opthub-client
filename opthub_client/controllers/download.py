@@ -39,7 +39,7 @@ SIZE_FETCH_TRIALS = 50
 @click.option("-suc", "--success", is_flag=True, help="Show only successful trials")
 @click.pass_context
 def download(
-    ctx: click.Context,
+    ctx: click.Context,  # noqa: ARG001
     competition: str | None,
     match: str | None,
     start: int,
@@ -57,7 +57,7 @@ def download(
 
         with output_file.open("w") as f:
             all_trials = []
-            with click.progressbar(
+            with click.progressbar(  # type: ignore[var-annotated] # opthub-client/issues/99
                 length=total_trials,
                 label="Downloading trials",
             ) as bar:
@@ -80,5 +80,5 @@ def download(
         click.echo(f"Trials have been written to {output_file}")
     except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
         error.error_handler()
-    # except Exception:
-    #     click.echo("Unexpected error occurred. Please try again later.")
+    except Exception:
+        click.echo("Unexpected error occurred. Please try again later.")

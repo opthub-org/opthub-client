@@ -6,7 +6,7 @@ from gql import gql
 
 from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
-from opthub_client.graphql.client import execute_query, execute_query_async, get_gql_client
+from opthub_client.graphql.client import execute_query, execute_query_async
 
 
 class Solution(TypedDict):
@@ -59,14 +59,15 @@ async def fetch_trials_async(
     Args:
         match_id (str): Match ID in the competition
         page (int): Page number
-        size (int): Size of the page
-        asc (bool): True for show trials in ascending order, False for descending order
+        limit (int): Size of the page
+        trial_from (int): Trial number to start fetching
+        is_asc (bool): True for show trials in ascending order, False for descending order
+        display_only_success (bool): True to display only successful trials
 
     Returns:
         list[Trial]:
             The the history of the user's submitted solutions and their evaluations and scores.
     """
-    client = get_gql_client()
     query = gql("""
             query getMatchTrialsByParticipant(
             $match: MatchIdentifierInput!,
@@ -110,7 +111,6 @@ async def fetch_trials_async(
             }}""")
     try:
         result = await execute_query_async(
-            client,
             query,
             variables={
                 "match": {"id": match_id},
@@ -155,12 +155,12 @@ def fetch_trials(
         match_id (str): Match ID in the competition
         start (int): Trial number to start fetching
         limit (int): Number of trials to fetch
+        is_desc (bool): True for descending order, False for ascending order
         display_only_success (bool): True to display only successful trials
     Returns:
         list[Trial]:
             The the history of the user's submitted solutions and their evaluations and scores.
     """
-    client = get_gql_client()
     query = gql("""
             query getMatchTrialsByParticipant(
             $match: MatchIdentifierInput!,
@@ -203,7 +203,6 @@ def fetch_trials(
             }}""")
     try:
         result = execute_query(
-            client,
             query,
             variables={
                 "match": {"id": match_id},
@@ -247,7 +246,6 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial | None:
         Trial:
             The the history of the user's submitted solution and their evaluation and score.
     """
-    client = get_gql_client()
     query = gql("""
             query getMatchTrialByParticipant(
             $match: MatchIdentifierInput!,
@@ -280,7 +278,7 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial | None:
                 }
             }}""")
     try:
-        result = execute_query(client, query, variables={"match": {"id": match_id}, "trialNo": trial_no})
+        result = execute_query(query, variables={"match": {"id": match_id}, "trialNo": trial_no})
     except GraphQLError as e:
         raise QueryError(resource="trial", detail=str(e.message)) from e
     if result is None:
