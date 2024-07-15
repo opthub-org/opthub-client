@@ -150,6 +150,6 @@ def show_trials(
             style=user_interaction_message_style(),
         )
     except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
-        error.error_handler()
+        error.handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")

@@ -25,7 +25,7 @@ class MutationError(Exception):
         self.message = f"MutationError: {method} {resource} - {detail}"
         super().__init__(self.message)
 
-    def error_handler(self) -> None:
+    def handler(self) -> None:
         """Handle the mutation error."""
         click.echo(str(self))
         sys.exit(1)

@@ -13,7 +13,7 @@ class FetchError(Exception):
         self.message = message
         super().__init__(self.message)
 
-    def error_handler(self) -> None:
+    def handler(self) -> None:
         """Handle the Fetch error."""
         click.echo(str(self))
         sys.exit(1)

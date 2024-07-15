@@ -23,7 +23,7 @@ class UserInputError(Exception):
         """Initialize the UserInputError class."""
         super().__init__(error_type.value)
 
-    def error_handler(self) -> None:
+    def handler(self) -> None:
         """Handle the user input error."""
         click.echo(str(self))
         sys.exit(1)

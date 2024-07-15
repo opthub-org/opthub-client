@@ -35,6 +35,6 @@ def show_trial(
         trial = fetch_trial(selected_match["id"], trial_no=trial_no)
         display_trial(trial, detail)
     except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
-        error.error_handler()
+        error.handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")

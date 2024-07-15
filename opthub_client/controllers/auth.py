@@ -22,6 +22,6 @@ def auth(ctx: click.Context, username: str, password: str) -> None:  # noqa: ARG
         credentials.cognito_login(username, password)
         click.echo("Successfully signed in.")
     except (CacheIOError, AuthenticationError, QueryError, FetchError) as e:
-        e.error_handler()
+        e.handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")

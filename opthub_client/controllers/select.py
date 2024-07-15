@@ -53,7 +53,7 @@ def select(
         # show selected competition and match
         click.echo(f"You have selected {selected_competition['alias']} - {selected_match['alias']}")
     except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
-        error.error_handler()
+        error.handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")
 

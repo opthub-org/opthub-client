@@ -51,7 +51,7 @@ def submit(ctx: click.Context, match: str | None, competition: str | None, file:
         create_solution(selected_match["id"], raw_solution_value)
         click.echo("...Submitted.")
     except (AuthenticationError, MutationError, CacheIOError, UserInputError) as error:
-        error.error_handler()
+        error.handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")
 
