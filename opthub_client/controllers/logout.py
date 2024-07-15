@@ -18,6 +18,6 @@ def logout(ctx: click.Context) -> None:  # noqa: ARG001
         check_current_version_status()
         credentials = Credentials()
         credentials.clear_credentials()
-        click.echo(" Successfully logged out.")
+        click.echo("Successfully logged out.")
     except (CacheIOError, AuthenticationError, QueryError, FetchError) as e:
         e.handler()
