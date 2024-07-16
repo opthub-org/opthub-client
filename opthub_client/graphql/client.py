@@ -29,8 +29,8 @@ def get_gql_client() -> Client:
     return Client(transport=transport, fetch_schema_from_transport=True)
 
 
-def execute_request(request: DocumentNode, variables: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Execute a request.
+def execute_graphql(request: DocumentNode, variables: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Execute a graphql request.
 
     Args:
         request (DocumentNode): graphql client request
@@ -50,8 +50,8 @@ def execute_request(request: DocumentNode, variables: dict[str, Any] | None = No
         raise GraphQLError(message=error_message) from auth_error
 
 
-async def execute_request_async(request: DocumentNode, variables: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Execute a request.
+async def execute_graphql_async(request: DocumentNode, variables: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Execute a graphql request.
 
     Args:
         request (DocumentNode): graphql client request

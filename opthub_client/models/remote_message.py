@@ -4,7 +4,7 @@ from gql import gql
 
 from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
-from opthub_client.graphql.client import execute_request
+from opthub_client.graphql.client import execute_graphql
 
 
 class RemoteMessage:
@@ -47,7 +47,7 @@ def get_version_status_messages(version: str) -> list[RemoteMessage]:
     }
     """)
     try:
-        result = execute_request(query, variables={"version": version})
+        result = execute_graphql(query, variables={"version": version})
     except GraphQLError as e:
         raise QueryError(resource="version status", detail=str(e.message)) from e
     data = result.get("getCLIVersionStatus")

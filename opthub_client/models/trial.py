@@ -7,7 +7,7 @@ from graphql import DocumentNode
 
 from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
-from opthub_client.graphql.client import execute_request, execute_request_async
+from opthub_client.graphql.client import execute_graphql, execute_graphql_async
 
 
 class Solution(TypedDict):
@@ -131,7 +131,7 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial | None:
                 }
             }}""")
     try:
-        result = execute_request(query, variables={"match": {"id": match_id}, "trialNo": trial_no})
+        result = execute_graphql(query, variables={"match": {"id": match_id}, "trialNo": trial_no})
     except GraphQLError as e:
         raise QueryError(resource="trial", detail=str(e.message)) from e
     if result is None:
@@ -277,13 +277,10 @@ async def fetch_trials_async(
     query = make_fetch_trials_query_document()
     variables = make_fetch_trials_query_variables(match_id, page, page_size, limit, offset, is_asc)
     try:
-        result = await execute_request_async(query, variables)
+        result = await execute_graphql_async(query, variables)
     except GraphQLError as e:
         raise QueryError(resource="trial", detail=str(e.message)) from e
-    return parse_fetched_trials(
-        result=result,
-        display_only_success=display_only_success,
-    )
+    return parse_fetched_trials(result, display_only_success)
 
 
 def fetch_trials(
@@ -313,10 +310,7 @@ def fetch_trials(
     query = make_fetch_trials_query_document()
     variables = make_fetch_trials_query_variables(match_id, page, page_size, limit, offset, is_asc)
     try:
-        result = execute_request(query, variables)
+        result = execute_graphql(query, variables)
     except GraphQLError as e:
         raise QueryError(resource="trial", detail=str(e.message)) from e
-    return parse_fetched_trials(
-        result=result,
-        display_only_success=display_only_success,
-    )
+    return parse_fetched_trials(result, display_only_success)

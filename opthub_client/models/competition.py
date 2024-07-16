@@ -6,7 +6,7 @@ from gql import gql
 
 from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
-from opthub_client.graphql.client import execute_request
+from opthub_client.graphql.client import execute_graphql
 
 
 class Competition(TypedDict):
@@ -44,7 +44,7 @@ def fetch_participating_competitions() -> list[Competition]:
         }
         """)
     try:
-        result = execute_request(query)
+        result = execute_graphql(query)
     except GraphQLError as e:
         raise QueryError(resource="competitions", detail=str(e)) from e
     data = result.get("getCompetitionsByParticipantUser")
