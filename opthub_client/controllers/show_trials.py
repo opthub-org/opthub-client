@@ -59,6 +59,8 @@ def show_trials(
         page = 0
         has_all_trials_displayed = False
         tasks = []
+        # trial_from is 0 and ascending is True, then increment trial_from by 1 because trial number starts from 1.
+        trial_from = trial_from + 1 if trial_from == 0 and ascending else trial_from
 
         async def next_trials() -> None:
             nonlocal page, has_all_trials_displayed
@@ -143,7 +145,15 @@ async def fetch_and_display_trials(
     Returns:
         bool: True if more trials are available, False if no more trials
     """
-    trials, is_first, is_last = await fetch_trials_async(selected_match_id, page, size, trial_from, asc, success)
+    trials, is_first, is_last = await fetch_trials_async(
+        match_id=selected_match_id,
+        page=page,
+        page_size=size,
+        limit=size,
+        offset=trial_from,
+        is_asc=asc,
+        display_only_success=success,
+    )
     run_in_terminal(lambda: display_trials(trials, detail), render_cli_done=False)
     if (asc and is_last) or (not asc and is_first):
         run_in_terminal(lambda: click.echo("No more trials."), render_cli_done=False)

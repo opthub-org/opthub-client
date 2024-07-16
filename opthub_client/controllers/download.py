@@ -15,7 +15,7 @@ from opthub_client.errors.user_input_error import UserInputError
 from opthub_client.models.trial import fetch_trials
 
 # Number of trials to fetch in one request
-SIZE_FETCH_TRIALS = 50
+SIZE_FETCH_TRIALS = 5
 
 
 @click.command()
@@ -24,8 +24,8 @@ SIZE_FETCH_TRIALS = 50
 @click.option(
     "-s",
     "--start",
-    type=click.IntRange(min=1),
-    default=1,
+    type=click.IntRange(min=0),
+    default=0,
     help="Start trial number",
 )
 @click.option(
@@ -52,9 +52,10 @@ def download(
         check_current_version_status()
         match_selection_context = MatchSelectionContext()
         selected_match = match_selection_context.get_match(match, competition)
-        output_file = Path(f"trials_{selected_match['alias']}_trials.json")
-        total_trials = end - start + 1
-
+        output_file = Path(f"trials_{selected_match['alias']}.json")
+        total_trials = end - start
+        # trial_from is 0 and ascending is True, then increment trial_from by 1 because trial number starts from 1.
+        start = start + 1 if start == 0 and not descending else start
         with output_file.open("w") as f:
             all_trials = []
             with click.progressbar(  # type: ignore[var-annotated] # opthub-client/issues/99
@@ -65,8 +66,9 @@ def download(
                     limit = min(SIZE_FETCH_TRIALS, end - batch_start + 1)
                     trials, is_first, is_last = fetch_trials(
                         selected_match["id"],
-                        page=index + 1,
-                        offset=batch_start,
+                        page=index,
+                        page_size=SIZE_FETCH_TRIALS,
+                        offset=end if descending else start,
                         limit=limit,
                         is_asc=not descending,
                         display_only_success=success,

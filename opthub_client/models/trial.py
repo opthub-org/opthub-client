@@ -7,7 +7,7 @@ from graphql import DocumentNode
 
 from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
-from opthub_client.graphql.client import execute_query, execute_query_async
+from opthub_client.graphql.client import execute_request, execute_request_async
 
 
 class Solution(TypedDict):
@@ -131,7 +131,7 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial | None:
                 }
             }}""")
     try:
-        result = execute_query(query, variables={"match": {"id": match_id}, "trialNo": trial_no})
+        result = execute_request(query, variables={"match": {"id": match_id}, "trialNo": trial_no})
     except GraphQLError as e:
         raise QueryError(resource="trial", detail=str(e.message)) from e
     if result is None:
@@ -222,6 +222,7 @@ def make_fetch_trials_query_document() -> DocumentNode:
 def make_fetch_trials_query_variables(
     match_id: str,
     page: int,
+    page_size: int,
     limit: int,
     offset: int,
     is_asc: bool,
@@ -231,6 +232,7 @@ def make_fetch_trials_query_variables(
     Args:
         match_id (str): Match ID in the competition
         page (int): Page number
+        page_size(int): Size of the page
         limit (int): Size of the page
         offset (int): Trial number to start fetching
         is_asc (bool): True for show trials in ascending order, False for descending order
@@ -241,9 +243,9 @@ def make_fetch_trials_query_variables(
     """
     return {
         "match": {"id": match_id},
-        "range": {"startTrialNo": offset + page * limit, "limit": limit}
+        "range": {"startTrialNo": offset + page * page_size, "limit": limit}
         if is_asc
-        else {"endTrialNo": offset - page * limit, "limit": limit},
+        else {"endTrialNo": offset - page * page_size, "limit": limit},
         "order": "ascending" if is_asc else "descending",
     }
 
@@ -251,6 +253,7 @@ def make_fetch_trials_query_variables(
 async def fetch_trials_async(
     match_id: str,
     page: int,
+    page_size: int,
     limit: int,
     offset: int,
     is_asc: bool,
@@ -261,6 +264,7 @@ async def fetch_trials_async(
     Args:
         match_id (str): Match ID in the competition
         page (int): Page number
+        page_size(int): Size of the page
         limit (int): Size of the page
         offset (int): Trial number to start fetching
         is_asc (bool): True for show trials in ascending order, False for descending order
@@ -271,9 +275,9 @@ async def fetch_trials_async(
             The history of the user's submitted solutions and their evaluations and scores.
     """
     query = make_fetch_trials_query_document()
-    variables = make_fetch_trials_query_variables(match_id, page, limit, offset, is_asc)
+    variables = make_fetch_trials_query_variables(match_id, page, page_size, limit, offset, is_asc)
     try:
-        result = await execute_query_async(query, variables)
+        result = await execute_request_async(query, variables)
     except GraphQLError as e:
         raise QueryError(resource="trial", detail=str(e.message)) from e
     return parse_fetched_trials(
@@ -285,6 +289,7 @@ async def fetch_trials_async(
 def fetch_trials(
     match_id: str,
     page: int,
+    page_size: int,
     limit: int,
     offset: int,
     is_asc: bool,
@@ -295,6 +300,7 @@ def fetch_trials(
     Args:
         match_id (str): Match ID in the competition
         page (int): Page number
+        page_size(int): Size of the page
         limit (int): Size of the page
         offset (int): Trial number to start fetching
         is_asc (bool): True for show trials in ascending order, False for descending order
@@ -305,9 +311,9 @@ def fetch_trials(
             The the history of the user's submitted solutions and their evaluations and scores.
     """
     query = make_fetch_trials_query_document()
-    variables = make_fetch_trials_query_variables(match_id, page, limit, offset, is_asc)
+    variables = make_fetch_trials_query_variables(match_id, page, page_size, limit, offset, is_asc)
     try:
-        result = execute_query(query, variables)
+        result = execute_request(query, variables)
     except GraphQLError as e:
         raise QueryError(resource="trial", detail=str(e.message)) from e
     return parse_fetched_trials(
