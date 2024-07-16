@@ -31,7 +31,7 @@ class CipherSuite:
         Returns:
             bytes: encryption key
         """
-        with shelve.open(str(self.file_path)) as key_store:
+        with shelve.open(str(self.file_path)) as key_store:  # noqa: S301 opthub-client#95
             key = key_store.get("encryption_key")
             if key is None:
                 key = Fernet.generate_key()

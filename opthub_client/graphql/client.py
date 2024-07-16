@@ -29,12 +29,11 @@ def get_gql_client() -> Client:
     return Client(transport=transport, fetch_schema_from_transport=True)
 
 
-def execute_query(client: Client, query: DocumentNode, variables: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Execute a query.
+def execute_graphql(request: DocumentNode, variables: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Execute a graphql request.
 
     Args:
-        client (Client): graphql client
-        query (DocumentNode): query
+        request (DocumentNode): graphql client request
         variables (_type_, optional): query variables. Defaults to None.
 
     Raises:
@@ -43,23 +42,19 @@ def execute_query(client: Client, query: DocumentNode, variables: dict[str, Any]
     Returns:
         dict[str, Any]: result
     """
+    client = get_gql_client()
     try:
-        return client.execute(query, variable_values=variables)
+        return client.execute(request, variable_values=variables)
     except TransportQueryError as auth_error:
         error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
         raise GraphQLError(message=error_message) from auth_error
 
 
-async def execute_query_async(
-    client: Client,
-    query: DocumentNode,
-    variables: dict[str, Any] | None = None,
-) -> dict[str, Any]:
-    """Execute a query asynchronously.
+async def execute_graphql_async(request: DocumentNode, variables: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Execute a graphql request.
 
     Args:
-        client (Client): graphql client
-        query (DocumentNode): query
+        request (DocumentNode): graphql client request
         variables (_type_, optional): query variables. Defaults to None.
 
     Raises:
@@ -68,30 +63,9 @@ async def execute_query_async(
     Returns:
         dict[str, Any]: result
     """
+    client = get_gql_client()
     try:
-        return await client.execute_async(query, variable_values=variables)
-    except TransportQueryError as auth_error:
-        error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
-        raise GraphQLError(message=error_message) from auth_error
-
-
-def execute_mutation(
-    client: Client,
-    mutation: DocumentNode,
-    variables: dict[str, Any] | None = None,
-) -> None:
-    """Execute a mutation.
-
-    Args:
-        client (Client): graphql client
-        mutation (DocumentNode): mutation
-        variables (_type_, optional): mutation variables. Defaults to None.
-
-    Raises:
-        GraphQLError: graphql error
-    """
-    try:
-        client.execute(mutation, variables)
+        return await client.execute_async(request, variable_values=variables)
     except TransportQueryError as auth_error:
         error_message = auth_error.errors[0]["message"] if auth_error.errors else "Unexpected error"
         raise GraphQLError(message=error_message) from auth_error

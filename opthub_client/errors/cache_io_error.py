@@ -22,7 +22,7 @@ class CacheIOError(Exception):
         """Initialize the CacheIOError class."""
         super().__init__(error_type.value)
 
-    def error_handler(self) -> None:
+    def handler(self) -> None:
         """Handle the cache file I/O error."""
         click.echo(str(self))
         sys.exit(1)

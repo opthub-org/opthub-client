@@ -15,7 +15,7 @@ class QueryError(Exception):
         self.message = f"QueryError: {resource} - {detail}"
         super().__init__(self.message)
 
-    def error_handler(self) -> None:
+    def handler(self) -> None:
         """Handle the query error."""
         click.echo(str(self))
         sys.exit(1)

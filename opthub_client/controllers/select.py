@@ -43,7 +43,7 @@ def select(
         match_selection_context = MatchSelectionContext()
         # competitions aliases for choices
         competitions = fetch_participating_competitions()
-        if not competitions:
+        if len(competitions) == 0:
             click.echo("No competitions found that you are participating in.")
             return
         selected_competition = select_competition(competitions, competition)
@@ -53,7 +53,7 @@ def select(
         # show selected competition and match
         click.echo(f"You have selected {selected_competition['alias']} - {selected_match['alias']}")
     except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
-        error.error_handler()
+        error.handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")
 
@@ -86,12 +86,12 @@ def select_competition(competitions: list[Competition], competition_option: str 
         if isinstance(result_competition["competition"], str):
             competition_option = result_competition["competition"]
         else:
-            raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+            raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)
     if competition_option not in competition_aliases:
-        raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+        raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)
     selected_competition = next((c for c in competitions if c["alias"] == competition_option), None)
     if selected_competition is None:
-        raise UserInputError(UserInputErrorMessage.INPUT_COMPETITION_ERROR)
+        raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)
     return selected_competition
 
 
@@ -123,10 +123,10 @@ def select_match(matches: list[Match], match_option: str | None) -> Match:
         if isinstance(result_match["match"], str):
             match = result_match["match"]
         else:
-            raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
+            raise UserInputError(UserInputErrorMessage.MATCH_ERROR)
     if match not in match_aliases:
-        raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
+        raise UserInputError(UserInputErrorMessage.MATCH_ERROR)
     selected_match = next((m for m in matches if m["alias"] == match), None)
     if selected_match is None:
-        raise UserInputError(UserInputErrorMessage.INPUT_MATCH_ERROR)
+        raise UserInputError(UserInputErrorMessage.MATCH_ERROR)
     return selected_match

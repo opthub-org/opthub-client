@@ -6,7 +6,7 @@ from gql import gql
 
 from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
-from opthub_client.graphql.client import execute_query, get_gql_client
+from opthub_client.graphql.client import execute_graphql
 
 
 class Match(TypedDict):
@@ -26,7 +26,6 @@ def fetch_matches_by_competition(comp_id: str, comp_alias: str) -> list[Match]:
     Returns:
         list[Match]: Matches related to the competition
     """
-    client = get_gql_client()
     query = gql("""
         query getMatchesByCompetition(
         $id: String,
@@ -74,12 +73,10 @@ def fetch_matches_by_competition(comp_id: str, comp_alias: str) -> list[Match]:
         }
         }""")
     try:
-        result = execute_query(client, query, variables={"id": comp_id, "alias": comp_alias})
+        result = execute_graphql(query, variables={"id": comp_id, "alias": comp_alias})
     except GraphQLError as e:
         raise QueryError(resource="matches", detail=str(e.message)) from e
     data = result.get("getMatchesByCompetition")
-    if not data:
-        raise QueryError(resource="matches", detail="No data returned.")
     if not isinstance(data, list):
         raise QueryError(resource="matches", detail="Invalid data returned.")
     return [Match(id=match["id"], alias=match["alias"]) for match in data]

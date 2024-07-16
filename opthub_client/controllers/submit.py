@@ -35,28 +35,23 @@ from opthub_client.validators.solution import SolutionValidator
     is_flag=True,
     help="Flag to indicate file submission.",
 )
-def submit(match: str | None, competition: str | None, file: bool) -> None:
-    """Submit a solution.
-
-    Args:
-        match (str | None): option for match(-m or --match)
-        competition (str | None): option for competition(-c or --competition)
-        file (bool): option for file(-f or --file). if -f or --file is provided, it will be a file submission.
-    """
+@click.pass_context
+def submit(ctx: click.Context, match: str | None, competition: str | None, file: bool) -> None:  # noqa: ARG001
+    """Submit a solution."""
     try:
         check_current_version_status()
         match_selection_context = MatchSelectionContext()
         selected_competition, selected_match = match_selection_context.get_selection(match, competition)
         raw_solution_value = get_file_submission() if file else get_text_submission()
         if not SolutionValidator.check_solution(raw_solution_value):
-            raise UserInputError(UserInputErrorMessage.INPUT_SOLUTION_ERROR)
+            raise UserInputError(UserInputErrorMessage.SOLUTION_ERROR)
         click.echo(
             f"Submitting to {selected_competition['alias']}/{selected_match['alias']}...",
         )
         create_solution(selected_match["id"], raw_solution_value)
         click.echo("...Submitted.")
     except (AuthenticationError, MutationError, CacheIOError, UserInputError) as error:
-        error.error_handler()
+        error.handler()
     except Exception:
         click.echo("Unexpected error occurred. Please try again later.")
 
@@ -82,10 +77,10 @@ def get_file_submission() -> str:
     ]
     result = prompt(questions)
     if not isinstance(result, dict):
-        raise UserInputError(UserInputErrorMessage.INPUT_FILE_ERROR)
+        raise UserInputError(UserInputErrorMessage.FILE_ERROR)
     file_path = result.get("file")
     if not isinstance(file_path, str):
-        raise UserInputError(UserInputErrorMessage.INPUT_FILE_PATH_ERROR)
+        raise UserInputError(UserInputErrorMessage.FILE_PATH_ERROR)
     full_path = Path(file_path).expanduser()
     return full_path.read_text()
 
@@ -108,5 +103,5 @@ def get_text_submission() -> str:
     ]
     result = prompt(questions)
     if not isinstance(result, dict) or "solution" not in result:
-        raise UserInputError(UserInputErrorMessage.INPUT_SOLUTION_ERROR)
+        raise UserInputError(UserInputErrorMessage.SOLUTION_ERROR)
     return str(result["solution"])

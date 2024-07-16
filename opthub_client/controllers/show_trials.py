@@ -18,35 +18,6 @@ from opthub_client.models.trial import fetch_trials_async
 from opthub_client.view.display_trials import display_trials, user_interaction_message, user_interaction_message_style
 
 
-async def fetch_and_display_trials(
-    selected_match_id: str,
-    page: int,
-    size: int,
-    trial_from: int,
-    detail: bool,
-    asc: bool,
-    success: bool,
-) -> bool:
-    """Fetch and display the trials. Returns True if more trials are available, False if no more trials.
-
-    Args:
-        selected_match_id (str): selected match id
-        page (int): Page number
-        size (int): Number of trials to display
-        detail (bool): True for detailed information, false for general information
-        asc (bool): True for show trials in ascending order, false for descending order
-
-    Returns:
-        bool: True if more trials are available, False if no more trials
-    """
-    trials, is_first, is_last = await fetch_trials_async(selected_match_id, page, size, trial_from, asc, success)
-    run_in_terminal(lambda: display_trials(trials, detail), render_cli_done=False)
-    if (asc and is_last) or (not asc and is_first):
-        run_in_terminal(lambda: click.echo("No more trials."), render_cli_done=False)
-        return False
-    return True
-
-
 @click.command(name="trials")
 @click.option("-c", "--competition", type=str, help="Competition ID.")
 @click.option("-m", "--match", type=str, help="Match ID.")
@@ -70,7 +41,7 @@ async def fetch_and_display_trials(
 @click.option("-suc", "--success", is_flag=True, help="Show only successful trials")
 @click.pass_context
 def show_trials(
-    ctx: click.Context,
+    ctx: click.Context,  # noqa: ARG001
     competition: str | None,
     match: str | None,
     size: int,
@@ -85,11 +56,11 @@ def show_trials(
         match_selection_context = MatchSelectionContext()
         selected_match = match_selection_context.get_match(match, competition)
         bindings = KeyBindings()
-        # trial_from is decremented by 1 if it is greater than 0 and ascending is True
-        trial_from = trial_from - 1 if trial_from > 0 and ascending else trial_from
         page = 0
         has_all_trials_displayed = False
         tasks = []
+        # trial_from is 0 and ascending is True, then increment trial_from by 1 because trial number starts from 1.
+        trial_from = trial_from + 1 if trial_from == 0 and ascending else trial_from
 
         async def next_trials() -> None:
             nonlocal page, has_all_trials_displayed
@@ -109,7 +80,7 @@ def show_trials(
 
         # n key is to display next batch of solutions
         @bindings.add("n")
-        def add_trials(event: KeyPressEvent) -> None:
+        def add_trials(event: KeyPressEvent) -> None:  # noqa: ARG001
             """Display next batch of solutions."""
             if not has_all_trials_displayed:
                 task = asyncio.create_task(next_trials())
@@ -120,7 +91,7 @@ def show_trials(
         @bindings.add("e")  # e for exit
         @bindings.add("q")  # q for exit
         @bindings.add("c-c")  # Ctrl-C for exit
-        def exit_trials_view(event: KeyPressEvent) -> None:
+        def exit_trials_view(event: KeyPressEvent) -> None:  # noqa: ARG001
             """Exit the application."""
             session.app.exit()
 
@@ -148,6 +119,43 @@ def show_trials(
             style=user_interaction_message_style(),
         )
     except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
-        error.error_handler()
-    except Exception:
-        click.echo("Unexpected error occurred. Please try again later.")
+        error.handler()
+
+
+async def fetch_and_display_trials(
+    selected_match_id: str,
+    page: int,
+    size: int,
+    trial_from: int,
+    detail: bool,
+    asc: bool,
+    success: bool,
+) -> bool:
+    """Fetch and display the trials. Returns True if more trials are available, False if no more trials.
+
+    Args:
+        selected_match_id (str): selected match id
+        page (int): Page number
+        size (int): Number of trials to display
+        trial_from (int): Trial number to start from
+        detail (bool): True for detailed information, false for general information
+        asc (bool): True for show trials in ascending order, false for descending order
+        success (bool): True for show only successful trials, false for all trials
+
+    Returns:
+        bool: True if more trials are available, False if no more trials
+    """
+    trials, is_first, is_last = await fetch_trials_async(
+        match_id=selected_match_id,
+        page=page,
+        page_size=size,
+        limit=size,
+        offset=trial_from,
+        is_asc=asc,
+        display_only_success=success,
+    )
+    run_in_terminal(lambda: display_trials(trials, detail), render_cli_done=False)
+    if (asc and is_last) or (not asc and is_first):
+        run_in_terminal(lambda: click.echo("No more trials."), render_cli_done=False)
+        return False
+    return True

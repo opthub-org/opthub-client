@@ -16,15 +16,18 @@ class SolutionValidator:
         Returns:
             bool: True if the solution is valid, False otherwise.
         """
-        variable = json.loads(raw_solution)
-        # variable is not list
-        if isinstance(variable, list):
-            return True
-        variable = [variable]
         try:
-            # each element of variable is float or int
-            variable = list(map(float, variable))
-        except ValueError:
-            # if any element of variable is not float or int
+            variable = json.loads(raw_solution)
+            # Check if variable is a scalar number (int or float)
+            if isinstance(variable, (int | float)):
+                return True
+            # Check if variable is a list of numbers
+            if isinstance(variable, list):
+                # Each element of variable is float or int
+                variable = list(map(float, variable))
+                return all(isinstance(value, (float)) for value in variable)
+        except (ValueError, json.JSONDecodeError):
             return False
-        return all(isinstance(value, (int | float)) for value in variable)
+        else:
+            # If variable is not a scalar number or a list of numbers return false
+            return False

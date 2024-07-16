@@ -17,7 +17,7 @@ def display_trial(trial: Trial | None, is_detail: bool) -> None:
 
 def display_trials(trials: list[Trial], is_detail: bool) -> None:
     """Display the trials."""
-    if trials is None:
+    if len(trials) == 0:
         click.echo("No solutions to display.")
     else:
         lines = ""

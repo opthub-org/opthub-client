@@ -87,6 +87,7 @@ lint.ignore = [
     "TRY301",   # Allow abstract `raise` to an inner function
     "DTZ005",   # Allow timezone naive datetime
     "BLE001",   # Allow builtin exceptions
+    "PLR0913",  # Allow too many arguments
 ]
 
 [tool.ruff.lint.pydocstyle]

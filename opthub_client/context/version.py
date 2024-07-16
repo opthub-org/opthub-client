@@ -6,7 +6,7 @@ from pathlib import Path
 from opthub_client.errors.cache_io_error import CacheIOError, CacheIOErrorMessage
 
 
-def get_version_from_file() -> str:
+def get_version_from_toml() -> str:
     """Read version from pyproject.toml file.
 
     Returns:
