@@ -1,3 +1,5 @@
+[日本語版](https://github.com/opthub-org/opthub-client/blob/main/README_ja.md) 👈
+
 # OptHub Client
 
 ![Skills](https://skillicons.dev/icons?i=py,graphql,vscode,github)
