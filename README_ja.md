@@ -13,7 +13,7 @@ Opthub Clientは、以下の機能を提供するPythonパッケージです。
 
 ## インストール
 
-事前に、Python 3.10以上をインストールして、pipを使えるように設定してください。その後、以下のコマンドを実行して、PyPIからopthub-clientをインストールします。
+事前に、Python 3.10以上をインストールして、パッケージマネージャーとしてpipを使えるように設定してください。その後、以下のコマンドを実行して、PyPIからopthub-clientをインストールします。
 
 ```bash
 pip install opthub-client

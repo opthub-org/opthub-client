@@ -2,10 +2,19 @@
 
 ![Skills](https://skillicons.dev/icons?i=py,graphql,vscode,github)
 
-OptHub Client is a CLI tool for OptHub. It offers the following features:
+The Opthub Client is a Python package that provides the following features:
 
-- Submit your solutions.
-- View your submitted solutions and their statuses.
+- Submitting solutions to OptHub competitions
+- Checking the history and status of solutions submitted to OptHub competitions
+
+This repository explains how to install the Opthub Client and how to submit solutions to OptHub competitions.
+
+## Installation
+Make sure you have Python 3.10 or higher installed and that you have set up pip as your package manager. Then, run the following command to install opthub-client from PyPI.
+
+```bash
+pip install opthub-client
+```
 
 ## For Contributors
 
@@ -23,8 +32,9 @@ Follow these steps to set up the environment:
 
 Once you have completed the above setup, you can use the `opt` command in the project's root directory.
 
-## Contact
+## Contact <a id="Contact"></a>
 
 If you have any questions or concerns, please feel free to contact us (Email: dev@opthub.ai).
 
+<img src="https://opthub.ai/assets/images/logo.svg" width="200">
 
