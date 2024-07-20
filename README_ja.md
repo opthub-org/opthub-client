@@ -30,20 +30,20 @@ OptHub CLIで解を送信するには、事前にアカウントを作成し、�
 `opt login`を実行し、ユーザー名、パスワードを入力します*。成功したメッセージが表示されればログイン完了です。
 ```bash
 $ opt login
-Username: user_name # 自分のユーザー名
-Password: *******   # 自分のパスワード
-Hello user_name. Successfully logged in.
+Username: [username] # 自分のユーザー名
+Password: [password]   # 自分のパスワード
+Hello [username]. Successfully logged in.
 ```
 \*アカウントを作成し、メールアドレス確認が完了していることが前提です
 
 ### コンペ・競技の選択
 
-`opt select`を実行し、コンペと競技を選択します*。`You have selected competition1/match1`と表示されれば選択完了です。
+`opt select`を実行し、コンペと競技を選択します*。`You have selected [competition_id]/[match_id]`と表示されれば選択完了です。
 ```bash
 $ opt select
-? Select a competition: competition1 # ↑↓キーでコンペを選択
-? Select a match: match1 # ↑↓キーで競技を選択
-You have selected competition1/match1 # competition1、match1にはそれぞれコンペID、競技IDが入る
+? Select a competition: [competition_id] # ↑↓キーでコンペを選択
+? Select a match: [match_id] # ↑↓キーで競技を選択
+You have selected [competition_id]/[match_id] 
 ```
 \*コンペに参加していることが前提です
 
@@ -54,7 +54,7 @@ You have selected competition1/match1 # competition1、match1にはそれぞれ�
 ```bash
 $ opt submit
 ? Write the solution: 3 #ここでは「3」という解を入力 
-Submitting to competition1/match1... # 送信中
+Submitting to [competition_id]/[match_id]... # 送信中
 ...Submitted # 送信完了
 ```
 
@@ -63,7 +63,7 @@ Submitting to competition1/match1... # 送信中
 `opt show trials`を実行し、送信した解が表示されます。nキーで次の20件の解を表示、eキーで確認を終了できます。
 ```bash
 $ opt show trials # デフォルトで20件ずつ降順で表示される
-Trial No: 30, status: success, Score: 0.0001  # 解の番号とステータス、スコアが表示
+Trial No: 30, status: success, Score: 0.0001  # 試行番号とステータス、スコアが表示
 Trial No: 29, status: scoring # スコア計算中なのでスコアは表示されない
 Trial No: 28, status: evaluating
 ・・・
@@ -72,10 +72,10 @@ n: next solutions, e: exit # nキーで次の20件の解を表示、eキーで�
 
 ### ファイルでの解の確認
 
-`opt download`を入力します。ダウンロードが完了したら、表示されたjsonファイルを確認してください。
+`opt download`を入力します。ダウンロードが完了したら、表示されたjsonファイルを確認してください。jsonファイルの詳細は[こちら](https://opthub.notion.site/download-11519960ee914c9e91983f899cbfdbfa?pvs=4)
 
 ```bash
-$ opt download -s 10 -e 30 # 解No10から30をダウンロード
+$ opt download -s 10 -e 30 # 試行番号10から30をダウンロード
 Downloading trials  [####################################]  100%
 Trials have been written to trials_match1.json 
 ```
