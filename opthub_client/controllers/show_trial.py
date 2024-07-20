@@ -26,7 +26,7 @@ def show_trial(
     detail: bool,
     trial_no: int,
 ) -> None:
-    """Check submitted solutions."""
+    """Check submitted solution."""
     try:
         check_current_version_status()
         match_selection_context = MatchSelectionContext()
