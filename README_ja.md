@@ -22,8 +22,8 @@ pip install opthub-client
 ## チュートリアル
 
 <!-- ここを変更する際にはnotionのチュートリアルも変更する必要あり -->
-CLIを使用するためには、アカウントを作成し、コンペに参加して置く必要があります。アカウントの作成方法やコンペの参加方法は[こちら](https://opthub.notion.site/1b96e2f4e9424db0934f297ee0351403?pvs=4)を確認してください。
-ターミナル上でログインから競技の選択、解の送信、解の確認までの流れを説明します。各コマンドの詳細は[こちら](https://opthub.notion.site/OptHub-Client-1fec52032bca4cdda14d5a28c0028952?pvs=4)を確認してください。
+OptHub CLIで解を送信するには、事前にアカウントを作成し、コンペに参加する必要があります。アカウントの作成方法やコンペの参加方法については[こちら](https://opthub.notion.site/1b96e2f4e9424db0934f297ee0351403?pvs=4)を確認してください。
+以下に、ターミナル上でのログインから競技の選択、解の送信、解の確認までの流れを説明します。各コマンドの詳細については[こちら](https://opthub.notion.site/OptHub-Client-1fec52032bca4cdda14d5a28c0028952?pvs=4)を確認してください。
 
 ### ログイン
 
@@ -34,33 +34,33 @@ Username: user_name # 自分のユーザー名
 Password: *******   # 自分のパスワード
 Hello user_name. Successfully logged in.
 ```
-\*アカウント作成、メールアドレス確認ができている前提としています
+\*アカウントを作成し、メールアドレス確認が完了していることが前提です
 
 ### コンペ・競技の選択
 
-`opt select`を実行し、コンペ・競技を選択します*。`You have selected competition1 - match1`と表示されればコンペ・競技の選択完了です。
+`opt select`を実行し、コンペと競技を選択します*。`You have selected competition1/match1`と表示されれば選択完了です。
 ```bash
 $ opt select
 ? Select a competition: competition1 # ↑↓キーでコンペを選択
 ? Select a match: match1 # ↑↓キーで競技を選択
-You have selected competition1 - match1 # competition1、match1にはそれぞれコンペ名、競技名が入る
+You have selected competition1/match1 # competition1、match1にはそれぞれコンペID、競技IDが入る
 ```
-\*コンペの参加ができている前提としています
+\*コンペの参加していることが前提です
 
 ### 解の送信
 
-`opt submit`を実行し、解を入力します。解を送信中というメッセージが表示され、`Submitted`という表示がでれば送信完了です。
+`opt submit`を実行し、解を入力します。送信中のメッセージが表示され、`Submitted`という表示されれば送信完了です。
 
 ```bash
 $ opt submit
 ? Write the solution: 3 #ここでは「3」という解を入力 
-Submitting to competition1/match1... # 送信中 competition1、match1にはコンペ名、競技名が表示されている
+Submitting to competition1/match1... # 送信中
 ...Submitted # 送信完了
 ```
 
 ### ターミナル上での解の確認
 
-`opt show trials`を実行し、解が表示されます。nキーで次の20件の解を表示、eキーで確認をやめることができます。
+`opt show trials`を実行し、送信した解が表示されます。nキーで次の20件の解を表示、eキーで確認を終了できます。
 ```bash
 $ opt show trials # デフォルトで20件ずつ降順で表示される
 Trial No: 30, status: success, Score: 0.0001  # 解の番号とステータス、スコアが表示
@@ -72,7 +72,7 @@ n: next solutions, e: exit # nキーで次の20件の解を表示、eキーで�
 
 ### ファイルでの解の確認
 
-`opt download`を入力します。ダウンロードし終えたら、表示されているjsonファイルを確認してください。
+`opt download`を入力します。ダウンロードが完了したら、表示されたjsonファイルを確認してください。
 
 ```bash
 $ opt download -s 10 -e 30 # 解No10から30をダウンロード
