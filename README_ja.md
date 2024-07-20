@@ -23,33 +23,93 @@ pip install opthub-client
 
 <!-- TODO: @tkumamoto -->
 <!-- アカウントを作成して、ログインして、コンペを選んで参加して、ターミナルでコンペを選択して、解を送信して確認するところまでを一通り説明する。詳しいコマンドの使い方はNotionを誘導する。 -->
-### アカウント作成
-アカウント作成の流れを説明します。
-1. ブラウザから下記URLにアクセスします
-<!-- TODO: 本番環境URL挿入 -->
-1. アカウント作成ボタンを押します
-2. ユーザーネーム、メールアドレス、パスワードを入力し、メールアドレス宛に届いたメールのURLをクリックします。ここでパスワードは大文字と小文字を含む英数字8文字以上にする必要があります
-3. Your registration has been confirmed!と出れば成功です
-
-### ログイン・コンペの参加
-ログインからコンペの参加までの流れを説明します。
-1. ブラウザから下記URLにアクセスします
-<!-- TODO: 本番環境URL挿入 -->
-2. ログインボタンを押します
-3. 作成したアカウントでログインします
-4. 左上のメニューから「コンペ」を選択します
-5. 「すべてのコンペ」から参加したい開催中のコンペを選択します
-6. 右上の「コンペに参加します」ボタンを押します
-
-### CLI操作
-CLI操作によってログインからコンペを選択、解を送信、解の確認までの流れを説明します。各コマンドの詳細は[こちら]()を確認ください。
+ターミナル操作を行う前に、アカウントを作成し、コンペに参加してください。アカウントの作成方法やコンペの参加方法は[こちら](https://opthub.notion.site/1b96e2f4e9424db0934f297ee0351403?pvs=4)を確認してください。
+ターミナル操作によってログインからコンペを選択、解を送信、解の確認までの流れを説明します。各コマンドの詳細は[こちら](https://opthub.notion.site/OptHub-Client-1fec52032bca4cdda14d5a28c0028952?pvs=4)を確認してください。
 <!-- TODO: URLを挿入 -->
-1. `opt login`でログインをします
-2. `opt select`で解を送信するコンペ、競技を選択します
-3. `opt submit`で解を送信します
-4. `opt show trials`でコマンドライン上で解を確認します。ファイルにダウンロードしたい場合は`opt download`でダウンロードしたファイルを確認してください
-
-
+1. `opt login`でログインをします。アカウント作成が完了していることを前提としています
+    ```bash
+    $ opt login
+    ```
+2. ユーザー名、パスワードを入力します
+    ```bash
+    $ opt login
+    Username: user_name # 自分のユーザー名
+    Password: *******   # 自分のパスワード
+    ```
+3. 成功したメッセージが表示されればログイン完了です
+    ```bash
+    $ opt login
+    Username: user_name
+    Password: *******
+    Hello user_name. Successfully logged in.
+    ```
+4. `opt select`で解を送信するコンペ、競技を選択します
+    ```bash
+    $ opt select
+    ```
+5. 自分が参加しているコンペティションが表示されるので、コンペティションを選びます。
+    ```bash
+    $ opt select
+    ? Select a competition:
+    > competition1 # ↑↓キーで選択、Enterで決定します
+      competition2 
+    ```
+6. コンペティションを選択したら、次は競技を選択します
+    ```bash
+    $ opt select
+    ? Select a competition: competition1
+    ? Select a match:
+    > match1 # ↑↓キーで選択、Enterで決定します
+      match2
+    ```
+7. `You have selected competition1 - match1`と表示されれば競技の選択完了です
+   ```bash
+    $ opt select
+    ? Select a competition: competition1
+    ? Select a match:
+    You have selected competition1 - match1 # competition1、match1にはそれぞれコンペ名、競技名が入る
+    ```
+8.  `opt submit`で解を送信します
+    ```bash
+    # selectによって選んだ競技に解を送信する 
+    $ opt submit
+    ```
+9. 解を入力します
+    ```bash
+    $ opt submit
+    ? Write the solution: 3 #ここでは「3」という解を入力 
+    ```
+10. 解を送信中というメッセージが表示され、`Submitted`という表示がでれば送信完了です
+     ```bash
+    $ opt submit
+    ? Write the solution: 3
+    Submitting to competition1/match1... # 送信中 competition1、match1にはコンペ名、競技名が表示されている
+    ...Submitted # 送信完了
+    ```
+11. `opt show trials`でターミナル上で解を確認します。
+    ```bash
+    # selectによって選んだ競技に送信した解を確認する 
+    $ opt show trials
+    ```
+12. 解が表示される
+     ```bash
+    $ opt show trials # デフォルトで20件ずつ表示される
+    Trial No: 1, status: evaluating # 解の番号とステータスが表示
+    n: next solutions, e: exit # nキーで次の20件の解を表示、eキーで確認をやめる
+    ```
+13. 解の情報をファイルで確認したい場合は`opt download`で確認できる
+    ```bash
+    # selectによって選んだ競技に送信した解をダウンロードする
+    # デフォルトでは解No1からNo50までをダウンロードする
+    $ opt download
+    ```
+14. 解をダウンロードし終わったら、表示されているjsonファイルを確認する
+    ```
+    $ opt download
+    Downloading trials  [####################################]  100%
+    # ダウンロードの進捗が表示
+    Trials have been written to trials_match1.json # trials_マッチ名.jsonファイルがダウンロードされる
+    ```
 ## 開発者の方へ
 1. 本リポジトリをclone
 2. Poetryの設定
