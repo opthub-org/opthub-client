@@ -16,7 +16,7 @@ Opthub Clientは、以下の機能を提供するPythonパッケージです。
 事前に、Python 3.10以上をインストールして、パッケージマネージャーとしてpipを使えるように設定してください。その後、以下のコマンドを実行して、PyPIからopthub-clientをインストールします。
 
 ```bash
-pip install opthub-client
+$ pip install opthub-client
 ```
 
 ## チュートリアル
@@ -49,11 +49,11 @@ You have selected [competition_id]/[match_id]
 
 ### 解の送信
 
-`opt submit`を実行し、解を入力します。送信中のメッセージが表示され、`Submitted`という表示されれば送信完了です。
+`opt submit`を実行し、解を入力します。送信中のメッセージが表示され、`Submitted`という表示されれば送信完了です。[solution]には、小数や整数、配列を入力します。ファイル形式での入力も可能です(ファイル形式については[こちら](https://opthub.notion.site/submit-8a6268ea5fb64dacb8fbcd57cf33f21a?pvs=4]))。
 
 ```bash
 $ opt submit
-? Write the solution: 3 #ここでは「3」という解を入力 
+? Write the solution: [solution] #解を入力 
 Submitting to [competition_id]/[match_id]... # 送信中
 ...Submitted # 送信完了
 ```
