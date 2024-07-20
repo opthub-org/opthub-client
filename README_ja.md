@@ -45,7 +45,7 @@ $ opt select
 ? Select a match: match1 # ↑↓キーで競技を選択
 You have selected competition1/match1 # competition1、match1にはそれぞれコンペID、競技IDが入る
 ```
-\*コンペの参加していることが前提です
+\*コンペに参加していることが前提です
 
 ### 解の送信
 
