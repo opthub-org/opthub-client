@@ -49,11 +49,11 @@ You have selected [competition_id]/[match_id]
 
 ### 解の送信
 
-`opt submit`を実行し、解を入力します。送信中のメッセージが表示され、`Submitted`という表示されれば送信完了です。[solution]には、小数や整数、配列を入力します。ファイル形式での入力も可能です(ファイル形式については[こちら](https://opthub.notion.site/submit-8a6268ea5fb64dacb8fbcd57cf33f21a?pvs=4]))。
+`opt submit`を実行し、解を入力します。送信中のメッセージが表示され、`Submitted`という表示されれば送信完了です。[your_solution]には、floatやint型の数値、それらの配列を入力します。ファイル形式での入力も可能です(ファイル形式の入力については[こちら](https://opthub.notion.site/submit-8a6268ea5fb64dacb8fbcd57cf33f21a?pvs=4]))。
 
 ```bash
 $ opt submit
-? Write the solution: [solution] #解を入力 
+? Write the solution: [your_solution] #解を入力 
 Submitting to [competition_id]/[match_id]... # 送信中
 ...Submitted # 送信完了
 ```
