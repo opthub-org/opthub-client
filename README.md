@@ -63,7 +63,7 @@ Submitting to [competition_id]/[match_id]... # Submitting
 ...Submitted # Submission complete
 ```
 
-👉 [How to Submit a Solution from a File](https://opthub.notion.site/show-trials-Check-the-solutions-bd3b16ce953e4976bf0c8048cf19e0dd?pvs=4)
+👉 [How to Submit a Solution from a File](https://opthub.notion.site/submit-Submit-a-solution-2192134bad9b40c39670b567dd6d8f3f?pvs=4)
 
 ### Check Submitted Solutions
 
