@@ -22,9 +22,8 @@ pip install opthub-client
 ## チュートリアル
 
 <!-- ここを変更する際にはnotionのチュートリアルも変更する必要あり -->
-ターミナル操作を行う前に、アカウントを作成し、コンペに参加してください。アカウントの作成方法やコンペの参加方法は[こちら](https://opthub.notion.site/1b96e2f4e9424db0934f297ee0351403?pvs=4)を確認してください。
-ターミナル操作によってログインからコンペを選択、解を送信、解の確認までの流れを説明します。各コマンドの詳細は[こちら](https://opthub.notion.site/OptHub-Client-1fec52032bca4cdda14d5a28c0028952?pvs=4)を確認してください。
-<!-- TODO: URLを挿入 -->
+CLIを使用するためには、アカウントを作成し、コンペに参加して置く必要があります。アカウントの作成方法やコンペの参加方法は[こちら](https://opthub.notion.site/1b96e2f4e9424db0934f297ee0351403?pvs=4)を確認してください。
+ターミナル上でログインから競技の選択、解の送信、解の確認までの流れを説明します。各コマンドの詳細は[こちら](https://opthub.notion.site/OptHub-Client-1fec52032bca4cdda14d5a28c0028952?pvs=4)を確認してください。
 
 ### ログイン
 
@@ -35,7 +34,7 @@ Username: user_name # 自分のユーザー名
 Password: *******   # 自分のパスワード
 Hello user_name. Successfully logged in.
 ```
-＊アカウント作成、メールアドレス確認ができている前提としています
+\*アカウント作成、メールアドレス確認ができている前提としています
 
 ### コンペ・競技の選択
 
@@ -46,14 +45,13 @@ $ opt select
 ? Select a match: match1 # ↑↓キーで競技を選択
 You have selected competition1 - match1 # competition1、match1にはそれぞれコンペ名、競技名が入る
 ```
-＊コンペの参加ができている前提としています
+\*コンペの参加ができている前提としています
 
 ### 解の送信
 
 `opt submit`を実行し、解を入力します。解を送信中というメッセージが表示され、`Submitted`という表示がでれば送信完了です。
 
 ```bash
-# selectによって選んだ競技に解を送信する 
 $ opt submit
 ? Write the solution: 3 #ここでは「3」という解を入力 
 Submitting to competition1/match1... # 送信中 competition1、match1にはコンペ名、競技名が表示されている
@@ -64,9 +62,11 @@ Submitting to competition1/match1... # 送信中 competition1、match1にはコ�
 
 `opt show trials`を実行し、解が表示されます。nキーで次の20件の解を表示、eキーで確認をやめることができます。
 ```bash
-# selectによって選んだ競技に送信した解を確認する 
-$ opt show trials # デフォルトで20件ずつ表示される
-Trial No: 1, status: evaluating # 解の番号とステータスが表示
+$ opt show trials # デフォルトで20件ずつ降順で表示される
+Trial No: 30, status: evaluating # 解の番号とステータスが表示
+Trial No: 29, status: scoring
+Trial No: 28, status: evaluator_failed
+・・・
 n: next solutions, e: exit # nキーで次の20件の解を表示、eキーで確認をやめる
 ```
 
@@ -75,12 +75,9 @@ n: next solutions, e: exit # nキーで次の20件の解を表示、eキーで�
 `opt download`を入力します。ダウンロードし終えたら、表示されているjsonファイルを確認してください。
 
 ```bash
-# selectによって選んだ競技に送信した解をダウンロードする
-# デフォルトでは解No1からNo50までをダウンロードする
-$ opt download
+$ opt download -s 10 -e 30 # 解No10から30をダウンロード
 Downloading trials  [####################################]  100%
-# ダウンロードの進捗が表示
-Trials have been written to trials_match1.json # trials_マッチ名.jsonファイルがダウンロードされる
+Trials have been written to trials_match1.json 
 ```
 
 ## 開発者の方へ
