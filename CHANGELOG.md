@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/opthub-org/opthub-client/compare/v0.1.2...v0.1.3) (2024-07-20)
+
+
+### Bug Fixes
+
+* fix depencies ([332a1ed](https://github.com/opthub-org/opthub-client/commit/332a1ed16db8915e2d9a16d74aba9b50145e6337))
+
 ## [0.1.2](https://github.com/opthub-org/opthub-client/compare/v0.1.1...v0.1.2) (2024-07-20)
 
 
