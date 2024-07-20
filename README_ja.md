@@ -23,6 +23,7 @@ pip install opthub-client
 
 <!-- TODO: @tkumamoto -->
 <!-- アカウントを作成して、ログインして、コンペを選んで参加して、ターミナルでコンペを選択して、解を送信して確認するところまでを一通り説明する。詳しいコマンドの使い方はNotionを誘導する。 -->
+<!-- ここを変更する際にはhttps://www.notion.so/opthub/OptHub-Client-1fec52032bca4cdda14d5a28c0028952ここのnotionのチュートリアルも変更する必要あり -->
 ターミナル操作を行う前に、アカウントを作成し、コンペに参加してください。アカウントの作成方法やコンペの参加方法は[こちら](https://opthub.notion.site/1b96e2f4e9424db0934f297ee0351403?pvs=4)を確認してください。
 ターミナル操作によってログインからコンペを選択、解を送信、解の確認までの流れを説明します。各コマンドの詳細は[こちら](https://opthub.notion.site/OptHub-Client-1fec52032bca4cdda14d5a28c0028952?pvs=4)を確認してください。
 <!-- TODO: URLを挿入 -->
