@@ -9,7 +9,7 @@ The Opthub Client is a Python package that provides the following features:
 - Submitting solutions to OptHub competitions
 - Checking the history and status of solutions submitted to OptHub competitions
 
-This section explains how to install the OptHub Client and provides a tutorial. For more detailed instructions, please refer to the [OptHub Client User Guide](https://opthub.notion.site/OptHub-Client-1fec52032bca4cdda14d5a28c0028952?pvs=4).
+This section explains how to install the OptHub Client and provides a tutorial. For more detailed instructions, please refer to the [OptHub Client User Guide](https://opthub.notion.site/OptHub-Client-User-Guide-ece08c9977ec4733b7cbeb2d5bafb797?pvs=4).
 
 ## Installation
 Make sure you have Python 3.10 or higher installed and that you have set up pip as your package manager. Then, run the following command to install opthub-client from PyPI.
@@ -24,7 +24,7 @@ In this tutorial, we will explain how to submit solutions for the competitions y
 
 To submit solutions, you need to create an account and join a competition beforehand.
 
-👉 [How to Create an Account and Join a Competition](https://opthub.notion.site/1b96e2f4e9424db0934f297ee0351403?pvs=4)
+👉 [How to Create an Account and Join a Competition](https://opthub.notion.site/Tutorial-23febfdfbb7c41d0893a6681f3e7ae20?pvs=4)
 
 ### Login
 
@@ -63,7 +63,7 @@ Submitting to [competition_id]/[match_id]... # Submitting
 ...Submitted # Submission complete
 ```
 
-👉 [How to Submit a Solution from a File](https://opthub.notion.site/submit-8a6268ea5fb64dacb8fbcd57cf33f21a?pvs=4)
+👉 [How to Submit a Solution from a File](https://opthub.notion.site/show-trials-Check-the-solutions-bd3b16ce953e4976bf0c8048cf19e0dd?pvs=4)
 
 ### Check Submitted Solutions
 
@@ -89,7 +89,7 @@ Downloading trials  [####################################]  100%
 Trials have been written to trials_match1.json
 ```
 
-👉 [Format of the Output JSON File](https://opthub.notion.site/download-11519960ee914c9e91983f899cbfdbfa?pvs=4)
+👉 [Format of the Output JSON File](https://opthub.notion.site/download-Download-the-solutions-c77b44f02df24609a8f04490d6036e77?pvs=4)
 
 ## For Contributors
 
