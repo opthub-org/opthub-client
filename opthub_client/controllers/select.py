@@ -51,7 +51,7 @@ def select(
         selected_match = select_match(matches, match)
         match_selection_context.update(selected_competition, selected_match)
         # show selected competition and match
-        click.echo(f"You have selected {selected_competition['alias']} - {selected_match['alias']}")
+        click.echo(f"You have selected {selected_competition['alias']}/{selected_match['alias']}")
     except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
         error.handler()
     except Exception:
