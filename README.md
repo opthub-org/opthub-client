@@ -19,7 +19,77 @@ pip install opthub-client
 ```
 
 ## Tutorial
-<!-- TODO: @tkumamoto -->
+
+In this tutorial, we will explain how to submit solutions for the competitions you are participating in and how to review the history of your submissions.
+
+To submit solutions, you need to create an account and join a competition beforehand.
+
+👉 [How to Create an Account and Join a Competition](https://opthub.notion.site/1b96e2f4e9424db0934f297ee0351403?pvs=4)
+
+### Login
+
+Execute `opt login` and enter your username and password.
+
+```bash
+$ opt login
+Username: [username] # Your username
+Password: [password]   # Your password
+Hello [username]. Successfully logged in.
+```
+
+⚠ You need to create an account and verify your email address beforehand.
+
+### Select a Competition and Match
+
+Execute `opt select` and select a competition and match.
+
+```bash
+$ opt select
+? Select a competition: [competition_id] # Use ↑↓ keys to select a competition
+? Select a match: [match_id] # Use ↑↓ keys to select a match
+You have selected [competition_id]/[match_id]
+```
+
+⚠ You need to join at least one competition beforehand.
+
+### Submit a Solution
+
+Execute `opt submit` and enter a solution according to the competition's input/output requirements.
+
+```bash
+$ opt submit
+? Write the solution: [your_solution] # Enter your solution
+Submitting to [competition_id]/[match_id]... # Submitting
+...Submitted # Submission complete
+```
+
+👉 [How to Submit a Solution from a File](https://opthub.notion.site/submit-8a6268ea5fb64dacb8fbcd57cf33f21a?pvs=4)
+
+### Check Submitted Solutions
+
+Execute `opt show trials` to display the solutions you have submitted. Press `n` to display the next 20 solutions, or press `e` to exit the check.
+
+```bash
+$ opt show trials # Displays 20 solutions in descending order by default
+Trial No: 30, status: success, Score: 0.0001
+Trial No: 29, status: scoring
+Trial No: 28, status: evaluating
+・・・
+n: next solutions, e: exit
+# Press n to display the next 20 solutions, e to exit the check
+```
+
+### Download Submitted Solutions
+
+Execute `opt download` to download the solutions by specifying the range of trial numbers.
+
+```bash
+$ opt download -s 10 -e 30 # Download trial numbers 10 to 30
+Downloading trials  [####################################]  100%
+Trials have been written to trials_match1.json
+```
+
+👉 [Format of the Output JSON File](https://opthub.notion.site/download-11519960ee914c9e91983f899cbfdbfa?pvs=4)
 
 ## For Contributors
 
