@@ -63,9 +63,9 @@ Submitting to competition1/match1... # 送信中 competition1、match1にはコ�
 `opt show trials`を実行し、解が表示されます。nキーで次の20件の解を表示、eキーで確認をやめることができます。
 ```bash
 $ opt show trials # デフォルトで20件ずつ降順で表示される
-Trial No: 30, status: evaluating # 解の番号とステータスが表示
-Trial No: 29, status: scoring
-Trial No: 28, status: success, Score: 0.0001
+Trial No: 30, status: success, Score: 0.0001  # 解の番号とステータス、スコアが表示
+Trial No: 29, status: scoring # スコア計算中なのでスコアは表示されない
+Trial No: 28, status: evaluating
 ・・・
 n: next solutions, e: exit # nキーで次の20件の解を表示、eキーで確認をやめる
 ```
