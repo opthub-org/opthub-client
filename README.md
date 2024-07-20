@@ -9,13 +9,13 @@ The Opthub Client is a Python package that provides the following features:
 - Submitting solutions to OptHub competitions
 - Checking the history and status of solutions submitted to OptHub competitions
 
-This repository explains how to install the Opthub Client and how to submit solutions to OptHub competitions.
+This section explains how to install the OptHub Client and provides a tutorial. For more detailed instructions, please refer to the [OptHub Client User Guide](https://opthub.notion.site/OptHub-Client-1fec52032bca4cdda14d5a28c0028952?pvs=4).
 
 ## Installation
 Make sure you have Python 3.10 or higher installed and that you have set up pip as your package manager. Then, run the following command to install opthub-client from PyPI.
 
 ```bash
-pip install opthub-client
+$ pip install opthub-client
 ```
 
 ## Tutorial
