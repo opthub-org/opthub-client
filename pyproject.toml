@@ -29,7 +29,8 @@ dependencies = [
     "boto3 >= 1.34",
     "cryptography >= 42.0.7",
     "jwcrypto >= 1.5.6",
-    "pyjwt >= 2.8.0"
+    "pyjwt >= 2.8.0",
+    "requests >= 2.31.0"
 ]
 
 [project.urls]
@@ -61,17 +62,17 @@ inquirerpy = "^0.3.4"
 gql = "^3.5.0"
 aiohttp = "^3.9.3"
 boto3 = "^1.34"
-boto3-stubs = {extras=["dynmodb","cognito"], version="^1.34"}
 cryptography = "^42.0.7"
 jwcrypto = "^1.5.6"
 pyjwt = "^2.8.0"
+requests = "^2.31.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.3"
 mypy = "^1.9.0"
 pytest = "^8.1.1"
-requests = "^2.31.0"
 types-requests = "^2.32.0.20240622"
+boto3-stubs = {extras=["dynmodb","cognito"], version="^1.34"}
 
 [tool.ruff]
 target-version = "py312"
