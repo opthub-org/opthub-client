@@ -4,13 +4,13 @@ import sys
 
 import click
 
-from opthub_client.context.version import get_version_from_toml
+from opthub_client.context.version import get_version_from_init
 from opthub_client.models.remote_message import get_version_status_messages
 
 
 def check_current_version_status() -> None:
     """This function gets the version message."""
-    version = get_version_from_toml()
+    version = get_version_from_init()
     messages = get_version_status_messages(version)
     exit_flag = False
     for message in messages:

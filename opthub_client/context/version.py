@@ -1,13 +1,10 @@
-"""Read version from toml file."""
+"""Read version from init.py file."""
 
-import tomllib
-from pathlib import Path
-
-from opthub_client.errors.cache_io_error import CacheIOError, CacheIOErrorMessage
+from opthub_client.__init__ import __version__
 
 
-def get_version_from_toml() -> str:
-    """Read version from pyproject.toml file.
+def get_version_from_init() -> str:
+    """Read version from [project]/init.py file.
 
     Returns:
         str: The version of the project as a string.
@@ -15,10 +12,5 @@ def get_version_from_toml() -> str:
     Raises:
         VersionNotFoundError: If the version cannot be found or is in an incorrect format.
     """
-    path = Path("pyproject.toml")
-    with path.open("rb") as file:
-        data = tomllib.load(file)
-    version = data["project"]["version"]
-    if not isinstance(version, str):
-        raise CacheIOError(CacheIOErrorMessage.VERSION_FILE_READ_FAILED)
+    version = __version__
     return version
