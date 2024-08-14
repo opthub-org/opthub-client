@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/opthub-org/opthub-client/compare/v0.1.3...v0.2.0) (2024-08-14)
+
+
+### Features
+
+* read version from init.py instead of toml.file ([b939238](https://github.com/opthub-org/opthub-client/commit/b939238eb894270c9a470ecdf98d8788a3baaee9))
+
+
+### Bug Fixes
+
+* revise read version ([9b3d005](https://github.com/opthub-org/opthub-client/commit/9b3d005ee3c28c2742f9bf416e514e7c56eb00ad))
+
 ## [0.1.3](https://github.com/opthub-org/opthub-client/compare/v0.1.2...v0.1.3) (2024-07-20)
 
 
