@@ -2,7 +2,7 @@
 
 import click
 
-from opthub_client.models.api_key import get_api_key
+from opthub_client.models.api_key import ApiKey, get_api_key
 
 
 @click.command(name="api_key")
@@ -20,6 +20,15 @@ def api_key(
         if not is_proceed:
             return
     api_key = get_api_key(force)
+    show_message(api_key)
+
+
+def show_message(api_key: ApiKey) -> None:
+    """Show message.
+
+    Args:
+        api_key (ApiKey): api key
+    """
     click.echo(click.style("The API key will only be displayed once.", fg="red", bold=True))
     click.echo(f"API_KEY: {api_key['value']}")
     click.echo(f"Expires at: {api_key['expires_at']}")
