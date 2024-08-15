@@ -20,7 +20,7 @@ def api_key(
         if not is_proceed:
             return
     api_key = get_api_key(force)
-    click.echo(click.style("WARNING: The API key will only be displayed once.", fg="red", bold=True))
+    click.echo(click.style("The API key will only be displayed once.", fg="red", bold=True))
     click.echo(f"API_KEY: {api_key['value']}")
     click.echo(f"Expires at: {api_key['expires_at']}")
     click.echo("Please store the API key in a safe place. Using the API key allows you to submit and verify solutions.")
