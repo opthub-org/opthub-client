@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/opthub-org/opthub-client/compare/v0.1.3...v0.2.0) (2024-08-16)
+
+
+### Features
+
+* create api_key command ([#121](https://github.com/opthub-org/opthub-client/issues/121)) ([6c58311](https://github.com/opthub-org/opthub-client/commit/6c58311f2c516a81a1cc3a3faca96e6c60376e1b))
+
 ## [0.1.3](https://github.com/opthub-org/opthub-client/compare/v0.1.2...v0.1.3) (2024-07-20)
 
 
