@@ -16,7 +16,7 @@ class ApiKey(TypedDict):
     value: str
 
 
-def get_api_key(force: bool) -> ApiKey:
+def create_api_key(force: bool) -> ApiKey:
     """Create and get API key from the server."""
     query = gql("""
         query createAPIKey(

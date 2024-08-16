@@ -2,7 +2,7 @@
 
 import click
 
-from opthub_client.models.api_key import ApiKey, get_api_key
+from opthub_client.models.api_key import ApiKey, create_api_key
 
 
 @click.command(name="api_key")
@@ -19,7 +19,7 @@ def api_key(
         is_proceed = click.confirm("The issued API_KEY will become invalid. Are you sure you want to proceed?")
         if not is_proceed:
             return
-    api_key = get_api_key(force)
+    api_key = create_api_key(force)
     show_message(api_key)
 
 
