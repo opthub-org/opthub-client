@@ -2,6 +2,7 @@
 
 import click
 
+from opthub_client.controllers.create import create
 from opthub_client.controllers.download import download
 from opthub_client.controllers.help import help
 from opthub_client.controllers.login import login
@@ -36,3 +37,4 @@ opt.add_command(help)
 opt.add_command(login)
 opt.add_command(logout)
 opt.add_command(download)
+opt.add_command(create)
