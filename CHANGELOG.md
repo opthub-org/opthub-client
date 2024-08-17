@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/opthub-org/opthub-client/compare/v0.2.0...v0.3.0) (2024-08-17)
+
+
+### Features
+
+* Modify url, jwks url, and client id ([9847b82](https://github.com/opthub-org/opthub-client/commit/9847b82f2b5195b33d84a7794625e5be509a4975))
+
 ## [0.2.0](https://github.com/opthub-org/opthub-client/compare/v0.1.3...v0.2.0) (2024-08-16)
 
 
