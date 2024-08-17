@@ -15,8 +15,8 @@ from opthub_client.context.utils import get_opthub_client_dir
 from opthub_client.errors.authentication_error import AuthenticationError, AuthenticationErrorMessage
 
 FILE_NAME = "credentials"
-CLIENT_ID = "24nvfsrgbuvu75h4o8oj2c2oek"
-JWKS_URL = "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_1Y69fktA0/.well-known/jwks.json"
+CLIENT_ID = "7t7snlnn801j8mjsf97eaart1s"
+JWKS_URL = "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_9TAMGx5NT/.well-known/jwks.json"
 
 
 class Credentials:

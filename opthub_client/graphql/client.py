@@ -10,7 +10,7 @@ from graphql import DocumentNode
 from opthub_client.context.credentials import Credentials
 from opthub_client.errors.graphql_error import GraphQLError
 
-URL = "https://jciqso7l7rhajfkt5s3dhybpcu.appsync-api.ap-northeast-1.amazonaws.com/graphql"
+URL = "https://tf5tepcpn5bori46x5cyxh3ehe.appsync-api.ap-northeast-1.amazonaws.com/graphql"
 
 
 def get_gql_client() -> Client:
