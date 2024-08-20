@@ -50,6 +50,7 @@ class Match:
     """A class representing a match in a competition."""
 
     id: UUID
+    client: raw.ApiClient
 
     def submit(self, solution: ArrayLike) -> SubmitResult:
         """Submit a solution."""
@@ -82,6 +83,7 @@ class Competition:
     """A class representing a competition."""
 
     id: UUID
+    client: raw.ApiClient
 
     @property
     def alias(self) -> str:
