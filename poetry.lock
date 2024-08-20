@@ -1382,7 +1382,7 @@ urllib3 = ">= 1.25.3"
 [package.source]
 type = "git"
 url = "https://github.com/opthub-org/opthub-api-client-python"
-reference = "3b715a1e"
+reference = "3b715a1e83fc014b8a67be223b6a35478f9795fc"
 resolved_reference = "3b715a1e83fc014b8a67be223b6a35478f9795fc"
 
 [[package]]
@@ -1904,4 +1904,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "ebe916094a7f6955ed7588d21bb64ce70bed36928b16f92b2d6c1d68a22dbacc"
+content-hash = "66d2361ab7df87f732eea581ec237774d7b8151bd05cea63ceea3e6d3666277f"

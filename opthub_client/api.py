@@ -13,39 +13,87 @@ from uuid import UUID
 import numpy as np
 import opthub_api_client as raw
 from numpy.typing import ArrayLike, NDArray
+from opthub_api_client import ParticipantType
 
-__all__ = ["raw", "OptHub", "Participant", "SubmitResult", "GetTrialResult"]
+__all__ = ["raw", "OptHub", "Match", "Participant", "Competition", "SubmitResult", "GetTrialResult", "ParticipantType"]
 
 
-class Participant:
-    """A class representing a match in a competition."""
+class Participant(NamedTuple):
+    """A class representing a participant."""
 
     id: UUID
+    type: ParticipantType
 
-    def __init__(self, participant_id: UUID) -> None:
-        """Creates a match instance from a match ID."""
-        self.id = participant_id
+    @property
+    def alias(self) -> str:
+        """Retrieve the alias name of the participant."""
+        raise NotImplementedError
 
 
 class SubmitResult(NamedTuple):
     """A record representing the result of a solution submission."""
 
-    match: str
-    participant_type: raw.ParticipantType
-    participant: str
+    participant: Participant
     trial_no: int
 
 
 class GetTrialResult(NamedTuple):
     """A record representing the result of trial retrieval."""
 
-    match: str
-    participant_type: raw.ParticipantType
-    participant: str
-    trial_no: int
+    participant: Participant
     variable: NDArray[np.double]
     created_at: datetime
     user: str | None
+
+
+class Match:
+    """A class representing a match in a competition."""
+
+    id: UUID
+
+    def submit(self, solution: ArrayLike) -> SubmitResult:
+        """Submit a solution."""
+        vector = np.array(solution, dtype=np.double).flatten()
+
+        res = raw.SolutionApi(self.client).create_solution(self.id, vector)
+
+        return SubmitResult(Participant(res.participant_id, res.participant_type), res.trial_no)
+
+    def get_trial(self, participant: Participant, trial_no: int) -> GetTrialResult | None:
+        """Retrieve a past submitted trial."""
+        res = raw.SolutionApi(self.client).get_solution(self.match, participant.id, trial_no)
+
+        variable = np.array(res.variable, dtype=np.double)
+
+        return GetTrialResult(
+            Participant(res.participant_id, res.participant_type),
+            variable,
+            res.created_at,
+            res.user_id,
+        )
+
+    @property
+    def alias(self) -> str:
+        """Retrieve the alias name of the match."""
+        raise NotImplementedError
+
+
+class Competition:
+    """A class representing a competition."""
+
+    id: UUID
+
+    @property
+    def alias(self) -> str:
+        """Retrieve the alias name of the competition."""
+        raise NotImplementedError
+
+    def match(self, alias: str | None) -> Match:
+        """Retrieve a match by its alias name.
+
+        If no alias name is specified, return the default one.
+        """
+        raise NotImplementedError
 
 
 class OptHub:
@@ -61,29 +109,12 @@ class OptHub:
 
         self.client = raw.ApiClient(conf)
 
-    def submit(self, competition: str | None, match: str | None, solution: ArrayLike) -> SubmitResult:
-        """Submit a solution."""
-        vector = np.array(solution, dtype=np.double).flatten()
-        match_id = self.resolve_match(competition, match)
+    def competition(self, alias: str | None) -> Competition:
+        """Retrieve a competition by its alias name.
 
-        res = raw.SolutionApi(self.client).create_solution(match_id, vector)
-
-        match = self.reverse_match(res.match_id)
-        participant = self.reverse_participant(res.participant_id)
-        return SubmitResult(match, res.participant_type, participant, res.trial_no)
-
-    def get_trial(self, competition: str, match: str | None, participant: str | None, trial_no: int) -> GetTrialResult:
-        """Retrieve a past submitted trial."""
-        match_id = self.resolve_match(competition, match)
-        participant_id = self.resolve_participant(participant)
-
-        res = raw.SolutionApi(self.client).get_solution(match_id, participant_id, trial_no)
-
-        match = self.reverse_match(res.match_id)
-        participant = self.reverse_participant(res.participant_id)
-        variable = np.array(res.variable, dtype=np.double)
-
-        return GetTrialResult(match, res.participant_type, participant, trial_no, variable, res.created_at, res.user_id)
+        If no alias name is specified, return the default one.
+        """
+        raise NotImplementedError
 
     def __enter__(self) -> Self:
         """A method to enable the use of the `with` statement."""
@@ -93,18 +124,3 @@ class OptHub:
     def __exit__(self, *args: object) -> None:
         """A method to enable the use of the `with` statement."""
         self.client.__exit__(*args)
-
-    def resolve_match(self, competition: str, match: str) -> UUID | None:
-        raise NotImplementedError
-
-    def resolve_participant(self, participant: str) -> UUID | None:
-        raise NotImplementedError
-
-    def reverse_match(self, match_id: UUID) -> tuple[str, str]:
-        raise NotImplementedError
-
-    def reverse_participant(self, participant_id: UUID) -> str:
-        raise NotImplementedError
-
-    def reverse_user(self, user_id: UUID) -> str:
-        raise NotImplementedError
