@@ -68,6 +68,7 @@ pyjwt = "^2.8.0"
 requests = "^2.31.0"
 
 opthub-api-client = { git = "https://github.com/opthub-org/opthub-api-client-python", rev = "3b715a1e" }
+numpy = "^2.1.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.3"
