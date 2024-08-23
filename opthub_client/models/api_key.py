@@ -18,8 +18,8 @@ class ApiKey(TypedDict):
 
 def create_api_key(force: bool) -> ApiKey:
     """Create and get API key from the server."""
-    query = gql("""
-        query createAPIKey(
+    mutation = gql("""
+        mutation createAPIKey(
         $force: Boolean
         ) {
             createAPIKey(
@@ -31,7 +31,7 @@ def create_api_key(force: bool) -> ApiKey:
         }
     """)
     try:
-        result = execute_graphql(query, variables={"force": force})
+        result = execute_graphql(mutation, variables={"force": force})
     except GraphQLError as e:
         raise QueryError(resource="api_key", detail=str(e.message)) from e
     data = result.get("createAPIKey")
