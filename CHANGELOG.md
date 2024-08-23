@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/opthub-org/opthub-client/compare/v0.3.0...v0.3.1) (2024-08-23)
+
+
+### Bug Fixes
+
+* change query to mutation in create_api_key ([c6f4cb5](https://github.com/opthub-org/opthub-client/commit/c6f4cb529cc2f56048ca6d0eb95c5c48721930f2))
+
 ## [0.3.0](https://github.com/opthub-org/opthub-client/compare/v0.2.0...v0.3.0) (2024-08-17)
 
 
