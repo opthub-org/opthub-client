@@ -15,19 +15,19 @@ import opthub_api_client as raw
 from numpy.typing import ArrayLike, NDArray
 from opthub_api_client import ParticipantType
 
-__all__ = ["raw", "OptHub", "Match", "Participant", "Competition", "SubmitResult", "GetTrialResult", "ParticipantType"]
+__all__ = ["raw", "OptHub", "Match", "Participant", "Competition", "SubmitResult", "Trial", "ParticipantType"]
 
 
-class Participant(NamedTuple):
+class Participant:
     """A class representing a participant."""
 
     id: UUID
-    type: ParticipantType
+    client: raw.ApiClient
 
     @property
-    def alias(self) -> str:
-        """Retrieve the alias name of the participant."""
-        raise NotImplementedError
+    def type(self) -> raw.ParticipantType:
+        """Retrieve the participant type."""
+        return raw.ParticipantApi(self.client).get_participant(str(self.id)).participant_type
 
 
 class SubmitResult(NamedTuple):
@@ -37,13 +37,12 @@ class SubmitResult(NamedTuple):
     trial_no: int
 
 
-class GetTrialResult(NamedTuple):
+class Trial(NamedTuple):
     """A record representing the result of trial retrieval."""
 
-    participant: Participant
     variable: NDArray[np.double]
     created_at: datetime
-    user: str | None
+    user: UUID | None
 
 
 class Match:
@@ -58,25 +57,28 @@ class Match:
 
         res = raw.SolutionApi(self.client).create_solution(self.id, vector)
 
-        return SubmitResult(Participant(res.participant_id, res.participant_type), res.trial_no)
+        participant = Participant
+        participant.id = UUID(res.participant_id)
+        participant.client = self.client
 
-    def get_trial(self, participant: Participant, trial_no: int) -> GetTrialResult | None:
+        return SubmitResult(participant, res.trial_no)
+
+    def get_trial(self, participant: Participant, trial_no: int) -> Trial:
         """Retrieve a past submitted trial."""
-        res = raw.SolutionApi(self.client).get_solution(self.match, participant.id, trial_no)
+        res = raw.SolutionApi(self.client).get_solution(self.id, participant.id, trial_no)
 
         variable = np.array(res.variable, dtype=np.double)
 
-        return GetTrialResult(
-            Participant(res.participant_id, res.participant_type),
+        return Trial(
             variable,
             res.created_at,
-            res.user_id,
+            UUID(res.user_id) if res.user_id is not None else None,
         )
 
     @property
     def alias(self) -> str:
         """Retrieve the alias name of the match."""
-        raise NotImplementedError
+        return raw.MatchApi(self.client).resolve_match_alias_by_id(str(self.id))
 
 
 class Competition:
@@ -88,14 +90,21 @@ class Competition:
     @property
     def alias(self) -> str:
         """Retrieve the alias name of the competition."""
-        raise NotImplementedError
+        return raw.CompetitionApi(self.client).resolve_competition_alias_by_id(str(self.id))
 
     def match(self, alias: str | None) -> Match:
         """Retrieve a match by its alias name.
 
         If no alias name is specified, return the default one.
         """
-        raise NotImplementedError
+        if alias is None:
+            raise NotImplementedError
+
+        match = Match()
+        match.id = raw.MatchApi(self.client).resolve_match_id_by_alias(alias)
+        match.client = self.client
+
+        return match
 
 
 class OptHub:
@@ -116,7 +125,14 @@ class OptHub:
 
         If no alias name is specified, return the default one.
         """
-        raise NotImplementedError
+        if alias is None:
+            raise NotImplementedError
+
+        compe = Competition()
+        compe.id = raw.CompetitionApi(self.client).resolve_competition_id_by_alias(alias)
+        compe.client = self.client
+
+        return compe
 
     def __enter__(self) -> Self:
         """A method to enable the use of the `with` statement."""
