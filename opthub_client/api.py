@@ -122,10 +122,10 @@ class OptHub:
 
         self.client = raw.ApiClient(conf)
 
-    def match(self, uuid: UUID) -> Match:
+    def match(self, uuid: str | UUID) -> Match:
         """Retrieve a match by its UUID."""
         match = Match()
-        match.uuid = uuid
+        match.uuid = uuid if isinstance(uuid, UUID) else UUID(uuid)
         match.api = self
 
         return match
