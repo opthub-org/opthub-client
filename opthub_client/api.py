@@ -23,8 +23,8 @@ class TrialStatus(NamedTuple):
     """A record representing the result of trial status retrieval."""
 
     type: raw.MatchTrialStatusType
-    evaluation: raw.MatchTrialEvaluation
-    score: raw.MatchTrialScore
+    evaluation: raw.MatchTrialEvaluation | None
+    score: raw.MatchTrialScore | None
 
 
 class SubmitResult:
