@@ -33,13 +33,16 @@ class SubmitResult:
     trial_no: int
     match: "Match"
 
-    def wait_evaluation(self) -> MatchTrialEvaluation:
+    def wait_evaluation(self) -> TrialStatus:
         """Wait until the evaluation is complete, then return the results."""
-        self._poll(lambda: self.get_trial(), lambda trial: trial.evaluation.type != "Evaluating")
+        self._poll(lambda: self.get_trial(), lambda trial: trial.evaluation.type != MatchTrialEvaluation.EVALUATING)
 
-    def wait_scoring(self) -> MatchTrialScore:
-        """Wait until the evaluation is complete, then return the results."""
-        self._poll(lambda: self.get_trial(), lambda trial: trial.evaluation.type != "Scoring")
+    def wait_scoring(self) -> TrialStatus:
+        """Wait until the scoring is complete, then return the results."""
+        self._poll(
+            lambda: self.get_trial(),
+            lambda trial: trial.evaluation.type not in {MatchTrialEvaluation.EVALUATING, MatchTrialEvaluation.SCORING},
+        )
 
     def get_trial(self) -> TrialStatus:
         """Retrieves the status of the trial.
