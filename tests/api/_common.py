@@ -1,0 +1,4 @@
+from uuid import UUID
+
+TEST_API_KEY = "abc"
+TEST_MATCH = UUID("d9691b73-7ab3-4981-95b4-b70061123973")
