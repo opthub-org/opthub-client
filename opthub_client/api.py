@@ -14,42 +14,63 @@ from uuid import UUID
 import numpy as np
 import opthub_api_client as raw
 from numpy.typing import ArrayLike
-from opthub_api_client import MatchTrialEvaluation, MatchTrialScore
+from opthub_api_client import MatchTrialEvaluation, MatchTrialScore, MatchTrialStatus
 
-__all__ = ["raw", "OptHub", "Match", "TrialStatus", "SubmitResult", "MatchTrialEvaluation", "MatchTrialScore"]
+__all__ = [
+    "raw",
+    "OptHub",
+    "Match",
+    "TrialStatus",
+    "Trial",
+    "MatchTrialStatus",
+    "MatchTrialEvaluation",
+    "MatchTrialScore",
+]
 
 
 class TrialStatus(NamedTuple):
     """A record representing the result of trial status retrieval."""
 
-    type: raw.MatchTrialStatusType
-    evaluation: raw.MatchTrialEvaluation | None
-    score: raw.MatchTrialScore | None
+    type: MatchTrialStatus
 
 
-class SubmitResult:
-    """A class representing the result of a solution submission."""
+class Trial:
+    """A class representing the match trial."""
 
     trial_no: int
+    status: TrialStatus
+    evaluation: MatchTrialEvaluation | None
+    score: MatchTrialScore | None
     match: "Match"
 
-    def wait_evaluation(self) -> TrialStatus:
+    def wait_evaluation(self) -> MatchTrialEvaluation:
         """Wait until the evaluation is complete, then return the results."""
-        self._poll(lambda: self.get_trial(), lambda trial: trial.evaluation.type != MatchTrialEvaluation.EVALUATING)
+        self._poll(lambda: self.update_status(), lambda: self.status.type != MatchTrialStatus.EVALUATING)
+        self.evaluation = raw.MatchTrialsApi(self.match.api.client).get_match_evaluation(
+            str(self.match.uuid),
+            self.trial_no,
+        )
+        return self.evaluation
 
-    def wait_scoring(self) -> TrialStatus:
+    def wait_scoring(self) -> MatchTrialScore:
         """Wait until the scoring is complete, then return the results."""
         self._poll(
-            lambda: self.get_trial(),
-            lambda trial: trial.evaluation.type not in {MatchTrialEvaluation.EVALUATING, MatchTrialEvaluation.SCORING},
+            lambda: self.update_status(),
+            lambda: self.status.type not in {MatchTrialStatus.EVALUATING, MatchTrialStatus.SCORING},
         )
+        self.score = raw.MatchTrialsApi(self.match.api.client).get_match_score(
+            str(self.match.uuid),
+            self.trial_no,
+        )
+        return self.score
 
-    def get_trial(self) -> TrialStatus:
+    def update_status(self) -> None:
         """Retrieves the status of the trial.
 
         Wait until the submitted results are reflected on the server side and the trial information becomes available.
         """
-        self._poll(self.try_get_trial(self.trial_no), lambda trial: trial is not None)
+        status = self._poll(self.try_get_trial(self.trial_no), lambda trial: trial is not None)
+        self.status = status
 
     def _poll[T](self, callback: Callable[[], T], finish: Callable[[T], bool]) -> T:
         while True:
@@ -69,32 +90,46 @@ class Match:
     uuid: UUID
     api: "OptHub"
 
-    def submit(self, solution: ArrayLike) -> SubmitResult:
+    def submit(self, solution: ArrayLike) -> Trial:
         """Submit a solution."""
-        vector = np.array(solution, dtype=np.double).flatten()
+        array = np.array(solution, dtype=np.double)
+        variable = {"scalar": array[0]} if array.ndim == 0 else {"vector": array}
 
-        response = raw.SolutionApi(self.api.client).create_solution(str(self.uuid), vector)
+        response = raw.MatchTrialsApi(self.api.client).create_match_trial(str(self.uuid), {"variable": variable})
 
-        result = SubmitResult()
-        result.trial_no = response.trial_no
-        result.api = self.api
-        return result
+        trial = Trial()
+        trial.trial_no = response.trial_no
+        trial.status = TrialStatus(response.status)
+        trial.evaluation = None
+        trial.score = None
+        trial.match = self
+        return trial
 
-    def try_get_trial(self, trial_no: int) -> TrialStatus | None:
+    def try_get_trial(self, trial_no: int) -> Trial | None:
         """Retrieves the status of the trial with the specified trial number.
 
         If the corresponding trial number does not exist, it returns `None`.
         """
         try:
-            response = raw.TrialApi(self.api.client).get_match_trial(str(self.uuid), trial_no)
-            return TrialStatus(response.type, response.evaluation, response.score)
+            response = raw.MatchTrialsApi(self.api.client).get_match_trial(str(self.uuid), trial_no)
+
+            status = TrialStatus(response.type)
+
+            trial = Trial()
+            trial.trial_no = trial_no
+            trial.status = status
+            trial.evaluation = None
+            trial.score = None
+            trial.match = self
 
         except raw.exceptions.NotFoundException as e:
-            if e.body == '"NoSuchTrialNo"':
+            if e.body["code"] == "TrialNotFound":
                 return None
             raise
 
-    def get_trial(self, trial_no: int) -> TrialStatus:
+        return trial
+
+    def get_trial(self, trial_no: int) -> Trial:
         """Retrieves the status of the trial with the specified trial number.
 
         If the corresponding trial number does not exist, an exception is raised.
