@@ -15,7 +15,7 @@ from uuid import UUID
 import numpy as np
 import opthub_api_client as raw
 from numpy.typing import ArrayLike
-from opthub_api_client import MatchTrialEvaluation, MatchTrialScore, MatchTrialStatus
+from opthub_api_client import MatchTrialEvaluation, MatchTrialScore, MatchTrialStatus, Solution
 
 __all__ = [
     "raw",
@@ -26,6 +26,7 @@ __all__ = [
     "MatchTrialStatus",
     "MatchTrialEvaluation",
     "MatchTrialScore",
+    "Solution",
 ]
 
 
@@ -83,6 +84,10 @@ class Trial:
             raise ScoringError(self.score.error)
 
         return self.score
+
+    def get_solution(self) -> Solution:
+        """Retrieves a past submitted solution."""
+        return raw.MatchTrialsApi(self.match.api.client).get_solution(str(self.match.uuid), self.trial_no)
 
     def update_status(self) -> None:
         """Retrieves the status of the trial.
