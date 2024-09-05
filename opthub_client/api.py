@@ -35,6 +35,14 @@ class TrialStatus(NamedTuple):
     type: MatchTrialStatus
 
 
+class EvaluationError(Exception):
+    pass
+
+
+class ScoringError(Exception):
+    pass
+
+
 class Trial:
     """A class representing the match trial."""
 
@@ -47,10 +55,15 @@ class Trial:
     def wait_evaluation(self, timeout: float | None = None) -> MatchTrialEvaluation:
         """Wait until the evaluation is complete, then return the results."""
         self._poll(lambda: self.update_status(), lambda _: self.status.type != MatchTrialStatus.EVALUATING, timeout)
+
         self.evaluation = raw.MatchTrialsApi(self.match.api.client).get_match_evaluation(
             str(self.match.uuid),
             self.trial_no,
         )
+
+        if self.evaluation.error is not None:
+            raise EvaluationError(self.evaluation.error)
+
         return self.evaluation
 
     def wait_scoring(self, timeout: float | None = None) -> MatchTrialScore:
@@ -60,10 +73,15 @@ class Trial:
             lambda _: self.status.type not in {MatchTrialStatus.EVALUATING, MatchTrialStatus.SCORING},
             timeout,
         )
+
         self.score = raw.MatchTrialsApi(self.match.api.client).get_match_score(
             str(self.match.uuid),
             self.trial_no,
         )
+
+        if self.score.error is not None:
+            raise ScoringError(self.score.error)
+
         return self.score
 
     def update_status(self) -> None:
