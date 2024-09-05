@@ -6,6 +6,7 @@ to access the OptHub public REST API.
 The automatically generated raw Python package is available at https://github.com/opthub-org/opthub-api-client-python.
 """
 
+import time
 from collections.abc import Callable
 from time import sleep
 from typing import NamedTuple, Self
@@ -43,20 +44,21 @@ class Trial:
     score: MatchTrialScore | None
     match: "Match"
 
-    def wait_evaluation(self) -> MatchTrialEvaluation:
+    def wait_evaluation(self, timeout: float | None = None) -> MatchTrialEvaluation:
         """Wait until the evaluation is complete, then return the results."""
-        self._poll(lambda: self.update_status(), lambda: self.status.type != MatchTrialStatus.EVALUATING)
+        self._poll(lambda: self.update_status(), lambda _: self.status.type != MatchTrialStatus.EVALUATING, timeout)
         self.evaluation = raw.MatchTrialsApi(self.match.api.client).get_match_evaluation(
             str(self.match.uuid),
             self.trial_no,
         )
         return self.evaluation
 
-    def wait_scoring(self) -> MatchTrialScore:
+    def wait_scoring(self, timeout: float | None = None) -> MatchTrialScore:
         """Wait until the scoring is complete, then return the results."""
         self._poll(
             lambda: self.update_status(),
-            lambda: self.status.type not in {MatchTrialStatus.EVALUATING, MatchTrialStatus.SCORING},
+            lambda _: self.status.type not in {MatchTrialStatus.EVALUATING, MatchTrialStatus.SCORING},
+            timeout,
         )
         self.score = raw.MatchTrialsApi(self.match.api.client).get_match_score(
             str(self.match.uuid),
@@ -69,15 +71,17 @@ class Trial:
 
         Wait until the submitted results are reflected on the server side and the trial information becomes available.
         """
-        status = self._poll(self.try_get_trial(self.trial_no), lambda trial: trial is not None)
-        self.status = status
+        trial = self._poll(lambda: self.match.try_get_trial(self.trial_no), lambda trial: trial is not None, None)
+        self.status = trial.status
 
-    def _poll[T](self, callback: Callable[[], T], finish: Callable[[T], bool]) -> T:
-        while True:
+    def _poll[T](self, callback: Callable[[], T], finish: Callable[[T], bool], timeout: float | None) -> T:
+        start = time.time()
+        while timeout is None or (time.time() - start) < timeout:
             result = callback()
             if finish(result):
                 return result
             sleep(self.match.api.poll_interval_sec)
+        raise TimeoutError
 
     def __del__(self) -> None:
         """Release the parent reference for GC."""
@@ -113,7 +117,7 @@ class Match:
         try:
             response = raw.MatchTrialsApi(self.api.client).get_match_trial(str(self.uuid), trial_no)
 
-            status = TrialStatus(response.type)
+            status = TrialStatus(response.status)
 
             trial = Trial()
             trial.trial_no = trial_no

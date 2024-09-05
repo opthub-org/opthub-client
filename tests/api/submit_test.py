@@ -11,5 +11,5 @@ def test_submit() -> None:
     with OptHub(common.TEST_API_KEY) as api:
         match = api.match(common.TEST_MATCH)
         submit = match.submit([1.1, -2.2, 3.3])
-        score = submit.wait_scoring()
+        score = submit.wait_scoring(timeout=5)
         assert score == EXPECTED_SCORE  # noqa: S101
