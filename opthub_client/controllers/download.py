@@ -32,7 +32,7 @@ SIZE_FETCH_TRIALS = 50
     "-e",
     "--end",
     type=click.IntRange(min=1),
-    default=SIZE_FETCH_TRIALS,
+    required=True,
     help="End trial number",
 )
 @click.option("-desc", "--descending", is_flag=True, help="Show trials in descending order")
