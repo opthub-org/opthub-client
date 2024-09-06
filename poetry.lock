@@ -1368,22 +1368,20 @@ files = [
 
 [[package]]
 name = "opthub-api-client"
-version = "1.0.0"
+version = "0.3.0"
 description = "OptHub REST API"
 optional = false
-python-versions = "^3.7"
-files = []
-develop = false
+python-versions = "<4.0,>=3.7"
+files = [
+    {file = "opthub_api_client-0.3.0-py3-none-any.whl", hash = "sha256:4c6530699b16cf6372002dbb58f234e32d61d9dc02b7c13a06d6d12b6e43d1b6"},
+    {file = "opthub_api_client-0.3.0.tar.gz", hash = "sha256:12c2334722d2f02b9578992119b3742ee067bc065596ef7832d523b9ffec20ca"},
+]
 
 [package.dependencies]
 pydantic = ">=2"
 python-dateutil = ">=2.8.2"
 typing-extensions = ">=4.7.1"
-urllib3 = ">= 1.25.3"
-
-[package.source]
-type = "directory"
-url = "opthub_api_client"
+urllib3 = ">=1.25.3"
 
 [[package]]
 name = "packaging"
@@ -1918,4 +1916,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "afc58474c1fe3f33da5a38ae3e14bf662b967bed92181a8697b6dff14a10a2d7"
+content-hash = "a660dc09eb510fce9d53dd425a5714356fca26159a7906c5a2ee33b4d7bed452"
