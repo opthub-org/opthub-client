@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/opthub-org/opthub-client/compare/v0.4.0...v0.5.0) (2024-09-06)
+
+
+### Features
+
+* OptHub 公開 REST API のクライアントライブラリを追加 ([#138](https://github.com/opthub-org/opthub-client/issues/138)) ([0a342ae](https://github.com/opthub-org/opthub-client/commit/0a342aea4746d08c57cc33b4bcdcd713ff0bd6a7))
+
 ## [0.4.0](https://github.com/opthub-org/opthub-client/compare/v0.3.0...v0.4.0) (2024-09-04)
 
 
