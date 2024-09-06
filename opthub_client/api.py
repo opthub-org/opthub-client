@@ -27,6 +27,8 @@ __all__ = [
     "MatchTrialEvaluation",
     "MatchTrialScore",
     "Solution",
+    "EvaluationError",
+    "ScoringError",
 ]
 
 
@@ -37,11 +39,11 @@ class TrialStatus(NamedTuple):
 
 
 class EvaluationError(Exception):
-    pass
+    """Exception during evaluation calculation failure."""
 
 
 class ScoringError(Exception):
-    pass
+    """Exception during score calculation failure."""
 
 
 class Trial:
