@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.5.0](https://github.com/opthub-org/opthub-client/compare/v0.4.0...v0.5.0) (2024-09-06)
+
+
+### Features
+
+* Add a client library for the OptHub public REST API. ([#138](https://github.com/opthub-org/opthub-client/issues/138)) ([0a342ae](https://github.com/opthub-org/opthub-client/commit/0a342aea4746d08c57cc33b4bcdcd713ff0bd6a7))
+
+## [0.4.0](https://github.com/opthub-org/opthub-client/compare/v0.3.0...v0.4.0) (2024-09-04)
+
+
+### Features
+
+* Require the -e option for the download command ([#135](https://github.com/opthub-org/opthub-client/issues/135)) ([6d17b0b](https://github.com/opthub-org/opthub-client/commit/6d17b0bc949eda57e8f5d4a2fba36861d0a31e34))
+
+
+### Bug Fixes
+
+* change query to mutation in create_api_key ([c6f4cb5](https://github.com/opthub-org/opthub-client/commit/c6f4cb529cc2f56048ca6d0eb95c5c48721930f2))
+
 ## [0.3.0](https://github.com/opthub-org/opthub-client/compare/v0.2.0...v0.3.0) (2024-08-17)
 
 
