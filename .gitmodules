@@ -1,0 +1,3 @@
+[submodule "opthub_api_client"]
+	path = opthub_api_client
+	url = git@github.com:opthub-org/opthub-api-client-python.git
