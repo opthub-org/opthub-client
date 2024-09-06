@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/opthub-org/opthub-client/compare/v0.4.0...v0.5.0) (2024-09-06)
+
+
+### Features
+
+* Add a client library for the OptHub public REST API. ([#141](https://github.com/opthub-org/opthub-client/issues/141)) ([c21e61e](https://github.com/opthub-org/opthub-client/commit/c21e61e34f07a0deb0148fa9899eab37c24c88aa))
+
 ## [0.4.0](https://github.com/opthub-org/opthub-client/compare/v0.3.0...v0.4.0) (2024-09-04)
 
 
