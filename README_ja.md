@@ -63,6 +63,7 @@ Submitting to [competition_id]/[match_id]... # 送信中
 ```
 
 👉 [ファイルで解を送信する方法](https://opthub.notion.site/submit-8a6268ea5fb64dacb8fbcd57cf33f21a?pvs=4)
+👉 [プログラム経由で解を送信する方法](https://opthub.notion.site/OptHub-API-e35cc47419054d6b8723180b27405c49?pvs=4)
 
 
 ### 解の確認
