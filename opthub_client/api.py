@@ -8,6 +8,7 @@ The automatically generated raw Python package is available at https://github.co
 
 import time
 from collections.abc import Callable
+from random import random
 from time import sleep
 from typing import NamedTuple, Self
 from uuid import UUID
@@ -57,7 +58,12 @@ class Trial:
 
     def wait_evaluation(self, timeout: float | None = None) -> MatchTrialEvaluation:
         """Wait until the evaluation is complete, then return the results."""
-        self._poll(lambda: self.update_status(), lambda _: self.status.type != MatchTrialStatus.EVALUATING, timeout)
+        self._poll(
+            lambda: self.update_status(),
+            lambda _: self.status.type != MatchTrialStatus.EVALUATING,
+            timeout,
+            first_wait=False,
+        )
 
         self.evaluation = raw.MatchTrialsApi(self.match.api.client).get_match_evaluation(
             str(self.match.uuid),
@@ -75,6 +81,7 @@ class Trial:
             lambda: self.update_status(),
             lambda _: self.status.type not in {MatchTrialStatus.EVALUATING, MatchTrialStatus.SCORING},
             timeout,
+            first_wait=False,
         )
 
         self.score = raw.MatchTrialsApi(self.match.api.client).get_match_score(
@@ -96,17 +103,43 @@ class Trial:
 
         Wait until the submitted results are reflected on the server side and the trial information becomes available.
         """
-        trial = self._poll(lambda: self.match.try_get_trial(self.trial_no), lambda trial: trial is not None, None)
+        trial = self._poll(
+            lambda: self.match.try_get_trial(self.trial_no),
+            lambda trial: trial is not None,
+            None,
+            first_wait=False,
+        )
         self.status = trial.status
 
-    def _poll[T](self, callback: Callable[[], T], finish: Callable[[T], bool], timeout: float | None) -> T:
+    def _poll[T](
+        self,
+        callback: Callable[[], T],
+        finish_condition: Callable[[T], bool],
+        timeout: float | None,
+        first_wait: bool,
+    ) -> T:
+        """Perform polling based on exponential backoff."""
         start = time.time()
-        while timeout is None or (time.time() - start) < timeout:
+        api = self.match.api
+        wait_sec = api.poll_interval_initial_sec
+
+        def wait() -> None:
+            nonlocal wait_sec
+            sleep(wait_sec + random() * api.poll_max_random_delay_sec)  # noqa: S311
+            wait_sec = min(wait_sec * api.poll_exponential_backoff_ratio, api.poll_interval_max_sec)
+
+        if first_wait:
+            wait()
+
+        while True:
             result = callback()
-            if finish(result):
+            if finish_condition(result):
                 return result
-            sleep(self.match.api.poll_interval_sec)
-        raise TimeoutError
+
+            if timeout is not None and (time.time() - start) > timeout:
+                raise TimeoutError
+
+            wait()
 
     def __del__(self) -> None:
         """Release the parent reference for GC."""
@@ -180,7 +213,10 @@ class OptHub:
     """A class for accessing the OptHub public REST API."""
 
     client: raw.ApiClient
-    poll_interval_sec = 0.5
+    poll_interval_initial_sec = 0.5
+    poll_interval_max_sec = 5 * 60
+    poll_max_random_delay_sec = 0.5
+    poll_exponential_backoff_ratio = 1.2
 
     def __init__(self, api_key: str, host: str | None = None) -> None:
         """Creates an instance for API access from an API key."""
