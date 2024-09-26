@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.1](https://github.com/opthub-org/opthub-client/compare/v0.5.0...v0.5.1) (2024-09-26)
+
+
+### Bug Fixes
+
+* JWT decode error ([eaae41d](https://github.com/opthub-org/opthub-client/commit/eaae41d7d8fad60291223915a61fde52d7ddfbd5))
+* remote messages error ([56fd494](https://github.com/opthub-org/opthub-client/commit/56fd494fcf10c4a1701a27c5273486f1c564b440))
+
 ## [0.5.0](https://github.com/opthub-org/opthub-client/compare/v0.4.0...v0.5.0) (2024-09-06)
 
 
