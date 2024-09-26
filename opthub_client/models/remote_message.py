@@ -51,7 +51,7 @@ def get_version_status_messages(version: str) -> list[RemoteMessage]:
     except GraphQLError as e:
         raise QueryError(resource="version status", detail=str(e.message)) from e
     data = result.get("getCLIVersionStatus")
-    if not data:
+    if data is None:
         raise QueryError(resource="version status", detail="No data returned.")
     if not isinstance(data, list):
         raise QueryError(resource="version status", detail="Invalid data returned.")
