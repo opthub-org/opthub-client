@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/opthub-org/opthub-client/compare/v0.5.1...v0.5.2) (2024-11-12)
+
+
+### Bug Fixes
+
+* error when the competition does not exist. ([7bee324](https://github.com/opthub-org/opthub-client/commit/7bee3249dc1237438cbad733b27b41853f3ef791))
+
 ## [0.5.1](https://github.com/opthub-org/opthub-client/compare/v0.5.0...v0.5.1) (2024-09-26)
 
 
