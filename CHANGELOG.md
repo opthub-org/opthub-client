@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/opthub-org/opthub-client/compare/v0.5.2...v0.6.0) (2024-11-12)
+
+
+### Features
+
+* Exponential-backoff policy for evaluation and score polling. ([1194301](https://github.com/opthub-org/opthub-client/commit/1194301074ae5802bd35369b049944d2d2fc9fd5))
+
 ## [0.5.2](https://github.com/opthub-org/opthub-client/compare/v0.5.1...v0.5.2) (2024-11-12)
 
 
