@@ -48,6 +48,9 @@ def select(
             return
         selected_competition = select_competition(competitions, competition)
         matches = fetch_matches_by_competition(selected_competition["id"], selected_competition["alias"])
+        if len(matches) == 0:
+            click.echo("No matches found in this competition")
+            return
         selected_match = select_match(matches, match)
         match_selection_context.update(selected_competition, selected_match)
         # show selected competition and match
