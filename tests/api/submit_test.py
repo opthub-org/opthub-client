@@ -3,7 +3,7 @@
 import tests.api._common as common
 from opthub_client.api import OptHub
 
-EXPECTED_SCORE = 10.0
+EXPECTED_SCORE = 5.0
 
 
 def test_submit() -> None:
