@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.2](https://github.com/opthub-org/opthub-client/compare/v0.6.1...v0.6.2) (2024-11-16)
+
+
+### Bug Fixes
+
+* Remove Self to support Python 3.10 ([9eb04e4](https://github.com/opthub-org/opthub-client/commit/9eb04e470066ecaede8f997de991343edf00725c))
+
 ## [0.6.1](https://github.com/opthub-org/opthub-client/compare/v0.6.0...v0.6.1) (2024-11-16)
 
 
