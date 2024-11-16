@@ -10,13 +10,15 @@ import time
 from collections.abc import Callable
 from random import random
 from time import sleep
-from typing import NamedTuple, Self
+from typing import NamedTuple, Self, TypeVar
 from uuid import UUID
 
 import numpy as np
 import opthub_api_client as raw
 from numpy.typing import ArrayLike
 from opthub_api_client import MatchTrialEvaluation, MatchTrialScore, MatchTrialStatus, Solution
+
+T = TypeVar("T")
 
 __all__ = [
     "raw",
@@ -111,7 +113,7 @@ class Trial:
         )
         self.status = trial.status
 
-    def _poll[T](
+    def _poll(
         self,
         callback: Callable[[], T],
         finish_condition: Callable[[T], bool],
