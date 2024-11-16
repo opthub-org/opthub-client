@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/opthub-org/opthub-client/compare/v0.6.0...v0.6.1) (2024-11-16)
+
+
+### Bug Fixes
+
+* Add TypeVar to support versions earlier than Python 3.12 ([079a42d](https://github.com/opthub-org/opthub-client/commit/079a42d671e7b8cdac032c7ef0b1fe4142dbeffb))
+
 ## [0.6.0](https://github.com/opthub-org/opthub-client/compare/v0.5.2...v0.6.0) (2024-11-12)
 
 
