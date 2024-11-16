@@ -6,19 +6,25 @@ to access the OptHub public REST API.
 The automatically generated raw Python package is available at https://github.com/opthub-org/opthub-api-client-python.
 """
 
+from __future__ import annotations
+
 import time
-from collections.abc import Callable
 from random import random
 from time import sleep
-from typing import NamedTuple, Self, TypeVar
+from typing import TYPE_CHECKING, NamedTuple, TypeVar
 from uuid import UUID
 
 import numpy as np
 import opthub_api_client as raw
-from numpy.typing import ArrayLike
 from opthub_api_client import MatchTrialEvaluation, MatchTrialScore, MatchTrialStatus, Solution
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from numpy.typing import ArrayLike
+
 T = TypeVar("T")
+TOptHub = TypeVar("TOptHub", bound="OptHub")
 
 __all__ = [
     "raw",
@@ -56,7 +62,7 @@ class Trial:
     status: TrialStatus
     evaluation: MatchTrialEvaluation | None
     score: MatchTrialScore | None
-    match: "Match"
+    match: Match
 
     def wait_evaluation(self, timeout: float | None = None) -> MatchTrialEvaluation:
         """Wait until the evaluation is complete, then return the results."""
@@ -152,7 +158,7 @@ class Match:
     """A class representing a match in a competition."""
 
     uuid: UUID
-    api: "OptHub"
+    api: OptHub
 
     def submit(self, solution: ArrayLike) -> Trial:
         """Submit a solution."""
@@ -235,7 +241,7 @@ class OptHub:
 
         return match
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> TOptHub:
         """A method to enable the use of the `with` statement."""
         self.client.__enter__()
         return self
