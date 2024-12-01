@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/opthub-org/opthub-client/compare/v0.7.0...v0.7.1) (2024-12-01)
+
+
+### Bug Fixes
+
+* fix display_trials bug when evaluating or scoring ([e2de7e8](https://github.com/opthub-org/opthub-client/commit/e2de7e81e7c01238d6fa658c3e0ff91085f92895))
+
 ## [0.7.0](https://github.com/opthub-org/opthub-client/compare/v0.6.3...v0.7.0) (2024-12-01)
 
 
