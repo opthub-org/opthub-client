@@ -9,6 +9,8 @@ from opthub_client.errors.graphql_error import GraphQLError
 from opthub_client.errors.query_error import QueryError
 from opthub_client.graphql.client import execute_graphql, execute_graphql_async
 
+TrialStatus = Literal["evaluating", "success", "scoring", "evaluator_failed", "scorer_failed"]
+
 
 class Solution(TypedDict):
     """This class represents the solution type."""
@@ -26,15 +28,17 @@ class Evaluation(TypedDict):
     info: object
     started_at: str
     finished_at: str
+    error: str | None
 
 
 class Score(TypedDict):
     """This class represents the score type."""
 
     status: Literal["Success", "Failed"]
-    score: float | None
+    value: float | None
     started_at: str | None
     finished_at: str | None
+    error: str | None
 
 
 class Trial(TypedDict):
@@ -42,7 +46,7 @@ class Trial(TypedDict):
 
     trialNo: int
     solution: Solution
-    status: Literal["evaluating", "success", "scoring", "evaluator_failed", "scorer_failed"]
+    status: TrialStatus
     evaluation: Evaluation | None
     score: Score | None
 
@@ -62,21 +66,23 @@ def create_trial(trial_data: dict[str, Any]) -> Trial:
         created_at=trial_data["solution"]["createdAt"],
     )
     evaluation = None
-    if status in ("success", "scoring", "scorer_failed") and "evaluation" in trial_data:
+    if "evaluation" in trial_data:
         evaluation = Evaluation(
             status=trial_data["evaluation"]["status"],
             objective=trial_data["evaluation"]["objective"],
             constraint=trial_data["evaluation"]["constraint"],
+            error=trial_data["evaluation"]["error"],
             info=trial_data["evaluation"]["info"],
             started_at=trial_data["evaluation"]["startedAt"],
             finished_at=trial_data["evaluation"]["finishedAt"],
         )
     score = None
-    if status in ("success") and "score" in trial_data:
+    if "score" in trial_data:
         score = Score(
             status=trial_data["score"]["status"],
-            score=trial_data["score"]["value"],
+            value=trial_data["score"]["value"],
             started_at=trial_data["score"]["startedAt"],
+            error=trial_data["score"]["error"],
             finished_at=trial_data["score"]["finishedAt"],
         )
     return Trial(
@@ -122,12 +128,14 @@ def fetch_trial(match_id: str, trial_no: int) -> Trial | None:
                     startedAt
                     finishedAt
                     info
+                    error
                 }
                 score {
                     status
                     startedAt
                     finishedAt
                     value
+                    error
                 }
             }}""")
     try:
@@ -207,6 +215,7 @@ def make_fetch_trials_query_document() -> DocumentNode:
                         status
                         startedAt
                         finishedAt
+                        error
                         info
                     }
                     score {
@@ -214,6 +223,7 @@ def make_fetch_trials_query_document() -> DocumentNode:
                         startedAt
                         finishedAt
                         value
+                        error
                     }
                 }
             }}""")
