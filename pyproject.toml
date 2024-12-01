@@ -101,6 +101,7 @@ convention = "google"
 
 [tool.poetry.scripts]
 opt = "opthub_client.opt:opt"
+opthub = "opthub_client.opt:opt"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
