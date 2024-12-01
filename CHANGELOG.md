@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.3](https://github.com/opthub-org/opthub-client/compare/v0.6.2...v0.6.3) (2024-12-01)
+
+
+### Bug Fixes
+
+* show error messages if use opt show trails -d. ([#158](https://github.com/opthub-org/opthub-client/issues/158)) ([6502d19](https://github.com/opthub-org/opthub-client/commit/6502d199b9ba68a1d61f2c4b1c27693624c932b4))
+
 ## [0.6.2](https://github.com/opthub-org/opthub-client/compare/v0.6.1...v0.6.2) (2024-11-16)
 
 
