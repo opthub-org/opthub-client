@@ -24,6 +24,7 @@ class Evaluation(TypedDict):
 
     status: Literal["Success", "Failed"]
     objective: float | list[float]
+    feasible: bool | None
     constraint: float | list[float]
     info: object
     started_at: str
@@ -66,18 +67,19 @@ def create_trial(trial_data: dict[str, Any]) -> Trial:
         created_at=trial_data["solution"]["createdAt"],
     )
     evaluation = None
-    if "evaluation" in trial_data:
+    if "evaluation" in trial_data and trial_data["evaluation"] is not None:
         evaluation = Evaluation(
             status=trial_data["evaluation"]["status"],
             objective=trial_data["evaluation"]["objective"],
             constraint=trial_data["evaluation"]["constraint"],
+            feasible=trial_data["evaluation"]["feasible"],
             error=trial_data["evaluation"]["error"],
             info=trial_data["evaluation"]["info"],
             started_at=trial_data["evaluation"]["startedAt"],
             finished_at=trial_data["evaluation"]["finishedAt"],
         )
     score = None
-    if "score" in trial_data:
+    if "score" in trial_data and trial_data["score"] is not None:
         score = Score(
             status=trial_data["score"]["status"],
             value=trial_data["score"]["value"],

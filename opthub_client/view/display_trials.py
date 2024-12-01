@@ -26,6 +26,8 @@ def user_interaction_message_style() -> Style:
             "section": "bold yellow",
             "key": "bold",
             "value": "",
+            "feasible": "bold green ",
+            "infeasible": "bold red",
             "error": "bold red",
             "n": "fg:blue bold",
             "e": "fg:red bold",
@@ -104,6 +106,18 @@ def display_detail_status(stats: str | TrialStatus) -> str:
     return status_dict.get(stats, "Unknown")
 
 
+def display_feasible(feasible: bool) -> str:
+    """Get the feasibility of the trial.
+
+    Args:
+        feasible (bool): The feasibility of the trial.
+
+    Returns:
+        str: The human-readable feasibility.
+    """
+    return "<feasible>Feasible</feasible>" if feasible else "<infeasible>Infeasible</infeasible>"
+
+
 def display_localized_date(iso_date: str) -> str:
     """Convert the ISO 8601 date string to the localized date.
 
@@ -165,6 +179,7 @@ def get_trial_info_detail(trial: Trial) -> str:
     evaluation = trial.get("evaluation", {})
     if evaluation:
         lines += "<section>Evaluation:</section>\n"
+        lines += f"\t<key>Feasibility         :</key> <value>{display_feasible(evaluation.get('feasible'))}</value>\n"
         lines += f"\t<key>Objective Function  :</key> <value>{evaluation.get('objective')}</value>\n"
         lines += f"\t<key>Constraint Function :</key> <value>{evaluation.get('constraint')}</value>\n"
         lines += f"\t<key>Started At          :</key> <value>{display_localized_date(evaluation.get('started_at', ''))}</value>\n"  # noqa: E501
