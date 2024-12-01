@@ -154,7 +154,15 @@ async def fetch_and_display_trials(
         is_asc=asc,
         display_only_success=success,
     )
-    run_in_terminal(lambda: display_trials(trials, detail), render_cli_done=False)
+
+    def display_trials_wrapper() -> None:
+        """Display trials. Wrapper function to handle the exceptions."""
+        try:
+            display_trials(trials, detail)
+        except (AuthenticationError, FetchError, QueryError, CacheIOError, UserInputError) as error:
+            error.handler()
+
+    run_in_terminal(display_trials_wrapper, render_cli_done=False)
     if (asc and is_last) or (not asc and is_first):
         run_in_terminal(lambda: click.echo("No more trials."), render_cli_done=False)
         return False
