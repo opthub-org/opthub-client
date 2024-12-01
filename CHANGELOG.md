@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/opthub-org/opthub-client/compare/v0.6.3...v0.7.0) (2024-12-01)
+
+
+### Features
+
+* improve design of trials history ([09d1508](https://github.com/opthub-org/opthub-client/commit/09d150832fbfcc5198ad5899cdc6df72d77cc0b7))
+
 ## [0.6.3](https://github.com/opthub-org/opthub-client/compare/v0.6.2...v0.6.3) (2024-12-01)
 
 
