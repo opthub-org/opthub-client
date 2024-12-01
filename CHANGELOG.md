@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/opthub-org/opthub-client/compare/v0.7.2...v0.8.0) (2024-12-01)
+
+
+### Features
+
+* add opthub command ([56a2f1e](https://github.com/opthub-org/opthub-client/commit/56a2f1e0f55e04c8d1e608bde52f43b98241761e))
+
 ## [0.7.2](https://github.com/opthub-org/opthub-client/compare/v0.7.1...v0.7.2) (2024-12-01)
 
 
