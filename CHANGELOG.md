@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/opthub-org/opthub-client/compare/v0.7.1...v0.7.2) (2024-12-01)
+
+
+### Bug Fixes
+
+* fix feasibility display ([9034b57](https://github.com/opthub-org/opthub-client/commit/9034b57b95c6e81de5f98cd0126b49e1bdf0e3e8))
+
 ## [0.7.1](https://github.com/opthub-org/opthub-client/compare/v0.7.0...v0.7.1) (2024-12-01)
 
 
