@@ -115,6 +115,8 @@ def display_feasible(feasible: bool) -> str:
     Returns:
         str: The human-readable feasibility.
     """
+    if feasible is None:
+        return "None"
     return "<feasible>Feasible</feasible>" if feasible else "<infeasible>Infeasible</infeasible>"
 
 
