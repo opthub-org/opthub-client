@@ -175,27 +175,31 @@ def get_trial_info_detail(trial: Trial) -> str:
     lines += f"\t<key>Variable   : </key> <value>{solution.get('variable')}</value>\n"
     lines += f"\t<key>Created At : </key> <value>{display_localized_date(solution.get('created_at', ''))}</value>\n\n"
 
+    error = None
+
     # Evaluation section
     evaluation = trial.get("evaluation", {})
-    if evaluation:
+    if evaluation is not None:
         lines += "<section>Evaluation:</section>\n"
         lines += f"\t<key>Feasibility         :</key> <value>{display_feasible(evaluation.get('feasible'))}</value>\n"
         lines += f"\t<key>Objective Function  :</key> <value>{evaluation.get('objective')}</value>\n"
         lines += f"\t<key>Constraint Function :</key> <value>{evaluation.get('constraint')}</value>\n"
         lines += f"\t<key>Started At          :</key> <value>{display_localized_date(evaluation.get('started_at', ''))}</value>\n"  # noqa: E501
         lines += f"\t<key>Finished At         :</key> <value>{display_localized_date(evaluation.get('finished_at', ''))}</value>\n\n"  # noqa: E501
+        error = evaluation.get("error")
 
     # Score section
     score = trial.get("score", {})
-    if score:
+    if score is not None:
         lines += "<section>Score:</section>\n"
         lines += f"\t<key>Value       :</key> <value>{score.get('value')}</value>\n"
         lines += f"\t<key>Started At  :</key> <value>{display_localized_date(score.get('started_at', ''))}</value>\n"
         lines += f"\t<key>Finished At :</key> <value>{display_localized_date(score.get('finished_at', ''))}</value>\n\n"
+        if error is None:
+            error = score.get("error")
 
     # Error details
-    error = evaluation.get("error") or score.get("error")
-    if error:
+    if error is not None:
         lines += "<error>Error Details:</error>\n"
         lines += "--------------------------------------------------\n"
         lines += f"<value>{error}</value>\n"
