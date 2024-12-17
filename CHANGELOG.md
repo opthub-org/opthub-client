@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/opthub-org/opthub-client/compare/v0.8.0...v0.8.1) (2024-12-17)
+
+
+### Bug Fixes
+
+* Modify to allow solutions to be reviewed after the competition ends. ([5d8ff38](https://github.com/opthub-org/opthub-client/commit/5d8ff382ee71d29bc26f712311969ba7519f1a59))
+
 ## [0.8.0](https://github.com/opthub-org/opthub-client/compare/v0.7.2...v0.8.0) (2024-12-01)
 
 
