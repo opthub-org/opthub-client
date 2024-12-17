@@ -5,7 +5,7 @@ import shelve
 from opthub_client.context.utils import get_opthub_client_dir
 from opthub_client.errors.cache_io_error import CacheIOError, CacheIOErrorMessage
 from opthub_client.errors.user_input_error import UserInputError, UserInputErrorMessage
-from opthub_client.models.competition import Competition, fetch_participating_competitions
+from opthub_client.models.competition import Competition, fetch_competitions_by_user
 from opthub_client.models.match import Match, fetch_matches_by_competition
 
 FILE_NAME = "match_selection"
@@ -67,7 +67,7 @@ class MatchSelectionContext:
         if competition is None or match is None:
             raise CacheIOError(CacheIOErrorMessage.MATCH_SELECTION_FILE_READ_FAILED)
         # competitions aliases for choices
-        competitions = fetch_participating_competitions()
+        competitions = fetch_competitions_by_user()
         selected_competition = next((c for c in competitions if c["alias"] == competition), None)
         if selected_competition is None:
             raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)
@@ -102,7 +102,7 @@ class MatchSelectionContext:
             competition = match_selection_context.competition_alias
         if competition is None or match is None:
             raise CacheIOError(CacheIOErrorMessage.MATCH_NOT_SELECTED)
-        competitions = fetch_participating_competitions()
+        competitions = fetch_competitions_by_user()
         selected_competition = next((c for c in competitions if c["alias"] == competition), None)
         if selected_competition is None:
             raise UserInputError(UserInputErrorMessage.COMPETITION_ERROR)

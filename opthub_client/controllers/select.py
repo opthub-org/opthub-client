@@ -10,7 +10,7 @@ from opthub_client.errors.cache_io_error import CacheIOError
 from opthub_client.errors.fetch_error import FetchError
 from opthub_client.errors.query_error import QueryError
 from opthub_client.errors.user_input_error import UserInputError, UserInputErrorMessage
-from opthub_client.models.competition import Competition, fetch_participating_competitions
+from opthub_client.models.competition import Competition, fetch_competitions_by_user
 from opthub_client.models.match import Match, fetch_matches_by_competition
 
 custom_style = {
@@ -42,7 +42,7 @@ def select(
         check_current_version_status()
         match_selection_context = MatchSelectionContext()
         # competitions aliases for choices
-        competitions = fetch_participating_competitions()
+        competitions = fetch_competitions_by_user()
         if len(competitions) == 0:
             click.echo("No competitions found that you are participating in.")
             return

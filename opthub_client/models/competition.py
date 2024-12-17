@@ -16,7 +16,7 @@ class Competition(TypedDict):
     alias: str
 
 
-def fetch_participating_competitions() -> list[Competition]:
+def fetch_competitions_by_user() -> list[Competition]:
     """Fetch competitions and matches that the user is participating in.
 
     Args:
@@ -40,6 +40,10 @@ def fetch_participating_competitions() -> list[Competition]:
                     id
                     alias
                 }
+                participated{
+                    id
+                    alias
+                }
             }
         }
         """)
@@ -51,6 +55,8 @@ def fetch_participating_competitions() -> list[Competition]:
     if not data:
         raise QueryError(resource="competitions", detail="No data returned.")
     participating_competitions = data.get("participating")
-    if not isinstance(participating_competitions, list):
+    participated_competitions = data.get("participated")
+    competitions = participating_competitions + participated_competitions
+    if not isinstance(competitions, list):
         raise QueryError(resource="competitions", detail="Invalid data returned.")
-    return [Competition(id=comp["id"], alias=comp["alias"]) for comp in participating_competitions]
+    return [Competition(id=comp["id"], alias=comp["alias"]) for comp in competitions]
